@@ -40,6 +40,14 @@ int module_start(SceSize argc, const void *args) {
 		injectData(info.modid, 1, 0xDBCFC, &width_float, sizeof(width_float));
 		injectData(info.modid, 1, 0xDBD00, &height_float, sizeof(height_float));
 	}
+	else if (strncmp(titleid, "PCSE00120", 9) == 0) { // Persona 4 Golden [USA] - 544p
+		injectData(info.modid, 1, 0xDBCEC, &width_float, sizeof(width_float));
+		injectData(info.modid, 1, 0xDBCF0, &height_float, sizeof(height_float));
+	}
+	else if (strncmp(titleid, "PCSG00563", 9) == 0) { // Persona 4 Golden [JPN] - 544p
+		injectData(info.modid, 1, 0xDBDA0, &width_float, sizeof(width_float));
+		injectData(info.modid, 1, 0xDBDA4, &height_float, sizeof(height_float));
+	}
 
 	return SCE_KERNEL_START_SUCCESS;
 }
