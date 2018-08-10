@@ -73,13 +73,13 @@ int module_start(SceSize argc, const void *args) {
 		patched = 1;
 	}
 	else if (strncmp(titleid, "PCSG00563", 9) == 0) { // Persona 4 Golden [JPN] - 544p
-		injectData(info.modid, 1, 0xDBDA0, &width_float, sizeof(width_float));
-		injectData(info.modid, 1, 0xDBDA4, &height_float, sizeof(height_float));
+		injectData(info.modid, 1, 0xDBD9C, &width_float, sizeof(width_float));
+		injectData(info.modid, 1, 0xDBDA0, &height_float, sizeof(height_float));
 		patched = 1;
 	}
 	else if (strncmp(titleid, "PCSH00021", 9) == 0) { // Persona 4 Golden [ASA] - 544p
-		injectData(info.modid, 1, 0xF1C54, &width_float, sizeof(width_float));
-		injectData(info.modid, 1, 0xF1C58, &height_float, sizeof(height_float));
+		injectData(info.modid, 1, 0xF1C50, &width_float, sizeof(width_float));
+		injectData(info.modid, 1, 0xF1C54, &height_float, sizeof(height_float));
 		patched = 1;
 	}
 
