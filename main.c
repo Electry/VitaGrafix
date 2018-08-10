@@ -7,6 +7,7 @@
 
 #include "display.h"
 #include "config.h"
+#include "tools.h"
 
 #define MAX_INJECTS_NUM 2
 

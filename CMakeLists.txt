@@ -22,6 +22,7 @@ add_executable(VitaGrafix
   main.c
   display.c
   config.c
+  tools.c
 )
 
 target_link_libraries(VitaGrafix
