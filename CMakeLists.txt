@@ -27,6 +27,7 @@ endif()
 
 add_executable(VitaGrafix
   main.c
+  display.c
 )
 
 target_link_libraries(VitaGrafix
