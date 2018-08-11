@@ -2,32 +2,49 @@
 #define _CONFIG_H_
 
 typedef enum {
+	FEATURE_DISABLED = 0,
+	FEATURE_ENABLED,
+	FEATURE_UNSPECIFIED,
+	FEATURE_UNSUPPORTED
+} VG_FeatureState;
+
+typedef enum {
 	FPS_60,
 	FPS_30
 } VG_Fps;
 
 typedef struct {
-	uint8_t enabled;
-	uint8_t osd_enabled;
+	VG_FeatureState enabled;
+	VG_FeatureState osd_enabled;
 
-	uint8_t game_enabled;
-	uint8_t game_osd_enabled;
+	VG_FeatureState game_enabled;
+	VG_FeatureState game_osd_enabled;
 
 	// Framebuffer
-	uint8_t fb_res_enabled;
+	VG_FeatureState fb_res_enabled;
 	uint16_t fb_width;
 	uint16_t fb_height;
 
 	// Internal buffer
-	uint8_t ib_res_enabled;
+	VG_FeatureState ib_res_enabled;
 	uint16_t ib_width;
 	uint16_t ib_height;
 
 	// Framerate
-	uint8_t fps_enabled;
+	VG_FeatureState fps_enabled;
 	VG_Fps fps;
 } VG_Config;
 
 VG_Config config_parse(const char *titleid);
+void config_set_default(
+		VG_FeatureState fb_res_enabled,
+		VG_FeatureState ib_res_enabled,
+		VG_FeatureState fps_enabled,
+		VG_Config *config);
+void config_set_unsupported(
+		VG_FeatureState fb_res,
+		VG_FeatureState ib_res,
+		VG_FeatureState fps,
+		VG_Config *config);
 
 #endif
