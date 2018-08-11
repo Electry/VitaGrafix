@@ -81,7 +81,8 @@ int module_start(SceSize argc, const void *args) {
 		return SCE_KERNEL_START_SUCCESS;
 	}
 
-	if (strncmp(titleid, "PCSF00243", 9) == 0) { // Killzone Mercenary [EUR] [1.12] - 60fps
+	if (strncmp(titleid, "PCSF00243", 9) == 0 || // Killzone Mercenary [EUR] [1.12]
+	    strncmp(titleid, "PCSA00107", 9) == 0) { // Killzone Mercenary [USA] [1.12]
 		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_ENABLED, &config);
 		config_set_default(FEATURE_DISABLED, FEATURE_DISABLED, FEATURE_DISABLED, &config);
 		supported_game = 1;
