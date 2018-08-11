@@ -9,7 +9,7 @@
 #include "config.h"
 #include "tools.h"
 
-#define MAX_INJECTS_NUM 2
+#define MAX_INJECTS_NUM 5
 
 // sceDisplaySetFrameBuf hook
 static SceUID sceDisplaySetFrameBuf_hookid;
@@ -82,10 +82,28 @@ int module_start(SceSize argc, const void *args) {
 	}
 
 	if (strncmp(titleid, "PCSF00243", 9) == 0) { // Killzone Mercenary [EUR] [1.12] - 60fps
-		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_UNSUPPORTED, FEATURE_ENABLED, &config);
+		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_ENABLED, &config);
 		config_set_default(FEATURE_DISABLED, FEATURE_DISABLED, FEATURE_DISABLED, &config);
 		supported_game = 1;
 
+		if (config.ib_res_enabled == FEATURE_ENABLED) {
+			uint32_t data32_w_h_w_h[4] = {
+				config.ib_width, config.ib_height, config.ib_width, config.ib_height
+			};
+			uint8_t nop_nop_nop_nop[8] = {
+				0x00, 0xBF, 0x00, 0xBF, 0x00, 0xBF, 0x00, 0xBF
+			};
+
+			// seg000:8115A5C8  BL  sub_8104DFC6
+			// seg000:8115A5CC  BL  sub_8104F55E
+			injectData(info.modid, 0, 0x15A5C8, &nop_nop_nop_nop, sizeof(nop_nop_nop_nop));
+
+			// dword_81AA1728  DCD 0x3C0  ; DATA XREF: sub_8104F55E
+			// dword_81AA172C  DCD 0x220  ; DATA XREF: sub_8104F55E
+			// dword_81AA1730  DCD 0x3C0  ; DATA XREF: sub_8104DFC6
+			// dword_81AA1734  DCD 0x220  ; DATA XREF: sub_8104DFC6
+			injectData(info.modid, 1, 0xD728, &data32_w_h_w_h, sizeof(data32_w_h_w_h));
+		}
 		if (config.fps_enabled == FEATURE_ENABLED) {
 			uint32_t data32_vblank = config.fps == FPS_60 ? 0x1 : 0x2;
 
