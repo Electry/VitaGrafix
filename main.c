@@ -87,7 +87,7 @@ int module_start(SceSize argc, const void *args) {
 		config_set_default(FEATURE_DISABLED, FEATURE_DISABLED, FEATURE_DISABLED, &config);
 		supported_game = 1;
 
-		if (config.ib_res_enabled == FEATURE_ENABLED) {
+		if (config.game_enabled == FEATURE_ENABLED && config.ib_res_enabled == FEATURE_ENABLED) {
 			uint32_t data32_w_h_w_h[4] = {
 				config.ib_width, config.ib_height, config.ib_width, config.ib_height
 			};
@@ -105,7 +105,7 @@ int module_start(SceSize argc, const void *args) {
 			// dword_81AA1734  DCD 0x220  ; DATA XREF: sub_8104DFC6
 			injectData(info.modid, 1, 0xD728, &data32_w_h_w_h, sizeof(data32_w_h_w_h));
 		}
-		if (config.fps_enabled == FEATURE_ENABLED) {
+		if (config.game_enabled == FEATURE_ENABLED && config.fps_enabled == FEATURE_ENABLED) {
 			uint32_t data32_vblank = config.fps == FPS_60 ? 0x1 : 0x2;
 
 			// dword_819706A4  DCD 2  ; DATA XREF: seg000:8104F722
@@ -120,7 +120,7 @@ int module_start(SceSize argc, const void *args) {
 		config_set_default(FEATURE_DISABLED, FEATURE_ENABLED, FEATURE_DISABLED, &config);
 		supported_game = 1;
 
-		if (config.ib_res_enabled == FEATURE_ENABLED) {
+		if (config.game_enabled == FEATURE_ENABLED && config.ib_res_enabled == FEATURE_ENABLED) {
 			float float_w_h[2] = {
 				(float)config.ib_width, (float)config.ib_height
 			};
@@ -138,6 +138,14 @@ int module_start(SceSize argc, const void *args) {
 
 			injectData(info.modid, 1, offset_w_h, &float_w_h, sizeof(float_w_h));
 		}
+	}
+
+	// If no features are enabled, mark game as disabled
+	if (supported_game &&
+			config.fb_res_enabled != FEATURE_ENABLED &&
+			config.ib_res_enabled != FEATURE_ENABLED &&
+			config.fps_enabled != FEATURE_ENABLED) {
+		config.game_enabled = FEATURE_DISABLED;
 	}
 
 	if (supported_game &&
