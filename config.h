@@ -46,5 +46,9 @@ void config_set_unsupported(
 		VG_FeatureState ib_res,
 		VG_FeatureState fps,
 		VG_Config *config);
+uint8_t config_is_fb_enabled(VG_Config *config);
+uint8_t config_is_ib_enabled(VG_Config *config);
+uint8_t config_is_fps_enabled(VG_Config *config);
+uint8_t config_is_osd_enabled(VG_Config *config);
 
 #endif

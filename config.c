@@ -83,6 +83,27 @@ void config_set_default(
 		config->fps_enabled = fps_enabled;
 }
 
+uint8_t config_is_fb_enabled(VG_Config *config) {
+	return config->enabled == FEATURE_ENABLED &&
+			config->game_enabled == FEATURE_ENABLED &&
+			config->fb_res_enabled == FEATURE_ENABLED;
+}
+uint8_t config_is_ib_enabled(VG_Config *config) {
+	return config->enabled == FEATURE_ENABLED &&
+			config->game_enabled == FEATURE_ENABLED &&
+			config->ib_res_enabled == FEATURE_ENABLED;
+}
+uint8_t config_is_fps_enabled(VG_Config *config) {
+	return config->enabled == FEATURE_ENABLED &&
+			config->game_enabled == FEATURE_ENABLED &&
+			config->fps_enabled == FEATURE_ENABLED;
+}
+uint8_t config_is_osd_enabled(VG_Config *config) {
+	return config->enabled == FEATURE_ENABLED &&
+			config->osd_enabled == FEATURE_ENABLED &&
+			config->game_osd_enabled == FEATURE_ENABLED;
+}
+
 VG_Config config_parse(const char *titleid) {
 	VG_Config config = {
 		FEATURE_ENABLED, FEATURE_ENABLED,
