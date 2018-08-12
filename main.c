@@ -115,10 +115,11 @@ int module_start(SceSize argc, const void *args) {
 			injectData(info.modid, 0, 0x9706A4, &data32_vblank, sizeof(data32_vblank));
 		}
 	}
-	else if (strncmp(titleid, "PCSB00245", 9) == 0 || // Persona 4 Golden [EUR] - 544p
-			 strncmp(titleid, "PCSE00120", 9) == 0 || // Persona 4 Golden [USA] - 544p
-			 strncmp(titleid, "PCSG00563", 9) == 0 || // Persona 4 Golden [JPN] - 544p
-			 strncmp(titleid, "PCSH00021", 9) == 0) { // Persona 4 Golden [ASA] - 544p
+	else if (strncmp(titleid, "PCSB00245", 9) == 0 || // Persona 4 Golden [EUR]
+			 strncmp(titleid, "PCSE00120", 9) == 0 || // Persona 4 Golden [USA]
+			 strncmp(titleid, "PCSG00004", 9) == 0 || // Persona 4 Golden [JPN] [1.01]
+			 strncmp(titleid, "PCSG00563", 9) == 0 || // Persona 4 Golden [JPN]
+			 strncmp(titleid, "PCSH00021", 9) == 0) { // Persona 4 Golden [ASA]
 		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_UNSUPPORTED, &config);
 		config_set_default(FEATURE_DISABLED, FEATURE_ENABLED, FEATURE_DISABLED, &config);
 		supported_game = 1;
@@ -133,7 +134,8 @@ int module_start(SceSize argc, const void *args) {
 				offset_w_h = 0xDBCFC;
 			} else if (strncmp(titleid, "PCSE00120", 9) == 0) {
 				offset_w_h = 0xDBCEC;
-			} else if (strncmp(titleid, "PCSG00563", 9) == 0) {
+			} else if (strncmp(titleid, "PCSG00004", 9) == 0 ||
+					strncmp(titleid, "PCSG00563", 9) == 0) {
 				offset_w_h = 0xDBD9C;
 			} else if (strncmp(titleid, "PCSH00021", 9) == 0) {
 				offset_w_h = 0xF1C50;

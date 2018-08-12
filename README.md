@@ -75,7 +75,7 @@ NOTE: If some options are left out, the plugin will use their default values (fo
 | Game          | Title ID(s)   | Supported features | Game defaults | Plugin defaults | Notes |
 | ------------- | ------------- | ------------------ | ------------- | --------------- | ----- |
 | Killzone: Mercenary | PCSF00243 <br/> PCSF00403 <br/> PCSA00107 <br/> PCSC00045 <br/> PCSD00071 | Internal res. <br/> FPS cap | Dynamic <br/> 30 | OFF <br/> OFF | Input doesn't work when framerate is > 59. <br/> Particles are rendered separately. | 
-| Persona 4 Golden | PCSB00245 <br/> PCSE00120 <br/> PCSG00563 <br/> PCSH00021 | Internal res. | 840x476 | 960x544 | |
+| Persona 4 Golden | PCSB00245 <br/> PCSE00120 <br/> PCSG00004 <br/> PCSG00563 <br/> PCSH00021 | Internal res. | 840x476 | 960x544 | |
 | WRC 3: FIA World Rally Championship | PCSB00204 | Internal res. | 704x448 | 960x544 | |
 | WRC 4: FIA World Rally Championship | PCSB00345 <br/> PCSE00411 | Internal res. | 704x448 | 960x544 | |
 
