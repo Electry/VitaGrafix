@@ -156,6 +156,28 @@ int module_start(SceSize argc, const void *args) {
 			injectData(info.modid, 0, 0xAC4310, &movs_r6_height, sizeof(movs_r6_height));
 		}
 	}
+	else if (strncmp(titleid, "PCSB00345", 9) == 0 || // WRC 4: FIA World Rally Championship [EUR] [1.01]
+			strncmp(titleid, "PCSE00411", 9) == 0) { // WRC 4: FIA World Rally Championship [USA]
+		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_UNSUPPORTED, &config);
+		config_set_default(FEATURE_DISABLED, FEATURE_ENABLED, FEATURE_DISABLED, &config);
+		supported_game = 1;
+
+		if (config.game_enabled == FEATURE_ENABLED && config.ib_res_enabled == FEATURE_ENABLED) {
+			uint8_t movs_r0_width[4], movs_r4_height[4];
+			uint32_t offset_w = 0, offset_h = 0;
+			make_thumb2_t2_mov(0, 1, config.ib_width, movs_r0_width);
+			make_thumb2_t2_mov(4, 1, config.ib_height, movs_r4_height);
+
+			if (strncmp(titleid, "PCSB00345", 9) == 0) {
+				offset_w = 0xAC297C; offset_h = 0xAC2982;
+			} else if (strncmp(titleid, "PCSE00411", 9) == 0) {
+				offset_w = 0xAC46C4; offset_h = 0xAC46CA;
+			}
+
+			injectData(info.modid, 0, offset_w, &movs_r0_width, sizeof(movs_r0_width));
+			injectData(info.modid, 0, offset_h, &movs_r4_height, sizeof(movs_r4_height));
+		}
+	}
 
 	// If no features are enabled, mark game as disabled
 	if (supported_game &&
