@@ -142,6 +142,20 @@ int module_start(SceSize argc, const void *args) {
 			injectData(info.modid, 1, offset_w_h, &float_w_h, sizeof(float_w_h));
 		}
 	}
+	else if (strncmp(titleid, "PCSB00204", 9) == 0) { // WRC 3: FIA World Rally Championship [EUR] [1.01]
+		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_UNSUPPORTED, &config);
+		config_set_default(FEATURE_DISABLED, FEATURE_ENABLED, FEATURE_DISABLED, &config);
+		supported_game = 1;
+
+		if (config.game_enabled == FEATURE_ENABLED && config.ib_res_enabled == FEATURE_ENABLED) {
+			uint8_t movs_r5_width[4], movs_r6_height[4];
+			make_thumb2_t2_mov(5, 1, config.ib_width, movs_r5_width);
+			make_thumb2_t2_mov(6, 1, config.ib_height, movs_r6_height);
+
+			injectData(info.modid, 0, 0xAC430A, &movs_r5_width, sizeof(movs_r5_width));
+			injectData(info.modid, 0, 0xAC4310, &movs_r6_height, sizeof(movs_r6_height));
+		}
+	}
 
 	// If no features are enabled, mark game as disabled
 	if (supported_game &&
