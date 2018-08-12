@@ -4,6 +4,24 @@
 #include "tools.h"
 
 /*
+ * T1 MOVS <Rd>,#<imm8>    # Outside IT block.
+ *    MOV<c> <Rd>,#<imm8>  # Inside IT block.
+ *
+ * 001            00     xxx xxxxxxxx
+ * Move immediate OPcode Rdn imm8
+ *
+ * byte 1   byte 0
+ * 00100xxx xxxxxxxx
+ */
+void make_thumb_t1_mov(uint8_t reg, uint8_t value, uint8_t out[2]) {
+	memset(out, 0, 2);
+
+	out[1] |= 0b00100000;	// Move immediate
+	out[1] |= reg;			// Rd
+	out[0] |= value;
+}
+
+/*
  * T2 MOV{S}<c>.W <Rd>,#<const>
  *
  * 11110           i 0      0010   S 1111 - 0  000  0000 00000000
