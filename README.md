@@ -79,6 +79,7 @@ NOTE: If some options are left out, the plugin will use their default values (fo
 | WRC 3: FIA World Rally Championship | PCSB00204 | Internal res. | 704x448 | 960x544 | |
 | WRC 4: FIA World Rally Championship | PCSB00345 <br/> PCSE00411 | Internal res. | 704x448 | 960x544 | |
 | God of War Collection | PCSF00438 <br/> PCSA00126 <br/> PCSC00059 | Framebuffer <br/> FPS cap | 720x408 <br/> 30 | 960x544 <br/> 60 | Both GoW 1 + 2 |
+| MUD - FIM Motocross World Championship | PCSB00182 | Internal res. | 704x448 | 960x544 | |
 
 
 Adding support for each and every game requires manual disassembly of game's binary to find addresses in the game code where the resolution is set.

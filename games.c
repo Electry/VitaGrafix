@@ -203,6 +203,21 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
+	else if (strncmp(titleid, "PCSB00182", 9) == 0) { // MUD - FIM Motocross World Championship [EUR]
+		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_UNSUPPORTED, config);
+		config_set_default(FEATURE_DISABLED, FEATURE_ENABLED, FEATURE_DISABLED, config);
+
+		if (config_is_ib_enabled(config)) {
+			uint8_t movs_r5_width[4], movs_r6_height[4];
+			make_thumb2_t2_mov(5, 1, config->ib_width, movs_r5_width);
+			make_thumb2_t2_mov(6, 1, config->ib_height, movs_r6_height);
+
+			injectData(eboot_info->modid, 0, 0x9B8B52, &movs_r5_width, sizeof(movs_r5_width));
+			injectData(eboot_info->modid, 0, 0x9B8B58, &movs_r6_height, sizeof(movs_r6_height));
+		}
+
+		return 1;
+	}
 
 	return 0;
 }
