@@ -11,7 +11,7 @@
 #include "games.h"
 #include "main.h"
 
-#define MAX_INJECTS_NUM 5
+#define MAX_INJECTS_NUM 15
 
 // sceDisplaySetFrameBuf hook
 static SceUID sceDisplaySetFrameBuf_hookid;

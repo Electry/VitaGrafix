@@ -111,6 +111,98 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 		
 		return 1;
 	}
-	
+	else if ((strncmp(titleid, "PCSF00438", 9) == 0 && // God of War Collection [EUR]
+			(eboot_info->module_nid == 0x8638ffed ||  // gow1.self
+			eboot_info->module_nid == 0x6531f96a)) || // gow2.self
+			(strncmp(titleid, "PCSA00126", 9) == 0 && // God of War Collection [USA]
+			(eboot_info->module_nid == 0x126f65c5 ||  // gow1.self
+			eboot_info->module_nid == 0x64ec7e)) ||   // gow2.self
+			(strncmp(titleid, "PCSC00059", 9) == 0 && // God of War Collection [JPN]
+			(eboot_info->module_nid == 0x990f8128 ||  // gow1.self
+			eboot_info->module_nid == 0x395a00f6))) { // gow2.self
+		config_set_unsupported(FEATURE_ENABLED, FEATURE_DISABLED, FEATURE_ENABLED, config);
+		config_set_default(FEATURE_ENABLED, FEATURE_DISABLED, FEATURE_ENABLED, config);
+
+		if (config_is_fb_enabled(config)) {
+			uint8_t movs_r0_width[4], movs_r4_width[4], movs_r7_width[4];
+			uint8_t movs_r1_height[4], movs_r2_height[4], movs_lr_height[4];
+			uint32_t offset_w_h_1 = 0, offset_w_h_2 = 0;
+			uint32_t offset_w_h_3 = 0, offset_w_h_4 = 0;
+			uint32_t offset_h = 0;
+			make_thumb2_t2_mov(0, 1, config->fb_width, movs_r0_width);
+			make_thumb2_t2_mov(4, 1, config->fb_width, movs_r4_width);
+			make_thumb2_t2_mov(7, 1, config->fb_width, movs_r7_width);
+			make_thumb2_t2_mov(1, 1, config->fb_height, movs_r1_height);
+			make_thumb2_t2_mov(2, 1, config->fb_height, movs_r2_height);
+			make_thumb2_t2_mov(REGISTER_LR, 1, config->fb_height, movs_lr_height);
+
+			if (strncmp(titleid, "PCSF00438", 9) == 0) {
+				if (eboot_info->module_nid == 0x8638ffed) { // gow1.self
+					offset_w_h_1 = 0x9E212; offset_w_h_2 = 0x9F0F0; offset_w_h_3 = 0xA31C6;
+					offset_w_h_4 = 0xCEF06; offset_h = 0xA1098;
+				} else if (eboot_info->module_nid == 0x6531f96a) { // gow2.self
+					offset_w_h_1 = 0xCDAE6; offset_w_h_2 = 0xCE9C4; offset_w_h_3 = 0xD2DBA;
+					offset_w_h_4 = 0xFF782; offset_h = 0xD0C8C;
+				}
+			} else if (strncmp(titleid, "PCSA00126", 9) == 0) {
+				if (eboot_info->module_nid == 0x126f65c5) { // gow1.self
+					offset_w_h_1 = 0x9E36E; offset_w_h_2 = 0x9F24C; offset_w_h_3 = 0xA3322;
+					offset_w_h_4 = 0xCF062; offset_h = 0xA11F4;
+				} else if (eboot_info->module_nid == 0x64ec7e) { // gow2.self
+					offset_w_h_1 = 0xCD9AE; offset_w_h_2 = 0xCE88C; offset_w_h_3 = 0xD2C82;
+					offset_w_h_4 = 0xFF64A; offset_h = 0xD0B54;
+				}
+			} else if (strncmp(titleid, "PCSC00059", 9) == 0) {
+				if (eboot_info->module_nid == 0x990f8128) { // gow1.self
+					offset_w_h_1 = 0x9E1E6; offset_w_h_2 = 0x9F0C4; offset_w_h_3 = 0xA319A;
+					offset_w_h_4 = 0xCEEDA; offset_h = 0xA106C;
+				} else if (eboot_info->module_nid == 0x395a00f6) { // gow2.self
+					offset_w_h_1 = 0xCD7DA; offset_w_h_2 = 0xCE6B8; offset_w_h_3 = 0xD2AAE;
+					offset_w_h_4 = 0xFF476; offset_h = 0xD0980;
+				}
+			}
+
+			injectData(eboot_info->modid, 0, offset_w_h_1, &movs_r4_width, sizeof(movs_r4_width));
+			injectData(eboot_info->modid, 0, offset_w_h_1 + 0x8, &movs_r2_height, sizeof(movs_r2_height));
+			injectData(eboot_info->modid, 0, offset_w_h_2, &movs_r0_width, sizeof(movs_r0_width));
+			injectData(eboot_info->modid, 0, offset_w_h_2 + 0x8, &movs_r1_height, sizeof(movs_r1_height));
+			injectData(eboot_info->modid, 0, offset_w_h_3, &movs_r7_width, sizeof(movs_r7_width));
+			injectData(eboot_info->modid, 0, offset_w_h_3 + 0x6, &movs_r1_height, sizeof(movs_r1_height));
+			injectData(eboot_info->modid, 0, offset_w_h_4, &movs_r0_width, sizeof(movs_r0_width));
+			injectData(eboot_info->modid, 0, offset_w_h_4 + 0x8, &movs_r2_height, sizeof(movs_r2_height));
+			injectData(eboot_info->modid, 0, offset_h, &movs_lr_height, sizeof(movs_lr_height));
+		}
+		if (config_is_fps_enabled(config)) {
+			uint8_t mov_r0_vblank[2];
+			uint32_t offset_vblank = 0;
+			make_thumb_t1_mov(0, config->fps == FPS_60 ? 0x1 : 0x2, mov_r0_vblank);
+
+			if (strncmp(titleid, "PCSF00438", 9) == 0) {
+				if (eboot_info->module_nid == 0x8638ffed) { // gow1.self
+					offset_vblank = 0x9E228;
+				} else if (eboot_info->module_nid == 0x6531f96a) { // gow2.self
+					offset_vblank = 0xCDAFC;
+				}
+			} else if (strncmp(titleid, "PCSA00126", 9) == 0) {
+				if (eboot_info->module_nid == 0x126f65c5) { // gow1.self
+					offset_vblank = 0x9E384;
+				} else if (eboot_info->module_nid == 0x64ec7e) { // gow2.self
+					offset_vblank = 0xCD9C4;
+				}
+			} else if (strncmp(titleid, "PCSC00059", 9) == 0) {
+				if (eboot_info->module_nid == 0x990f8128) { // gow1.self
+					offset_vblank = 0x9E1FC;
+				} else if (eboot_info->module_nid == 0x395a00f6) { // gow2.self
+					offset_vblank = 0xCD7F0;
+				}
+			}
+
+			// sceDisplayWaitVblankStartMulti
+			injectData(eboot_info->modid, 0, offset_vblank, &mov_r0_vblank, sizeof(mov_r0_vblank));
+		}
+
+		return 1;
+	}
+
 	return 0;
 }
