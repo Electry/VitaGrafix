@@ -107,6 +107,7 @@ NOTE: If some options are left out, the plugin will use their default values (fo
 | God of War Collection | PCSF00438 <br/> PCSA00126 <br/> PCSC00059 | Framebuffer <br/> FPS cap | 720x408 <br/> 30 | 960x544 <br/> 60 | Both GoW 1 + 2 |
 | MUD - FIM Motocross World Championship | PCSB00182 | Internal res. | 704x448 | 960x544 | |
 | MXGP: The Official Motocross Videogame | PCSB00470 <br/> PCSE00530 | Internal res. | 704x448 | 960x544 | |
+| F1 2011 | PCSB00027 | Internal res. | 640x384 | 960x544 | |
 
 
 Adding support for each and every game requires manual disassembly of game's binary to find addresses in the game code where the resolution is set.

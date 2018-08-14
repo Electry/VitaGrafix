@@ -241,6 +241,20 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
+	else if (strncmp(titleid, "PCSB00027", 9) == 0) { // F1 2011 [EUR]
+		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_UNSUPPORTED, config);
+		config_set_default(FEATURE_DISABLED, FEATURE_ENABLED, FEATURE_DISABLED, config);
+
+		if (config_is_ib_enabled(config)) {
+			uint8_t movs_r1_width_r2_height[8];
+			make_thumb2_t2_mov(1, 1, config->ib_width, movs_r1_width_r2_height);
+			make_thumb2_t2_mov(2, 1, config->ib_height, &movs_r1_width_r2_height[4]);
+
+			injectData(eboot_info->modid, 0, 0x10F0AA, &movs_r1_width_r2_height, sizeof(movs_r1_width_r2_height));
+		}
+
+		return 1;
+	}
 
 	return 0;
 }
