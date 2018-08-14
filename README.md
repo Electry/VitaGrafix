@@ -39,19 +39,38 @@ You can configure every game separately using unified configuration file.
 - This section applies to all games and overrides their individual options.
 ```
 [MAIN]
-ENABLED=1      <- Setting this to 0 disables all game modifications. (default = 1)
-OSD=1          <- Setting this to 0 disables in game OSD (during few seconds at the beginning). (default = 1)
+ENABLED=1      <- Setting this to 0 disables all game modifications.
+                  (default = 1)
+OSD=1          <- Setting this to 0 disables in game OSD (during few seconds at the beginning).
+                  (default = 1)
 ```
 
 ### GAME section
 - This section applies to a single game.
 ```
 [PCSB00245]    <- TITLE ID of your game
-ENABLED=1      <- Setting this to 0 disables all game modifications. (default = 1)
-OSD=1          <- Setting this to 0 disables in game OSD (during few seconds at the beginning). (default = 1)
-FB=960x544     <- Framebuffer resolution. Setting this to OFF disables this feature. (default = depending on the game, not supported on all titles)
-IB=960x544     <- Internal buffer resolution. Setting this to OFF disables this feature. (default = depending on the game, not supported on all titles)
-FPS=60         <- FPS cap. Setting this to OFF disables this feature. (default = depending on the game, not supported on all titles)
+ENABLED=1      <- Setting this to 0 disables all game modifications.
+                  (default = 1)
+OSD=1          <- Setting this to 0 disables in game OSD (during few seconds at the beginning).
+                  (default = 1)
+FB=960x544     <- Framebuffer resolution. Setting this to OFF disables this feature.
+                  (default = depending on the game, not supported on all titles)
+                  Valid options:
+                    960x544
+                    720x408
+                    640x368
+                    OFF
+IB=960x544     <- Internal buffer resolution. Setting this to OFF disables this feature.
+                  Changing this generally does not impact resolution of UI elements.
+                  (default = depending on the game, not supported on all titles)
+                  Valid options:
+                    WxH (where 0 < W <= 960 and 0 < H <= 544)
+                    OFF
+FPS=60         <- FPS cap. Setting this to OFF disables this feature.
+                  (default = depending on the game, not supported on all titles)
+                  Valid options:
+                    60
+                    30
 ```
 
 ### Example config.txt
@@ -68,6 +87,13 @@ IB=864x492
 
 [PCSB00204]
 IB=OFF
+
+[PCSF00438]
+FB=720x408
+FPS=30
+
+[PCSB00204]
+ENABLED=0
 ```
 NOTE: If some options are left out, the plugin will use their default values (for each game).
 
