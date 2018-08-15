@@ -255,6 +255,30 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
+	else if (strncmp(titleid, "PCSF00021", 9) == 0 || // LittleBigPlanet [EUR] [1.22]
+			strncmp(titleid, "PCSA00017", 9) == 0 || // LittleBigPlanet [USA] [1.22]
+			strncmp(titleid, "PCSC00013", 9) == 0 || // LittleBigPlanet [JPN] [1.22]
+			strncmp(titleid, "PCSD00006", 9) == 0) { // LittleBigPlanet [ASA] [1.22]
+		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_UNSUPPORTED, config);
+		config_set_default(FEATURE_DISABLED, FEATURE_ENABLED, FEATURE_DISABLED, config);
+
+		if (config_is_ib_enabled(config)) {
+			uint8_t movs_r1_width[4], movs_r2_height[4];
+			make_thumb2_t2_mov(1, 1, config->ib_width, movs_r1_width);
+			make_thumb2_t2_mov(2, 1, config->ib_height, movs_r2_height);
+
+			injectData(eboot_info->modid, 0, 0x168546, &movs_r1_width, sizeof(movs_r1_width));
+			injectData(eboot_info->modid, 0, 0x168546 + 0x4, &movs_r2_height, sizeof(movs_r2_height));
+			injectData(eboot_info->modid, 0, 0x16856A, &movs_r1_width, sizeof(movs_r1_width));
+			injectData(eboot_info->modid, 0, 0x16856A + 0x4, &movs_r2_height, sizeof(movs_r2_height));
+			injectData(eboot_info->modid, 0, 0x168582, &movs_r1_width, sizeof(movs_r1_width));
+			injectData(eboot_info->modid, 0, 0x168582 + 0x8, &movs_r2_height, sizeof(movs_r2_height));
+			injectData(eboot_info->modid, 0, 0x1685B0, &movs_r1_width, sizeof(movs_r1_width));
+			injectData(eboot_info->modid, 0, 0x1685B0 + 0x4, &movs_r2_height, sizeof(movs_r2_height));
+		}
+
+		return 1;
+	}
 
 	return 0;
 }
