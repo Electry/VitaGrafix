@@ -279,6 +279,18 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
+	else if (strncmp(titleid, "PCSF00570", 9) == 0 || // Borderlands 2 [EUR] [1.07]
+			strncmp(titleid, "PCSE00383", 9) == 0) { // Borderlands 2 [USA] [1.09]
+		config_set_unsupported(FEATURE_ENABLED, FEATURE_UNSUPPORTED, FEATURE_UNSUPPORTED, config);
+		config_set_default(FEATURE_DISABLED, FEATURE_DISABLED, FEATURE_DISABLED, config);
+
+		if (config_is_fb_enabled(config)) {
+			uint32_t data32_w_h[2] = {config->fb_width, config->fb_height};
+			injectData(eboot_info->modid, 1, 0x24A94, &data32_w_h, sizeof(data32_w_h));
+		}
+
+		return 1;
+	}
 
 	return 0;
 }

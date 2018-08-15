@@ -109,6 +109,7 @@ NOTE: If some options are left out, the plugin will use their default values (fo
 | MXGP: The Official Motocross Videogame | PCSB00470 <br/> PCSE00530 | Internal res. | 704x448 | 960x544 | |
 | F1 2011 | PCSB00027 | Internal res. | 640x384 | 960x544 | |
 | LittleBigPlanet | PCSF00021 <br/> PCSA00017 <br/> PCSC00013 <br/> PCSD00006 | Internal res. | 720x408 | 960x544 | |
+| Borderlands 2 | PCSF00570 <br/> PCSE00383 | Framebuffer | 960x544 | OFF | Only works at 960x544 and 640x368 |
 
 
 Adding support for each and every game requires manual disassembly of game's binary to find addresses in the game code where the resolution is set.
