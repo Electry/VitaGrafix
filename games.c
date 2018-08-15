@@ -291,6 +291,18 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
+	else if (strncmp(titleid, "PCSB00040", 9) == 0 || // Asphalt: Injection [EUR]
+			strncmp(titleid, "PCSE00007", 9) == 0) { // Asphalt: Injection [USA]
+		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_UNSUPPORTED, config);
+		config_set_default(FEATURE_DISABLED, FEATURE_ENABLED, FEATURE_DISABLED, config);
+
+		if (config_is_ib_enabled(config)) {
+			uint32_t data32_w_h[2] = {config->ib_width, config->ib_height};
+			injectData(eboot_info->modid, 1, 0x5A2C, &data32_w_h, sizeof(data32_w_h));
+		}
+
+		return 1;
+	}
 
 	return 0;
 }
