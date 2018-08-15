@@ -303,6 +303,31 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
+	else if (strncmp(titleid, "PCSB00877", 9) == 0 || // LEGO Star Wars: The Force Awakens [EUR]
+			strncmp(titleid, "PCSE00791", 9) == 0) { // LEGO Star Wars: The Force Awakens [USA]
+		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_UNSUPPORTED, config);
+		config_set_default(FEATURE_DISABLED, FEATURE_ENABLED, FEATURE_DISABLED, config);
+
+		if (config_is_ib_enabled(config)) {
+			uint8_t movs_r4_width[4], movs_r5_height[4];
+			uint32_t data32_w_h[2] = {config->ib_width, config->ib_height};
+			uint32_t offset_w_h = 0, offset_data_w_h = 0;
+			make_thumb2_t2_mov(4, 1, config->ib_width, movs_r4_width);
+			make_thumb2_t2_mov(5, 1, config->ib_height, movs_r5_height);
+
+			if (strncmp(titleid, "PCSB00877", 9) == 0) {
+				offset_w_h = 0x1F313E; offset_data_w_h = 0x4650;
+			} else if (strncmp(titleid, "PCSE00791", 9) == 0) {
+				offset_w_h = 0x1F315E; offset_data_w_h = 0x4508;
+			}
+
+			injectData(eboot_info->modid, 0, offset_w_h, &movs_r4_width, sizeof(movs_r4_width));
+			injectData(eboot_info->modid, 0, offset_w_h + 0x6, &movs_r5_height, sizeof(movs_r5_height));
+			injectData(eboot_info->modid, 1, offset_data_w_h, &data32_w_h, sizeof(data32_w_h));
+		}
+
+		return 1;
+	}
 
 	return 0;
 }
