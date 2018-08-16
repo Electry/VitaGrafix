@@ -328,6 +328,41 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
+	else if (strncmp(titleid, "PCSB00951", 9) == 0 || // World of Final Fantasy [EUR] [1.03]
+			strncmp(titleid, "PCSE00880", 9) == 0 || // World of Final Fantasy [USA] [1.03]
+			strncmp(titleid, "PCSH00223", 9) == 0) { // World of Final Fantasy [ASA] [1.03]
+		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_UNSUPPORTED, config);
+		config_set_default(FEATURE_DISABLED, FEATURE_ENABLED, FEATURE_DISABLED, config);
+
+		if (config_is_ib_enabled(config)) {
+			uint8_t movs_lr_width[4], movs_r8_width[4], movs_r5_width[4];
+			uint8_t movs_r1_height[4], movs_r9_height[4], movs_r0_height[4];
+			uint32_t offset_w_h_1 = 0, offset_w_h_2 = 0, offset_w_h_3 = 0;
+			make_thumb2_t2_mov(REGISTER_LR, 1, config->ib_width, movs_lr_width);
+			make_thumb2_t2_mov(8, 1, config->ib_width, movs_r8_width);
+			make_thumb2_t2_mov(5, 1, config->ib_width, movs_r5_width);
+			make_thumb2_t2_mov(1, 1, config->ib_height, movs_r1_height);
+			make_thumb2_t2_mov(9, 1, config->ib_height, movs_r9_height);
+			make_thumb2_t2_mov(0, 1, config->ib_height, movs_r0_height);
+
+			if (strncmp(titleid, "PCSB00951", 9) == 0) {
+				offset_w_h_1 = 0x5B6418; offset_w_h_2 = 0x42856A; offset_w_h_3 = 0x22C9E6;
+			} else if (strncmp(titleid, "PCSE00880", 9) == 0) {
+				offset_w_h_1 = 0x5B6430; offset_w_h_2 = 0x428582; offset_w_h_3 = 0x22C9FE;
+			} else if (strncmp(titleid, "PCSH00223", 9) == 0) {
+				offset_w_h_1 = 0x5B6448; offset_w_h_2 = 0x42859A; offset_w_h_3 = 0x22CA16;
+			}
+
+			injectData(eboot_info->modid, 0, offset_w_h_1, &movs_lr_width, sizeof(movs_lr_width));
+			injectData(eboot_info->modid, 0, offset_w_h_1 + 0x8, &movs_r1_height, sizeof(movs_r1_height));
+			injectData(eboot_info->modid, 0, offset_w_h_2, &movs_r8_width, sizeof(movs_r8_width));
+			injectData(eboot_info->modid, 0, offset_w_h_2 + 0x8, &movs_r9_height, sizeof(movs_r9_height));
+			injectData(eboot_info->modid, 0, offset_w_h_3, &movs_r5_width, sizeof(movs_r5_width));
+			injectData(eboot_info->modid, 0, offset_w_h_3 + 0x6, &movs_r0_height, sizeof(movs_r0_height));
+		}
+
+		return 1;
+	}
 
 	return 0;
 }
