@@ -306,7 +306,7 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 	else if (!strncmp(titleid, "PCSB00877", 9) || // LEGO Star Wars: The Force Awakens [EUR]
 			!strncmp(titleid, "PCSE00791", 9)) { // LEGO Star Wars: The Force Awakens [USA]
 		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
-		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
+		config_set_default_params(FT_DISABLED, 960, 544, FT_ENABLED, 720, 408, FT_DISABLED, FPS_30, config);
 
 		if (config_is_ib_enabled(config)) {
 			uint8_t movs_r4_width[4], movs_r5_height[4];
