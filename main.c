@@ -36,9 +36,9 @@ void injectData(SceUID modid, int segidx, uint32_t offset, const void *data, siz
 
 int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
 
-	updateFramebuf(pParam);
-
 	if (timer > 0) {
+		updateFramebuf(pParam);
+
 		int y = 5;
 		drawStringF(5, y, "%s: %s", titleid,
 					config.game_enabled  == FEATURE_ENABLED ? "patched" : "disabled");
@@ -59,7 +59,11 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
 		timer--;
 	} else {
 		// Release no longer used hook
+		int ret = TAI_CONTINUE(int, sceDisplaySetFrameBuf_hookref, pParam, sync);
+
 		taiHookRelease(sceDisplaySetFrameBuf_hookid, sceDisplaySetFrameBuf_hookref);
+		sceDisplaySetFrameBuf_hookid = -1;
+		return ret;
 	}
 
 	return TAI_CONTINUE(int, sceDisplaySetFrameBuf_hookref, pParam, sync);
@@ -113,11 +117,13 @@ int module_start(SceSize argc, const void *args) {
 
 int module_stop(SceSize argc, const void *args) {
 
-	if (supported_game && config_is_osd_enabled(&config))
+	if (supported_game && config_is_osd_enabled(&config) && sceDisplaySetFrameBuf_hookid >= 0) {
 		taiHookRelease(sceDisplaySetFrameBuf_hookid, sceDisplaySetFrameBuf_hookref);
+	}
 
 	while (injects_num-- > 0) {
-		taiInjectRelease(injects[injects_num]);
+		if (injects[injects_num] >= 0)
+			taiInjectRelease(injects[injects_num]);
 	}
 
 	return SCE_KERNEL_STOP_SUCCESS;
