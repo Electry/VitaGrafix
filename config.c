@@ -20,39 +20,39 @@ void config_parse_resolution(char *buffer, SceOff i, uint16_t *width, uint16_t *
 void config_parse_main(char *buffer, SceOff i, VG_Config *config) {
 	if (strncmp(&buffer[i], "ENABLED=", 8) == 0) {
 		i += 8;
-		config->enabled = buffer[i] == '0' ? FEATURE_DISABLED : FEATURE_ENABLED;
+		config->enabled = buffer[i] == '0' ? FT_DISABLED : FT_ENABLED;
 	}
 	else if (strncmp(&buffer[i], "OSD=", 4) == 0) {
 		i += 4;
-		config->osd_enabled = buffer[i] == '0' ? FEATURE_DISABLED : FEATURE_ENABLED;
+		config->osd_enabled = buffer[i] == '0' ? FT_DISABLED : FT_ENABLED;
 	}
 }
 
 void config_parse_game(char *buffer, SceOff i, VG_Config *config) {
 	if (strncmp(&buffer[i], "ENABLED=", 8) == 0) {
 		i += 8;
-		config->game_enabled = buffer[i] == '0' ? FEATURE_DISABLED : FEATURE_ENABLED;
+		config->game_enabled = buffer[i] == '0' ? FT_DISABLED : FT_ENABLED;
 	}
 	else if (strncmp(&buffer[i], "OSD=", 4) == 0) {
 		i += 4;
-		config->game_osd_enabled = buffer[i] == '0' ? FEATURE_DISABLED : FEATURE_ENABLED;
+		config->game_osd_enabled = buffer[i] == '0' ? FT_DISABLED : FT_ENABLED;
 	}
 	else if (strncmp(&buffer[i], "FPS=", 4) == 0) {
 		i += 4;
-		config->fps_enabled = strncmp(&buffer[i], "OFF", 3) == 0 ? FEATURE_DISABLED : FEATURE_ENABLED;
-		if (config->fps_enabled == FEATURE_ENABLED)
+		config->fps_enabled = strncmp(&buffer[i], "OFF", 3) == 0 ? FT_DISABLED : FT_ENABLED;
+		if (config->fps_enabled == FT_ENABLED)
 			config->fps = strncmp(&buffer[i], "30", 2) == 0 ? FPS_30 : FPS_60;
 	}
 	else if (strncmp(&buffer[i], "FB=", 3) == 0) {
 		i += 3;
-		config->fb_res_enabled = strncmp(&buffer[i], "OFF", 3) == 0 ? FEATURE_DISABLED : FEATURE_ENABLED;
-		if (config->fb_res_enabled == FEATURE_ENABLED)
+		config->fb_res_enabled = strncmp(&buffer[i], "OFF", 3) == 0 ? FT_DISABLED : FT_ENABLED;
+		if (config->fb_res_enabled == FT_ENABLED)
 			config_parse_resolution(buffer, i, &(config->fb_width), &(config->fb_height));
 	}
 	else if (strncmp(&buffer[i], "IB=", 3) == 0) {
 		i += 3;
-		config->ib_res_enabled = strncmp(&buffer[i], "OFF", 3) == 0 ? FEATURE_DISABLED : FEATURE_ENABLED;
-		if (config->ib_res_enabled == FEATURE_ENABLED)
+		config->ib_res_enabled = strncmp(&buffer[i], "OFF", 3) == 0 ? FT_DISABLED : FT_ENABLED;
+		if (config->ib_res_enabled == FT_ENABLED)
 			config_parse_resolution(buffer, i, &(config->ib_width), &(config->ib_height));
 	}
 }
@@ -62,11 +62,11 @@ void config_set_unsupported(
 		VG_FeatureState ib_res,
 		VG_FeatureState fps,
 		VG_Config *config) {
-	if (fb_res == FEATURE_UNSUPPORTED)
+	if (fb_res == FT_UNSUPPORTED)
 		config->fb_res_enabled = fb_res;
-	if (ib_res == FEATURE_UNSUPPORTED)
+	if (ib_res == FT_UNSUPPORTED)
 		config->ib_res_enabled = ib_res;
-	if (fps == FEATURE_UNSUPPORTED)
+	if (fps == FT_UNSUPPORTED)
 		config->fps_enabled = fps;
 }
 
@@ -75,11 +75,11 @@ void config_set_default(
 		VG_FeatureState ib_res_enabled,
 		VG_FeatureState fps_enabled,
 		VG_Config *config) {
-	if (config->fb_res_enabled == FEATURE_UNSPECIFIED)
+	if (config->fb_res_enabled == FT_UNSPECIFIED)
 		config->fb_res_enabled = fb_res_enabled;
-	if (config->ib_res_enabled == FEATURE_UNSPECIFIED)
+	if (config->ib_res_enabled == FT_UNSPECIFIED)
 		config->ib_res_enabled = ib_res_enabled;
-	if (config->fps_enabled == FEATURE_UNSPECIFIED)
+	if (config->fps_enabled == FT_UNSPECIFIED)
 		config->fps_enabled = fps_enabled;
 }
 
@@ -93,50 +93,50 @@ void config_set_default_params(
 		VG_FeatureState fps_enabled,
 		VG_Fps fps,
 		VG_Config *config) {
-	if (config->fb_res_enabled == FEATURE_UNSPECIFIED) {
+	if (config->fb_res_enabled == FT_UNSPECIFIED) {
 		config->fb_res_enabled = fb_res_enabled;
 		config->fb_width = fb_width;
 		config->fb_height = fb_height;
 	}
-	if (config->ib_res_enabled == FEATURE_UNSPECIFIED) {
+	if (config->ib_res_enabled == FT_UNSPECIFIED) {
 		config->ib_res_enabled = ib_res_enabled;
 		config->ib_width = ib_width;
 		config->ib_height = ib_height;
 	}
-	if (config->fps_enabled == FEATURE_UNSPECIFIED) {
+	if (config->fps_enabled == FT_UNSPECIFIED) {
 		config->fps_enabled = fps_enabled;
 		config->fps = fps;
 	}
 }
 
 uint8_t config_is_fb_enabled(VG_Config *config) {
-	return config->enabled == FEATURE_ENABLED &&
-			config->game_enabled == FEATURE_ENABLED &&
-			config->fb_res_enabled == FEATURE_ENABLED;
+	return config->enabled == FT_ENABLED &&
+			config->game_enabled == FT_ENABLED &&
+			config->fb_res_enabled == FT_ENABLED;
 }
 uint8_t config_is_ib_enabled(VG_Config *config) {
-	return config->enabled == FEATURE_ENABLED &&
-			config->game_enabled == FEATURE_ENABLED &&
-			config->ib_res_enabled == FEATURE_ENABLED;
+	return config->enabled == FT_ENABLED &&
+			config->game_enabled == FT_ENABLED &&
+			config->ib_res_enabled == FT_ENABLED;
 }
 uint8_t config_is_fps_enabled(VG_Config *config) {
-	return config->enabled == FEATURE_ENABLED &&
-			config->game_enabled == FEATURE_ENABLED &&
-			config->fps_enabled == FEATURE_ENABLED;
+	return config->enabled == FT_ENABLED &&
+			config->game_enabled == FT_ENABLED &&
+			config->fps_enabled == FT_ENABLED;
 }
 uint8_t config_is_osd_enabled(VG_Config *config) {
-	return config->enabled == FEATURE_ENABLED &&
-			config->osd_enabled == FEATURE_ENABLED &&
-			config->game_osd_enabled == FEATURE_ENABLED;
+	return config->enabled == FT_ENABLED &&
+			config->osd_enabled == FT_ENABLED &&
+			config->game_osd_enabled == FT_ENABLED;
 }
 
 VG_Config config_parse(const char *titleid) {
 	VG_Config config = {
-		FEATURE_ENABLED, FEATURE_ENABLED,
-		FEATURE_ENABLED, FEATURE_ENABLED,
-		FEATURE_UNSPECIFIED, 960, 544,
-		FEATURE_UNSPECIFIED, 960, 544,
-		FEATURE_UNSPECIFIED, FPS_60
+		FT_ENABLED, FT_ENABLED,
+		FT_ENABLED, FT_ENABLED,
+		FT_UNSPECIFIED, 960, 544,
+		FT_UNSPECIFIED, 960, 544,
+		FT_UNSPECIFIED, FPS_60
 	};
 
 	SceUID fd = -1;

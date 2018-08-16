@@ -8,13 +8,13 @@
 #include "games.h"
 
 uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config *config) {
-	if (strncmp(titleid, "PCSF00243", 9) == 0 || // Killzone Mercenary [EUR] [1.12]
-			strncmp(titleid, "PCSF00403", 9) == 0 || // Killzone Mercenary [EUR] [1.12]
-			strncmp(titleid, "PCSA00107", 9) == 0 || // Killzone Mercenary [USA] [1.12]
-			strncmp(titleid, "PCSC00045", 9) == 0 || // Killzone Mercenary [JPN] [1.12]
-			strncmp(titleid, "PCSD00071", 9) == 0) { // Killzone Mercenary [ASA] [1.12]
-		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_ENABLED, config);
-		config_set_default(FEATURE_DISABLED, FEATURE_DISABLED, FEATURE_DISABLED, config);
+	if (!strncmp(titleid, "PCSF00243", 9) || // Killzone Mercenary [EUR] [1.12]
+			!strncmp(titleid, "PCSF00403", 9) || // Killzone Mercenary [EUR] [1.12]
+			!strncmp(titleid, "PCSA00107", 9) || // Killzone Mercenary [USA] [1.12]
+			!strncmp(titleid, "PCSC00045", 9) || // Killzone Mercenary [JPN] [1.12]
+			!strncmp(titleid, "PCSD00071", 9)) { // Killzone Mercenary [ASA] [1.12]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_ENABLED, config);
+		config_set_default(FT_DISABLED, FT_DISABLED, FT_DISABLED, config);
 
 		if (config_is_ib_enabled(config)) {
 			uint32_t data32_w_h_w_h[4] = {
@@ -43,13 +43,13 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 		
 		return 1;
 	}
-	else if (strncmp(titleid, "PCSB00245", 9) == 0 || // Persona 4 Golden [EUR]
-			 strncmp(titleid, "PCSE00120", 9) == 0 || // Persona 4 Golden [USA]
-			 strncmp(titleid, "PCSG00004", 9) == 0 || // Persona 4 Golden [JPN] [1.01]
-			 strncmp(titleid, "PCSG00563", 9) == 0 || // Persona 4 Golden [JPN]
-			 strncmp(titleid, "PCSH00021", 9) == 0) { // Persona 4 Golden [ASA]
-		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_UNSUPPORTED, config);
-		config_set_default(FEATURE_DISABLED, FEATURE_ENABLED, FEATURE_DISABLED, config);
+	else if (!strncmp(titleid, "PCSB00245", 9) || // Persona 4 Golden [EUR]
+			!strncmp(titleid, "PCSE00120", 9) || // Persona 4 Golden [USA]
+			!strncmp(titleid, "PCSG00004", 9) || // Persona 4 Golden [JPN] [1.01]
+			!strncmp(titleid, "PCSG00563", 9) || // Persona 4 Golden [JPN]
+			!strncmp(titleid, "PCSH00021", 9)) { // Persona 4 Golden [ASA]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
 
 		if (config_is_ib_enabled(config)) {
 			float float_w_h[2] = {
@@ -57,14 +57,14 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 			};
 			uint32_t offset_w_h = 0;
 
-			if (strncmp(titleid, "PCSB00245", 9) == 0) {
+			if (!strncmp(titleid, "PCSB00245", 9)) {
 				offset_w_h = 0xDBCFC;
-			} else if (strncmp(titleid, "PCSE00120", 9) == 0) {
+			} else if (!strncmp(titleid, "PCSE00120", 9)) {
 				offset_w_h = 0xDBCEC;
-			} else if (strncmp(titleid, "PCSG00004", 9) == 0 ||
-					strncmp(titleid, "PCSG00563", 9) == 0) {
+			} else if (!strncmp(titleid, "PCSG00004", 9) ||
+					!strncmp(titleid, "PCSG00563", 9)) {
 				offset_w_h = 0xDBD9C;
-			} else if (strncmp(titleid, "PCSH00021", 9) == 0) {
+			} else if (!strncmp(titleid, "PCSH00021", 9)) {
 				offset_w_h = 0xF1C50;
 			}
 
@@ -73,9 +73,9 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 		
 		return 1;
 	}
-	else if (strncmp(titleid, "PCSB00204", 9) == 0) { // WRC 3: FIA World Rally Championship [EUR] [1.01]
-		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_UNSUPPORTED, config);
-		config_set_default(FEATURE_DISABLED, FEATURE_ENABLED, FEATURE_DISABLED, config);
+	else if (!strncmp(titleid, "PCSB00204", 9)) { // WRC 3: FIA World Rally Championship [EUR] [1.01]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
 
 		if (config_is_ib_enabled(config)) {
 			uint8_t movs_r5_width[4], movs_r6_height[4];
@@ -88,10 +88,10 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 		
 		return 1;
 	}
-	else if (strncmp(titleid, "PCSB00345", 9) == 0 || // WRC 4: FIA World Rally Championship [EUR] [1.01]
-			strncmp(titleid, "PCSE00411", 9) == 0) { // WRC 4: FIA World Rally Championship [USA]
-		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_UNSUPPORTED, config);
-		config_set_default(FEATURE_DISABLED, FEATURE_ENABLED, FEATURE_DISABLED, config);
+	else if (!strncmp(titleid, "PCSB00345", 9) || // WRC 4: FIA World Rally Championship [EUR] [1.01]
+			!strncmp(titleid, "PCSE00411", 9)) { // WRC 4: FIA World Rally Championship [USA]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
 
 		if (config_is_ib_enabled(config)) {
 			uint8_t movs_r0_width[4], movs_r4_height[4];
@@ -99,9 +99,9 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 			make_thumb2_t2_mov(0, 1, config->ib_width, movs_r0_width);
 			make_thumb2_t2_mov(4, 1, config->ib_height, movs_r4_height);
 
-			if (strncmp(titleid, "PCSB00345", 9) == 0) {
+			if (!strncmp(titleid, "PCSB00345", 9)) {
 				offset_w = 0xAC297C; offset_h = 0xAC2982;
-			} else if (strncmp(titleid, "PCSE00411", 9) == 0) {
+			} else if (!strncmp(titleid, "PCSE00411", 9)) {
 				offset_w = 0xAC46C4; offset_h = 0xAC46CA;
 			}
 
@@ -111,17 +111,17 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 		
 		return 1;
 	}
-	else if ((strncmp(titleid, "PCSF00438", 9) == 0 && // God of War Collection [EUR]
+	else if ((!strncmp(titleid, "PCSF00438", 9) && // God of War Collection [EUR]
 			(eboot_info->module_nid == 0x8638ffed ||  // gow1.self
 			eboot_info->module_nid == 0x6531f96a)) || // gow2.self
-			(strncmp(titleid, "PCSA00126", 9) == 0 && // God of War Collection [USA]
+			(!strncmp(titleid, "PCSA00126", 9) && // God of War Collection [USA]
 			(eboot_info->module_nid == 0x126f65c5 ||  // gow1.self
 			eboot_info->module_nid == 0x64ec7e)) ||   // gow2.self
-			(strncmp(titleid, "PCSC00059", 9) == 0 && // God of War Collection [JPN]
+			(!strncmp(titleid, "PCSC00059", 9) && // God of War Collection [JPN]
 			(eboot_info->module_nid == 0x990f8128 ||  // gow1.self
 			eboot_info->module_nid == 0x395a00f6))) { // gow2.self
-		config_set_unsupported(FEATURE_ENABLED, FEATURE_DISABLED, FEATURE_ENABLED, config);
-		config_set_default(FEATURE_ENABLED, FEATURE_DISABLED, FEATURE_ENABLED, config);
+		config_set_unsupported(FT_ENABLED, FT_DISABLED, FT_ENABLED, config);
+		config_set_default(FT_ENABLED, FT_DISABLED, FT_ENABLED, config);
 
 		if (config_is_fb_enabled(config)) {
 			uint8_t movs_r0_width[4], movs_r4_width[4], movs_r7_width[4];
@@ -136,7 +136,7 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 			make_thumb2_t2_mov(2, 1, config->fb_height, movs_r2_height);
 			make_thumb2_t2_mov(REGISTER_LR, 1, config->fb_height, movs_lr_height);
 
-			if (strncmp(titleid, "PCSF00438", 9) == 0) {
+			if (!strncmp(titleid, "PCSF00438", 9)) {
 				if (eboot_info->module_nid == 0x8638ffed) { // gow1.self
 					offset_w_h_1 = 0x9E212; offset_w_h_2 = 0x9F0F0; offset_w_h_3 = 0xA31C6;
 					offset_w_h_4 = 0xCEF06; offset_h = 0xA1098;
@@ -144,7 +144,7 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 					offset_w_h_1 = 0xCDAE6; offset_w_h_2 = 0xCE9C4; offset_w_h_3 = 0xD2DBA;
 					offset_w_h_4 = 0xFF782; offset_h = 0xD0C8C;
 				}
-			} else if (strncmp(titleid, "PCSA00126", 9) == 0) {
+			} else if (!strncmp(titleid, "PCSA00126", 9)) {
 				if (eboot_info->module_nid == 0x126f65c5) { // gow1.self
 					offset_w_h_1 = 0x9E36E; offset_w_h_2 = 0x9F24C; offset_w_h_3 = 0xA3322;
 					offset_w_h_4 = 0xCF062; offset_h = 0xA11F4;
@@ -152,7 +152,7 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 					offset_w_h_1 = 0xCD9AE; offset_w_h_2 = 0xCE88C; offset_w_h_3 = 0xD2C82;
 					offset_w_h_4 = 0xFF64A; offset_h = 0xD0B54;
 				}
-			} else if (strncmp(titleid, "PCSC00059", 9) == 0) {
+			} else if (!strncmp(titleid, "PCSC00059", 9)) {
 				if (eboot_info->module_nid == 0x990f8128) { // gow1.self
 					offset_w_h_1 = 0x9E1E6; offset_w_h_2 = 0x9F0C4; offset_w_h_3 = 0xA319A;
 					offset_w_h_4 = 0xCEEDA; offset_h = 0xA106C;
@@ -177,19 +177,19 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 			uint32_t offset_vblank = 0;
 			make_thumb_t1_mov(0, config->fps == FPS_60 ? 0x1 : 0x2, mov_r0_vblank);
 
-			if (strncmp(titleid, "PCSF00438", 9) == 0) {
+			if (!strncmp(titleid, "PCSF00438", 9)) {
 				if (eboot_info->module_nid == 0x8638ffed) { // gow1.self
 					offset_vblank = 0x9E228;
 				} else if (eboot_info->module_nid == 0x6531f96a) { // gow2.self
 					offset_vblank = 0xCDAFC;
 				}
-			} else if (strncmp(titleid, "PCSA00126", 9) == 0) {
+			} else if (!strncmp(titleid, "PCSA00126", 9)) {
 				if (eboot_info->module_nid == 0x126f65c5) { // gow1.self
 					offset_vblank = 0x9E384;
 				} else if (eboot_info->module_nid == 0x64ec7e) { // gow2.self
 					offset_vblank = 0xCD9C4;
 				}
-			} else if (strncmp(titleid, "PCSC00059", 9) == 0) {
+			} else if (!strncmp(titleid, "PCSC00059", 9)) {
 				if (eboot_info->module_nid == 0x990f8128) { // gow1.self
 					offset_vblank = 0x9E1FC;
 				} else if (eboot_info->module_nid == 0x395a00f6) { // gow2.self
@@ -203,9 +203,9 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
-	else if (strncmp(titleid, "PCSB00182", 9) == 0) { // MUD - FIM Motocross World Championship [EUR]
-		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_UNSUPPORTED, config);
-		config_set_default(FEATURE_DISABLED, FEATURE_ENABLED, FEATURE_DISABLED, config);
+	else if (!strncmp(titleid, "PCSB00182", 9)) { // MUD - FIM Motocross World Championship [EUR]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
 
 		if (config_is_ib_enabled(config)) {
 			uint8_t movs_r5_width[4], movs_r6_height[4];
@@ -218,10 +218,10 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
-	else if (strncmp(titleid, "PCSB00470", 9) == 0 || // MXGP: The Official Motocross Videogame [EUR]
-			strncmp(titleid, "PCSE00530", 9) == 0) {  // MXGP: The Official Motocross Videogame [USA]
-		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_UNSUPPORTED, config);
-		config_set_default(FEATURE_DISABLED, FEATURE_ENABLED, FEATURE_DISABLED, config);
+	else if (!strncmp(titleid, "PCSB00470", 9) || // MXGP: The Official Motocross Videogame [EUR]
+			!strncmp(titleid, "PCSE00530", 9)) {  // MXGP: The Official Motocross Videogame [USA]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
 
 		if (config_is_ib_enabled(config)) {
 			uint8_t movs_r0_width[4], movs_r5_height[4];
@@ -229,9 +229,9 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 			make_thumb2_t2_mov(0, 1, config->ib_width, movs_r0_width);
 			make_thumb2_t2_mov(5, 1, config->ib_height, movs_r5_height);
 
-			if (strncmp(titleid, "PCSB00470", 9) == 0) {
+			if (!strncmp(titleid, "PCSB00470", 9)) {
 				offset_w_h = 0xB1D47A;
-			} else if (strncmp(titleid, "PCSE00530", 9) == 0) {
+			} else if (!strncmp(titleid, "PCSE00530", 9)) {
 				offset_w_h = 0xB1D36A;
 			}
 
@@ -241,9 +241,9 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
-	else if (strncmp(titleid, "PCSB00027", 9) == 0) { // F1 2011 [EUR]
-		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_UNSUPPORTED, config);
-		config_set_default(FEATURE_DISABLED, FEATURE_ENABLED, FEATURE_DISABLED, config);
+	else if (!strncmp(titleid, "PCSB00027", 9)) { // F1 2011 [EUR]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
 
 		if (config_is_ib_enabled(config)) {
 			uint8_t movs_r1_width_r2_height[8];
@@ -255,12 +255,12 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
-	else if (strncmp(titleid, "PCSF00021", 9) == 0 || // LittleBigPlanet [EUR] [1.22]
-			strncmp(titleid, "PCSA00017", 9) == 0 || // LittleBigPlanet [USA] [1.22]
-			strncmp(titleid, "PCSC00013", 9) == 0 || // LittleBigPlanet [JPN] [1.22]
-			strncmp(titleid, "PCSD00006", 9) == 0) { // LittleBigPlanet [ASA] [1.22]
-		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_UNSUPPORTED, config);
-		config_set_default(FEATURE_DISABLED, FEATURE_ENABLED, FEATURE_DISABLED, config);
+	else if (!strncmp(titleid, "PCSF00021", 9) || // LittleBigPlanet [EUR] [1.22]
+			!strncmp(titleid, "PCSA00017", 9) || // LittleBigPlanet [USA] [1.22]
+			!strncmp(titleid, "PCSC00013", 9) || // LittleBigPlanet [JPN] [1.22]
+			!strncmp(titleid, "PCSD00006", 9)) { // LittleBigPlanet [ASA] [1.22]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
 
 		if (config_is_ib_enabled(config)) {
 			uint8_t movs_r1_width[4], movs_r2_height[4];
@@ -279,10 +279,10 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
-	else if (strncmp(titleid, "PCSF00570", 9) == 0 || // Borderlands 2 [EUR] [1.07]
-			strncmp(titleid, "PCSE00383", 9) == 0) { // Borderlands 2 [USA] [1.09]
-		config_set_unsupported(FEATURE_ENABLED, FEATURE_UNSUPPORTED, FEATURE_UNSUPPORTED, config);
-		config_set_default(FEATURE_DISABLED, FEATURE_DISABLED, FEATURE_DISABLED, config);
+	else if (!strncmp(titleid, "PCSF00570", 9) || // Borderlands 2 [EUR] [1.07]
+			!strncmp(titleid, "PCSE00383", 9)) { // Borderlands 2 [USA] [1.09]
+		config_set_unsupported(FT_ENABLED, FT_UNSUPPORTED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_DISABLED, FT_DISABLED, config);
 
 		if (config_is_fb_enabled(config)) {
 			uint32_t data32_w_h[2] = {config->fb_width, config->fb_height};
@@ -291,10 +291,10 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
-	else if (strncmp(titleid, "PCSB00040", 9) == 0 || // Asphalt: Injection [EUR]
-			strncmp(titleid, "PCSE00007", 9) == 0) { // Asphalt: Injection [USA]
-		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_UNSUPPORTED, config);
-		config_set_default(FEATURE_DISABLED, FEATURE_ENABLED, FEATURE_DISABLED, config);
+	else if (!strncmp(titleid, "PCSB00040", 9) || // Asphalt: Injection [EUR]
+			!strncmp(titleid, "PCSE00007", 9)) { // Asphalt: Injection [USA]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
 
 		if (config_is_ib_enabled(config)) {
 			uint32_t data32_w_h[2] = {config->ib_width, config->ib_height};
@@ -303,10 +303,10 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
-	else if (strncmp(titleid, "PCSB00877", 9) == 0 || // LEGO Star Wars: The Force Awakens [EUR]
-			strncmp(titleid, "PCSE00791", 9) == 0) { // LEGO Star Wars: The Force Awakens [USA]
-		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_UNSUPPORTED, config);
-		config_set_default(FEATURE_DISABLED, FEATURE_ENABLED, FEATURE_DISABLED, config);
+	else if (!strncmp(titleid, "PCSB00877", 9) || // LEGO Star Wars: The Force Awakens [EUR]
+			!strncmp(titleid, "PCSE00791", 9)) { // LEGO Star Wars: The Force Awakens [USA]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
 
 		if (config_is_ib_enabled(config)) {
 			uint8_t movs_r4_width[4], movs_r5_height[4];
@@ -315,9 +315,9 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 			make_thumb2_t2_mov(4, 1, config->ib_width, movs_r4_width);
 			make_thumb2_t2_mov(5, 1, config->ib_height, movs_r5_height);
 
-			if (strncmp(titleid, "PCSB00877", 9) == 0) {
+			if (!strncmp(titleid, "PCSB00877", 9)) {
 				offset_w_h = 0x1F313E; offset_data_w_h = 0x4650;
-			} else if (strncmp(titleid, "PCSE00791", 9) == 0) {
+			} else if (!strncmp(titleid, "PCSE00791", 9)) {
 				offset_w_h = 0x1F315E; offset_data_w_h = 0x4508;
 			}
 
@@ -328,11 +328,11 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
-	else if (strncmp(titleid, "PCSB00951", 9) == 0 || // World of Final Fantasy [EUR] [1.03]
-			strncmp(titleid, "PCSE00880", 9) == 0 || // World of Final Fantasy [USA] [1.03]
-			strncmp(titleid, "PCSH00223", 9) == 0) { // World of Final Fantasy [ASA] [1.03]
-		config_set_unsupported(FEATURE_UNSUPPORTED, FEATURE_ENABLED, FEATURE_UNSUPPORTED, config);
-		config_set_default(FEATURE_DISABLED, FEATURE_ENABLED, FEATURE_DISABLED, config);
+	else if (!strncmp(titleid, "PCSB00951", 9) || // World of Final Fantasy [EUR] [1.03]
+			!strncmp(titleid, "PCSE00880", 9) || // World of Final Fantasy [USA] [1.03]
+			!strncmp(titleid, "PCSH00223", 9)) { // World of Final Fantasy [ASA] [1.03]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
 
 		if (config_is_ib_enabled(config)) {
 			uint8_t movs_r5_width[4], movs_r0_height[4];
@@ -340,11 +340,11 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 			make_thumb2_t2_mov(5, 1, config->ib_width, movs_r5_width);
 			make_thumb2_t2_mov(0, 1, config->ib_height, movs_r0_height);
 
-			if (strncmp(titleid, "PCSB00951", 9) == 0) {
+			if (!strncmp(titleid, "PCSB00951", 9)) {
 				offset_w_h = 0x22C9E6;
-			} else if (strncmp(titleid, "PCSE00880", 9) == 0) {
+			} else if (!strncmp(titleid, "PCSE00880", 9)) {
 				offset_w_h = 0x22C9FE;
-			} else if (strncmp(titleid, "PCSH00223", 9) == 0) {
+			} else if (!strncmp(titleid, "PCSH00223", 9)) {
 				offset_w_h = 0x22CA16;
 			}
 

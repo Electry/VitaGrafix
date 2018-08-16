@@ -41,7 +41,7 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
 
 		int y = 5;
 		drawStringF(5, y, "%s: %s", titleid,
-					config.game_enabled  == FEATURE_ENABLED ? "patched" : "disabled");
+					config.game_enabled  == FT_ENABLED ? "patched" : "disabled");
 
 		if (config_is_fb_enabled(&config)) {
 			y += 20;
@@ -81,7 +81,7 @@ int module_start(SceSize argc, const void *args) {
 
 	// Parse config
 	config = config_parse(titleid);
-	if (config.enabled == FEATURE_DISABLED) {
+	if (config.enabled == FT_DISABLED) {
 		return SCE_KERNEL_START_SUCCESS;
 	}
 
@@ -90,7 +90,7 @@ int module_start(SceSize argc, const void *args) {
 
 	// If game is unsupported, mark it as disabled
 	if (!supported_game) {
-		config.game_enabled = FEATURE_DISABLED;
+		config.game_enabled = FT_DISABLED;
 	}
 
 	// If no features are enabled, mark game as disabled
@@ -98,7 +98,7 @@ int module_start(SceSize argc, const void *args) {
 			!config_is_fb_enabled(&config) &&
 			!config_is_ib_enabled(&config) &&
 			!config_is_fps_enabled(&config)) {
-		config.game_enabled = FEATURE_DISABLED;
+		config.game_enabled = FT_DISABLED;
 	}
 
 	// Hook sceDisplaySetFrameBuf for OSD
