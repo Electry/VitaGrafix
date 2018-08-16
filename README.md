@@ -112,7 +112,7 @@ NOTE: If some options are left out, the plugin will use their default values (fo
 | Borderlands 2 | PCSF00570 <br/> PCSE00383 | Framebuffer | 960x544 | OFF | Only works at 960x544 and 640x368 |
 | Asphalt: Injection | PCSB00040 <br/> PCSE00007 | Internal res. | 720x408 | 960x544 | |
 | LEGO Star Wars: The Force Awakens | PCSB00877 <br/> PCSE00791 | Internal res. | 640x368 | 960x544 | |
-| World of Final Fantasy | PCSB00951 <br/> PCSE00880 <br/> PCSH00223 | Internal res. | 640x384 | 960x544 | |
+| World of Final Fantasy | PCSB00951 <br/> PCSE00880 <br/> PCSH00223 | Internal res. | 640x384 | 800x480 | Only few resolutions work properly (with visible effects and no glitches) |
 
 
 Adding support for each and every game requires manual disassembly of game's binary to find addresses in the game code where the resolution is set.
