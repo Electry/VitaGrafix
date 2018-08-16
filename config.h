@@ -41,6 +41,16 @@ void config_set_default(
 		VG_FeatureState ib_res_enabled,
 		VG_FeatureState fps_enabled,
 		VG_Config *config);
+void config_set_default_params(
+		VG_FeatureState fb_res_enabled,
+		uint16_t fb_width,
+		uint16_t fb_height,
+		VG_FeatureState ib_res_enabled,
+		uint16_t ib_width,
+		uint16_t ib_height,
+		VG_FeatureState fps_enabled,
+		VG_Fps fps,
+		VG_Config *config);
 void config_set_unsupported(
 		VG_FeatureState fb_res,
 		VG_FeatureState ib_res,

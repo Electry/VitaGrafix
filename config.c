@@ -83,6 +83,32 @@ void config_set_default(
 		config->fps_enabled = fps_enabled;
 }
 
+void config_set_default_params(
+		VG_FeatureState fb_res_enabled,
+		uint16_t fb_width,
+		uint16_t fb_height,
+		VG_FeatureState ib_res_enabled,
+		uint16_t ib_width,
+		uint16_t ib_height,
+		VG_FeatureState fps_enabled,
+		VG_Fps fps,
+		VG_Config *config) {
+	if (config->fb_res_enabled == FEATURE_UNSPECIFIED) {
+		config->fb_res_enabled = fb_res_enabled;
+		config->fb_width = fb_width;
+		config->fb_height = fb_height;
+	}
+	if (config->ib_res_enabled == FEATURE_UNSPECIFIED) {
+		config->ib_res_enabled = ib_res_enabled;
+		config->ib_width = ib_width;
+		config->ib_height = ib_height;
+	}
+	if (config->fps_enabled == FEATURE_UNSPECIFIED) {
+		config->fps_enabled = fps_enabled;
+		config->fps = fps;
+	}
+}
+
 uint8_t config_is_fb_enabled(VG_Config *config) {
 	return config->enabled == FEATURE_ENABLED &&
 			config->game_enabled == FEATURE_ENABLED &&
