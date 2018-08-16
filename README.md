@@ -4,6 +4,7 @@ VitaGrafix is a taiHEN plugin that allows you to change resolution and FPS cap o
 Heavily inspired by [vitaRescale](https://github.com/Rinnegatamante/vitaRescale) from Rinnegatamante, with added features and more supported games.
 
 ## Installation
+#### If you experience crashes at h-encore exit / enso bootup, make sure you have the latest kuio (v1.2)
 1. Download latest [VitaGrafix.suprx](https://github.com/Electry/VitaGrafix/releases) and kuio.skprx ([kuio.zip](https://github.com/Rinnegatamante/kuio/releases))
 2. If 'ux0:tai/config.txt' does exist
     1. Copy 'VitaGrafix.suprx' and 'kuio.skprx' to 'ux0:tai/' directory
@@ -29,8 +30,6 @@ ur0:tai/VitaGrafix.suprx
     1. Create 'ux0:data/VitaGrafix' folder
     2. Create and open 'ux0:data/VitaGrafix/config.txt' file
     3. Refer to the configuration section below
-    
-NOTE: If you already have kuio.skprx installed (used by other plugin), you don't need to download it again.
 
 ## Configuration
 You can configure every game separately using unified configuration file.
