@@ -260,7 +260,7 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 			!strncmp(titleid, "PCSC00013", 9) || // LittleBigPlanet [JPN] [1.22]
 			!strncmp(titleid, "PCSD00006", 9)) { // LittleBigPlanet [ASA] [1.22]
 		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
-		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
+		config_set_default(FT_DISABLED, FT_DISABLED, FT_DISABLED, config);
 
 		if (config_is_ib_enabled(config)) {
 			uint8_t movs_r1_width[4], movs_r2_height[4];
