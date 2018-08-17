@@ -354,6 +354,20 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
+	else if (!strncmp(titleid, "PCSB00048", 9) || // Ridge Racer [EUR] [1.02]
+			!strncmp(titleid, "PCSE00001", 9) || // Ridge Racer [USA] [1.02]
+			!strncmp(titleid, "PCSG00001", 9)) { // Ridge Racer [JPN] [1.04]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
+
+		if (config_is_ib_enabled(config)) {
+			uint32_t data32_w_h[2] = {config->ib_width, config->ib_height};
+
+			injectData(eboot_info->modid, 1, 0x53E4, &data32_w_h, sizeof(data32_w_h));
+		}
+
+		return 1;
+	}
 
 	return 0;
 }
