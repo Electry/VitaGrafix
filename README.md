@@ -101,6 +101,7 @@ NOTE: If some options are left out, the plugin will use their default values (fo
 | ------------- | ------------- | ------------------ | ------------- | --------------- | ----- |
 | Asphalt: Injection | PCSB00040 <br/> PCSE00007 | Internal res. | 720x408 | 960x544 | |
 | Borderlands 2 | PCSF00570 <br/> PCSE00383 | Framebuffer | 960x544 | OFF | Only works at 960x544 and 640x368 |
+| Dead or Alive 5 Plus | PCSB00296 <br/> PCSE00235 <br/> PCSG00167 | Internal res. | 720x408 | 960x544 | |
 | F1 2011 | PCSB00027 | Internal res. | 640x384 | 960x544 | |
 | God of War Collection | PCSF00438 <br/> PCSA00126 <br/> PCSC00059 | Framebuffer <br/> FPS cap | 720x408 <br/> 30 | 960x544 <br/> 60 | Both GoW 1 + 2 |
 | Killzone: Mercenary | PCSF00243 <br/> PCSF00403 <br/> PCSA00107 <br/> PCSC00045 <br/> PCSD00071 | Internal res. <br/> FPS cap | Dynamic <br/> 30 | OFF <br/> OFF | Input doesn't work when framerate is > 59. <br/> Particles are rendered separately. |
