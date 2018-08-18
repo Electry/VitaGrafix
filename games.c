@@ -330,7 +330,8 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 	}
 	else if (!strncmp(titleid, "PCSB00951", 9) || // World of Final Fantasy [EUR] [1.03]
 			!strncmp(titleid, "PCSE00880", 9) || // World of Final Fantasy [USA] [1.03]
-			!strncmp(titleid, "PCSH00223", 9)) { // World of Final Fantasy [ASA] [1.03]
+			!strncmp(titleid, "PCSH00223", 9) || // World of Final Fantasy [ASA] [1.03]
+			!strncmp(titleid, "PCSG00709", 9)) { // World of Final Fantasy [JPN] [?]
 		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
 		config_set_default_params(FT_DISABLED, 960, 544, FT_ENABLED, 800, 480, FT_DISABLED, FPS_30, config);
 
@@ -346,6 +347,8 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 				offset_w_h = 0x22C9FE;
 			} else if (!strncmp(titleid, "PCSH00223", 9)) {
 				offset_w_h = 0x22CA16;
+			} else if (!strncmp(titleid, "PCSG00709", 9)) {
+				offset_w_h = 0x22C9DE;
 			}
 
 			injectData(eboot_info->modid, 0, offset_w_h, &movs_r5_width, sizeof(movs_r5_width));
