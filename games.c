@@ -387,6 +387,23 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
+	else if (!strncmp(titleid, "PCSG00617", 9)) { // Utawarerumono: Itsuwari no Kamen [JPN]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
+
+		if (config_is_ib_enabled(config)) {
+			uint8_t mov_r0_width_r1_height[8];
+			make_arm_a1_mov(0, 0, config->ib_width, mov_r0_width_r1_height);
+			make_arm_a1_mov(1, 0, config->ib_height, &mov_r0_width_r1_height[4]);
+
+			// seg000:81119058  MOV  R0, #0x2A0
+			// seg000:8111905C  MOV  R1, #0x180
+			injectData(eboot_info->modid, 0, 0x119058, &mov_r0_width_r1_height, sizeof(mov_r0_width_r1_height));
+			injectData(eboot_info->modid, 0, 0x11907C, &mov_r0_width_r1_height, sizeof(mov_r0_width_r1_height));
+		}
+
+		return 1;
+	}
 
 	return 0;
 }
