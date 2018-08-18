@@ -426,6 +426,32 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
+	else if (!strncmp(titleid, "PCSG00610", 9)) { // Miracle Girls Festival [JPN]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
+
+		if (config_is_ib_enabled(config)) {
+			uint8_t movs_r2_width[4], movs_r3_width[4], movs_r7_width[4];
+			uint8_t movs_r3_height[4], movs_r4_height[4], movs_lr_height[4];
+			make_thumb2_t2_mov(2, 1, config->ib_width, movs_r2_width);
+			make_thumb2_t2_mov(3, 1, config->ib_height, movs_r3_height);
+			make_thumb2_t2_mov(4, 1, config->ib_height, movs_r4_height);
+			make_thumb2_t2_mov(3, 1, config->ib_width, movs_r3_width);
+			make_thumb2_t2_mov(REGISTER_LR, 1, config->ib_height, movs_lr_height);
+			make_thumb2_t2_mov(7, 1, config->ib_width, movs_r7_width);
+
+			injectData(eboot_info->modid, 0, 0x158EB0, &movs_r2_width, sizeof(movs_r2_width));
+			injectData(eboot_info->modid, 0, 0x158EB0 + 0x8, &movs_r3_height, sizeof(movs_r3_height));
+			injectData(eboot_info->modid, 0, 0x159EAE, &movs_r2_width, sizeof(movs_r2_width));
+			injectData(eboot_info->modid, 0, 0x159EAE + 0x8, &movs_r4_height, sizeof(movs_r4_height));
+			injectData(eboot_info->modid, 0, 0x15D32A, &movs_r3_width, sizeof(movs_r3_width));
+			injectData(eboot_info->modid, 0, 0x15D32A + 0x4, &movs_lr_height, sizeof(movs_lr_height));
+			injectData(eboot_info->modid, 0, 0x15D6C4, &movs_r7_width, sizeof(movs_r7_width));
+			injectData(eboot_info->modid, 0, 0x15D6C4 + 0x4, &movs_lr_height, sizeof(movs_lr_height));
+		}
+
+		return 1;
+	}
 
 	return 0;
 }
