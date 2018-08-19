@@ -515,6 +515,29 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
+	else if (!strncmp(titleid, "PCSB00316", 9) || // MotoGP 13 [EUR] [1.02]
+			!strncmp(titleid, "PCSE00409", 9)) {  // MotoGP 13 [USA]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
+
+		if (config_is_ib_enabled(config)) {
+			uint8_t movs_r0_width[4], movs_r5_height[4];
+			uint32_t offset_w_h = 0;
+			make_thumb2_t2_mov(0, 1, config->ib_width, movs_r0_width);
+			make_thumb2_t2_mov(5, 1, config->ib_height, movs_r5_height);
+
+			if (!strncmp(titleid, "PCSB00316", 9)) {
+				offset_w_h = 0xAA57A4;
+			} else if (!strncmp(titleid, "PCSE00409", 9)) {
+				offset_w_h = 0xAA622C;
+			}
+
+			injectData(eboot_info->modid, 0, offset_w_h, &movs_r0_width, sizeof(movs_r0_width));
+			injectData(eboot_info->modid, 0, offset_w_h + 0x6, &movs_r5_height, sizeof(movs_r5_height));
+		}
+
+		return 1;
+	}
 
 	return 0;
 }

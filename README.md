@@ -110,6 +110,7 @@ NOTE: If some options are left out, the plugin will use their default values (fo
 | LEGO Star Wars: The Force Awakens | PCSB00877 <br/> PCSE00791 | Internal res. | 640x368 | 720x408 | Game crashes when opening pause menu at high resolutions. |
 | LittleBigPlanet | PCSF00021 <br/> PCSA00017 <br/> PCSC00013 <br/> PCSD00006 | Internal res. | 720x408 | OFF | Particles cause artifacts at native res. |
 | Miracle Girls Festival | PCSG00610 | Internal res. | 720x408 | 960x544 | |
+| MotoGP 13 | PCSB00316 <br/> PCSE00409 | Internal res. | 704x448 | 960x544 | |
 | MUD - FIM Motocross World Championship | PCSB00182 | Internal res. | 704x448 | 960x544 | |
 | MXGP: The Official Motocross Videogame | PCSB00470 <br/> PCSE00530 | Internal res. | 704x448 | 960x544 | |
 | Persona 4 Golden | PCSB00245 <br/> PCSE00120 <br/> PCSG00004 <br/> PCSG00563 <br/> PCSH00021 | Internal res. | 840x476 | 960x544 | |
