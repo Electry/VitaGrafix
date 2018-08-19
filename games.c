@@ -452,6 +452,43 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
+	else if (!strncmp(titleid, "PCSF00248", 9) || // Jak and Daxter: The Precursor Legacy HD [EUR]
+			!strncmp(titleid, "PCSF00249", 9) || // Jak II HD [EUR]
+			!strncmp(titleid, "PCSF00250", 9) || // Jak 3 HD [EUR]
+			((!strncmp(titleid, "PCSF00247", 9) || // The Jak and Daxter Trilogy [EUR]
+			!strncmp(titleid, "PCSA00080", 9)) && // Jak and Daxter Collection [USA]
+			(eboot_info->module_nid == 0x109d6ad5 || // Jak1.self
+			eboot_info->module_nid == 0x15059015 || // Jak2.self
+			eboot_info->module_nid == 0x790ebad9))) { // Jak3.self
+		config_set_unsupported(FT_ENABLED, FT_UNSUPPORTED, FT_UNSUPPORTED, config);
+		config_set_default(FT_ENABLED, FT_DISABLED, FT_DISABLED, config);
+
+		if (config_is_fb_enabled(config)) {
+			uint8_t movs_r0_width[4], movs_r0_height[4];
+			uint32_t offset_w = 0, offset_h = 0;
+			make_thumb2_t2_mov(0, 1, config->fb_width, movs_r0_width);
+			make_thumb2_t2_mov(0, 1, config->fb_height, movs_r0_height);
+
+			if (!strncmp(titleid, "PCSF00248", 9) ||
+					((!strncmp(titleid, "PCSF00247", 9) || !strncmp(titleid, "PCSA00080", 9)) &&
+					eboot_info->module_nid == 0x109d6ad5)) {
+				offset_w = 0x1B250; offset_h = 0x1B260;
+			} else if (!strncmp(titleid, "PCSF00249", 9) ||
+					((!strncmp(titleid, "PCSF00247", 9) || !strncmp(titleid, "PCSA00080", 9)) &&
+					eboot_info->module_nid == 0x15059015)) {
+				offset_w = 0x211F2; offset_h = 0x211FA;
+			} else if (!strncmp(titleid, "PCSF00250", 9) ||
+					((!strncmp(titleid, "PCSF00247", 9) || !strncmp(titleid, "PCSA00080", 9)) &&
+					eboot_info->module_nid == 0x790ebad9)) {
+				offset_w = 0x26096; offset_h = 0x2609E;
+			}
+
+			injectData(eboot_info->modid, 0, offset_w, &movs_r0_width, sizeof(movs_r0_width));
+			injectData(eboot_info->modid, 0, offset_h, &movs_r0_height, sizeof(movs_r0_height));
+		}
+
+		return 1;
+	}
 
 	return 0;
 }

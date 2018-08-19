@@ -104,6 +104,7 @@ NOTE: If some options are left out, the plugin will use their default values (fo
 | Dead or Alive 5 Plus | PCSB00296 <br/> PCSE00235 <br/> PCSG00167 | Internal res. | 720x408 | 960x544 | |
 | F1 2011 | PCSB00027 | Internal res. | 640x384 | 960x544 | |
 | God of War Collection | PCSF00438 <br/> PCSA00126 <br/> PCSC00059 | Framebuffer <br/> FPS cap | 720x408 <br/> 30 | 960x544 <br/> 60 | Both GoW 1 + 2 |
+| Jak and Daxter Collection | PCSF00247 <br/> PCSF00248 <br/> PCSF00249 <br/> PCSF00250 <br/> PCSA00080 | Framebuffer | 720x408 | 960x544 | All 3 games |
 | Killzone: Mercenary | PCSF00243 <br/> PCSF00403 <br/> PCSA00107 <br/> PCSC00045 <br/> PCSD00071 | Internal res. <br/> FPS cap | Dynamic <br/> 30 | OFF <br/> OFF | Input doesn't work when framerate is > 59. <br/> Particles are rendered separately. |
 | LEGO Star Wars: The Force Awakens | PCSB00877 <br/> PCSE00791 | Internal res. | 640x368 | 720x408 | Game crashes when opening pause menu at high resolutions. |
 | LittleBigPlanet | PCSF00021 <br/> PCSA00017 <br/> PCSC00013 <br/> PCSD00006 | Internal res. | 720x408 | OFF | Particles cause artifacts at native res. |
