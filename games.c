@@ -553,6 +553,34 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
+	else if (!strncmp(titleid, "PCSB00762", 9)) { // WRC 5: FIA World Rally Championship [EUR]
+		config_set_unsupported(FT_ENABLED, FT_UNSUPPORTED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_DISABLED, FT_DISABLED, config);
+
+		if (config_is_fb_enabled(config)) {
+			uint8_t nop[2] = {0x00, 0xBF};
+			uint8_t nop_nop[4] = {0x00, 0xBF, 0x00, 0xBF};
+			uint8_t movs_r0_width[4], mov_r6_height[4];
+			make_thumb2_t2_mov(0, 1, config->fb_width, movs_r0_width);
+			make_thumb2_t2_mov(6, 0, config->fb_height, mov_r6_height);
+
+			// seg000:8118BFF2  BL.W   sub_816BCAEE  ; handles parsing single param from the game config file
+			// seg000:8118C002  BEQ.W  loc_8118C15C  ; if param is valid, store it in [R5,#4], nop this to continue to fallback case
+			// seg000:8118C03E  BL.W   sub_816BCAEE  ; ... same thing for height
+			// seg000:8118C04E  BEQ    loc_8118C144
+			injectData(eboot_info->modid, 0, 0x18C002, &nop_nop, sizeof(nop_nop));
+			injectData(eboot_info->modid, 0, 0x18C04E, &nop, sizeof(nop));
+
+			// seg000:8118C010  MOVS.W  R0, #0x500  ; fallback case uses hardcoded 1280x720
+			// seg000:8118C014  STR     R0, [R5,#4] ; we can use this to inject our res
+			// seg000:8118C022  MOV.W   R6, #0x2D0  ; ... same thing for height
+			// seg000:8118C05A  STR     R6, [R5,#8]
+			injectData(eboot_info->modid, 0, 0x18C010, &movs_r0_width, sizeof(movs_r0_width));
+			injectData(eboot_info->modid, 0, 0x18C022, &mov_r6_height, sizeof(mov_r6_height));
+		}
+
+		return 1;
+	}
 
 	return 0;
 }

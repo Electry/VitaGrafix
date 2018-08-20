@@ -120,6 +120,7 @@ NOTE: If some options are left out, the plugin will use their default values (fo
 | World of Final Fantasy | PCSB00951 <br/> PCSE00880 <br/> PCSH00223 <br/> PCSG00709 | Internal res. | 640x384 | 800x480 | Only few resolutions work properly (with visible effects and no glitches) |
 | WRC 3: FIA World Rally Championship | PCSB00204 | Internal res. | 704x448 | 960x544 | |
 | WRC 4: FIA World Rally Championship | PCSB00345 <br/> PCSE00411 | Internal res. | 704x448 | 960x544 | |
+| WRC 5: FIA World Rally Championship | PCSB00762 | Framebuffer | 960x544 | OFF | |
 
 
 Adding support for each and every game requires manual disassembly of game's binary to find addresses in the game code where the resolution is set.
