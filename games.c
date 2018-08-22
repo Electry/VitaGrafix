@@ -399,7 +399,7 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
-	else if (!strncmp(titleid, "PCSG00617", 9)) { // Utawarerumono: Itsuwari no Kamen [JPN]
+	else if (!strncmp(titleid, "PCSG00617", 9)) { // Utawarerumono: Itsuwari no Kamen [JPN] [1.02]
 		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
 		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
 
@@ -586,6 +586,33 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 			// seg000:8118C05A  STR     R6, [R5,#8]
 			injectData(eboot_info->modid, 0, 0x18C010, &movs_r0_width, sizeof(movs_r0_width));
 			injectData(eboot_info->modid, 0, 0x18C022, &mov_r6_height, sizeof(mov_r6_height));
+		}
+
+		return 1;
+	}
+	else if (!strncmp(titleid, "PCSB01145", 9) || // Utawarerumono: Mask of Truth [EUR]
+			!strncmp(titleid, "PCSE01102", 9)) { // Utawarerumono: Mask of Truth [USA]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
+
+		if (config_is_ib_enabled(config)) {
+			uint8_t mov_r0_width[4], mov_r1_height[4];
+			uint32_t offset_w_h = 0;
+			make_arm_a1_mov(0, 0, config->ib_width, mov_r0_width);
+			make_arm_a1_mov(1, 0, config->ib_height, mov_r1_height);
+
+			if (!strncmp(titleid, "PCSB01145", 9)) {
+				offset_w_h = 0x15143C;
+			} else if (!strncmp(titleid, "PCSE01102", 9)) {
+				offset_w_h = 0x154AA8;
+			}
+
+			// seg000:8115143C  BIC   R0, R0, #7
+			// seg000:81151440  VMOV  S0, R0
+			// seg000:81151444  BIC   R1, R1, #7
+			// seg000:81151448  VMOV  S1, R1
+			injectData(eboot_info->modid, 0, offset_w_h, &mov_r0_width, sizeof(mov_r0_width));
+			injectData(eboot_info->modid, 0, offset_w_h + 0x8, &mov_r1_height, sizeof(mov_r1_height));
 		}
 
 		return 1;
