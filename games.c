@@ -591,7 +591,8 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 		return 1;
 	}
 	else if (!strncmp(titleid, "PCSB01145", 9) || // Utawarerumono: Mask of Truth [EUR]
-			!strncmp(titleid, "PCSE01102", 9)) { // Utawarerumono: Mask of Truth [USA]
+			!strncmp(titleid, "PCSE01102", 9) || // Utawarerumono: Mask of Truth [USA]
+			!strncmp(titleid, "PCSG00838", 9)) { // Utawarerumono: Futari no Hakuoro [JPN] [1.04]
 		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
 		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
 
@@ -605,6 +606,8 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 				offset_w_h = 0x15143C;
 			} else if (!strncmp(titleid, "PCSE01102", 9)) {
 				offset_w_h = 0x154AA8;
+			} else if (!strncmp(titleid, "PCSG00838", 9)) {
+				offset_w_h = 0x152698;
 			}
 
 			// seg000:8115143C  BIC   R0, R0, #7
