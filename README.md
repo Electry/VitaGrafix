@@ -102,6 +102,7 @@ NOTE: If some options are left out, the plugin will use their default values (fo
 | Asphalt: Injection | PCSB00040 <br/> PCSE00007 | Internal res. | 720x408 | 960x544 | |
 | Borderlands 2 | PCSF00570 <br/> PCSE00383 | Framebuffer | 960x544 | OFF | Only works at 960x544 and 640x368 |
 | Dead or Alive 5 Plus | PCSB00296 <br/> PCSE00235 <br/> PCSG00167 | Internal res. | 720x408 | 960x544 | |
+| Dragon Quest Builders | PCSB00981 <br/> PCSE00912 <br/> PCSG00697 <br/> PCSH00221 | Internal res. | 720x408 | 960x544 | |
 | F1 2011 | PCSB00027 | Internal res. | 640x384 | 960x544 | |
 | God of War Collection | PCSF00438 <br/> PCSA00126 <br/> PCSC00059 | Framebuffer <br/> FPS cap | 720x408 <br/> 30 | 960x544 <br/> 60 | Both GoW 1 + 2 |
 | Hatsune Miku: Project Diva f | PCSB00419 <br/> PCSE00326 <br/> PCSG00074 | FPS cap | 30 | OFF | At 60fps menu is double speed, gameplay remains normal |
@@ -110,14 +111,18 @@ NOTE: If some options are left out, the plugin will use their default values (fo
 | LEGO Star Wars: The Force Awakens | PCSB00877 <br/> PCSE00791 | Internal res. | 640x368 | 720x408 | Game crashes when opening pause menu at high resolutions. |
 | LittleBigPlanet | PCSF00021 <br/> PCSA00017 <br/> PCSC00013 <br/> PCSD00006 | Internal res. | 720x408 | OFF | Particles cause artifacts at native res. |
 | Miracle Girls Festival | PCSG00610 | Internal res. | 720x408 | 960x544 | |
+| MotoGP 13 | PCSB00316 <br/> PCSE00409 | Internal res. | 704x448 | 960x544 | |
+| MotoGP 14 | PCSE00529 | Internal res. | 704x448 | 960x544 | |
 | MUD - FIM Motocross World Championship | PCSB00182 | Internal res. | 704x448 | 960x544 | |
 | MXGP: The Official Motocross Videogame | PCSB00470 <br/> PCSE00530 | Internal res. | 704x448 | 960x544 | |
 | Persona 4 Golden | PCSB00245 <br/> PCSE00120 <br/> PCSG00004 <br/> PCSG00563 <br/> PCSH00021 | Internal res. | 840x476 | 960x544 | |
 | Ridge Racer | PCSB00048 <br/> PCSE00001 <br/> PCSG00001 | Internal res. | 720x408 | 960x544 | |
-| Utawarerumono: Mask of Deception / Itsuwari no Kamen | PCSE00959 <br/> PCSG00617 | Internal res. | 672x384 | 960x544 | |
+| Utawarerumono: Mask of Deception / Itsuwari no Kamen | PCSB01093 <br/> PCSE00959 <br/> PCSG00617 | Internal res. | 672x384 | 960x544 | |
+| Utawarerumono: Mask of Truth / Futari no Hakuoro | PCSB01145 <br/> PCSE01102 <br/> PCSG00838 | Internal res. | 672x384 | 960x544 | |
 | World of Final Fantasy | PCSB00951 <br/> PCSE00880 <br/> PCSH00223 <br/> PCSG00709 | Internal res. | 640x384 | 800x480 | Only few resolutions work properly (with visible effects and no glitches) |
 | WRC 3: FIA World Rally Championship | PCSB00204 | Internal res. | 704x448 | 960x544 | |
 | WRC 4: FIA World Rally Championship | PCSB00345 <br/> PCSE00411 | Internal res. | 704x448 | 960x544 | |
+| WRC 5: FIA World Rally Championship | PCSB00762 | Framebuffer | 960x544 | OFF | |
 
 
 Adding support for each and every game requires manual disassembly of game's binary to find addresses in the game code where the resolution is set.

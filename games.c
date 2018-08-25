@@ -371,26 +371,35 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
-	else if (!strncmp(titleid, "PCSE00959", 9)) { // Utawarerumono: Mask of Deception [USA]
+	else if (!strncmp(titleid, "PCSB01093", 9) || // Utawarerumono: Mask of Deception [EUR]
+			!strncmp(titleid, "PCSE00959", 9)) {  // Utawarerumono: Mask of Deception [USA]
 		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
 		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
 
 		if (config_is_ib_enabled(config)) {
 			uint8_t mov_r1_width[4], mov_r0_height[4];
+			uint32_t offset_w = 0, offset_h = 0;
 			make_arm_a1_mov(1, 0, config->ib_width, mov_r1_width);
 			make_arm_a1_mov(0, 0, config->ib_height, mov_r0_height);
 
+			if (!strncmp(titleid, "PCSB01093", 9)) {
+				offset_w = 0x119AA0; offset_h = 0x119AB8;
+			} else if (!strncmp(titleid, "PCSE00959", 9)) {
+				offset_w = 0x11D1BC; offset_h = 0x11D1D4;
+			}
+
 			// seg000:8111D1BC  BIC   R1, R1, #7    ; Replace 70*960 ... formula with simple MOV r1, #width
 			// seg000:8111D1C4  STR   R1, [R6]      ; R6 is 0x81B7D550
-			injectData(eboot_info->modid, 0, 0x11D1BC, &mov_r1_width, sizeof(mov_r1_width));
+			injectData(eboot_info->modid, 0, offset_w, &mov_r1_width, sizeof(mov_r1_width));
+
 			// seg000:8111D1D4  BIC   R0, R0, #7
 			// seg000:8111D1D8  STR   R0, [R6,#4]
-			injectData(eboot_info->modid, 0, 0x11D1D4, &mov_r0_height, sizeof(mov_r0_height));
+			injectData(eboot_info->modid, 0, offset_h, &mov_r0_height, sizeof(mov_r0_height));
 		}
 
 		return 1;
 	}
-	else if (!strncmp(titleid, "PCSG00617", 9)) { // Utawarerumono: Itsuwari no Kamen [JPN]
+	else if (!strncmp(titleid, "PCSG00617", 9)) { // Utawarerumono: Itsuwari no Kamen [JPN] [1.02]
 		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
 		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
 
@@ -511,6 +520,131 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 			injectData(eboot_info->modid, 0, offset_vblank, &movs_r0_vblank, sizeof(movs_r0_vblank));
 			if (config->fps == FPS_60) // patch PV anim speed
 				injectData(eboot_info->modid, 0, offset_pvspeed, &vmov_s1_1float, sizeof(vmov_s1_1float));
+		}
+
+		return 1;
+	}
+	else if (!strncmp(titleid, "PCSB00316", 9) || // MotoGP 13 [EUR] [1.02]
+			!strncmp(titleid, "PCSE00409", 9)) {  // MotoGP 13 [USA]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
+
+		if (config_is_ib_enabled(config)) {
+			uint8_t movs_r0_width[4], movs_r5_height[4];
+			uint32_t offset_w_h = 0;
+			make_thumb2_t2_mov(0, 1, config->ib_width, movs_r0_width);
+			make_thumb2_t2_mov(5, 1, config->ib_height, movs_r5_height);
+
+			if (!strncmp(titleid, "PCSB00316", 9)) {
+				offset_w_h = 0xAA57A4;
+			} else if (!strncmp(titleid, "PCSE00409", 9)) {
+				offset_w_h = 0xAA622C;
+			}
+
+			injectData(eboot_info->modid, 0, offset_w_h, &movs_r0_width, sizeof(movs_r0_width));
+			injectData(eboot_info->modid, 0, offset_w_h + 0x6, &movs_r5_height, sizeof(movs_r5_height));
+		}
+
+		return 1;
+	}
+	else if (!strncmp(titleid, "PCSE00529", 9)) { // MotoGP 14 [USA]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
+
+		if (config_is_ib_enabled(config)) {
+			uint8_t movs_r0_width[4], movs_r4_height[4];
+			make_thumb2_t2_mov(0, 1, config->ib_width, movs_r0_width);
+			make_thumb2_t2_mov(4, 1, config->ib_height, movs_r4_height);
+
+			injectData(eboot_info->modid, 0, 0x52B5EA, &movs_r0_width, sizeof(movs_r0_width));
+			injectData(eboot_info->modid, 0, 0x52B5EA + 0x6, &movs_r4_height, sizeof(movs_r4_height));
+		}
+
+		return 1;
+	}
+	else if (!strncmp(titleid, "PCSB00762", 9)) { // WRC 5: FIA World Rally Championship [EUR]
+		config_set_unsupported(FT_ENABLED, FT_UNSUPPORTED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_DISABLED, FT_DISABLED, config);
+
+		if (config_is_fb_enabled(config)) {
+			uint8_t nop[2] = {0x00, 0xBF};
+			uint8_t nop_nop[4] = {0x00, 0xBF, 0x00, 0xBF};
+			uint8_t movs_r0_width[4], mov_r6_height[4];
+			make_thumb2_t2_mov(0, 1, config->fb_width, movs_r0_width);
+			make_thumb2_t2_mov(6, 0, config->fb_height, mov_r6_height);
+
+			// seg000:8118BFF2  BL.W   sub_816BCAEE  ; handles parsing single param from the game config file
+			// seg000:8118C002  BEQ.W  loc_8118C15C  ; if param is valid, store it in [R5,#4], nop this to continue to fallback case
+			// seg000:8118C03E  BL.W   sub_816BCAEE  ; ... same thing for height
+			// seg000:8118C04E  BEQ    loc_8118C144
+			injectData(eboot_info->modid, 0, 0x18C002, &nop_nop, sizeof(nop_nop));
+			injectData(eboot_info->modid, 0, 0x18C04E, &nop, sizeof(nop));
+
+			// seg000:8118C010  MOVS.W  R0, #0x500  ; fallback case uses hardcoded 1280x720
+			// seg000:8118C014  STR     R0, [R5,#4] ; we can use this to inject our res
+			// seg000:8118C022  MOV.W   R6, #0x2D0  ; ... same thing for height
+			// seg000:8118C05A  STR     R6, [R5,#8]
+			injectData(eboot_info->modid, 0, 0x18C010, &movs_r0_width, sizeof(movs_r0_width));
+			injectData(eboot_info->modid, 0, 0x18C022, &mov_r6_height, sizeof(mov_r6_height));
+		}
+
+		return 1;
+	}
+	else if (!strncmp(titleid, "PCSB01145", 9) || // Utawarerumono: Mask of Truth [EUR]
+			!strncmp(titleid, "PCSE01102", 9) || // Utawarerumono: Mask of Truth [USA]
+			!strncmp(titleid, "PCSG00838", 9)) { // Utawarerumono: Futari no Hakuoro [JPN] [1.04]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
+
+		if (config_is_ib_enabled(config)) {
+			uint8_t mov_r0_width[4], mov_r1_height[4];
+			uint32_t offset_w_h = 0;
+			make_arm_a1_mov(0, 0, config->ib_width, mov_r0_width);
+			make_arm_a1_mov(1, 0, config->ib_height, mov_r1_height);
+
+			if (!strncmp(titleid, "PCSB01145", 9)) {
+				offset_w_h = 0x15143C;
+			} else if (!strncmp(titleid, "PCSE01102", 9)) {
+				offset_w_h = 0x154AA8;
+			} else if (!strncmp(titleid, "PCSG00838", 9)) {
+				offset_w_h = 0x152698;
+			}
+
+			// seg000:8115143C  BIC   R0, R0, #7
+			// seg000:81151440  VMOV  S0, R0
+			// seg000:81151444  BIC   R1, R1, #7
+			// seg000:81151448  VMOV  S1, R1
+			injectData(eboot_info->modid, 0, offset_w_h, &mov_r0_width, sizeof(mov_r0_width));
+			injectData(eboot_info->modid, 0, offset_w_h + 0x8, &mov_r1_height, sizeof(mov_r1_height));
+		}
+
+		return 1;
+	}
+	else if (!strncmp(titleid, "PCSB00981", 9) || // Dragon Quest Builders [EUR]
+			!strncmp(titleid, "PCSE00912", 9) || // Dragon Quest Builders [USA]
+			!strncmp(titleid, "PCSG00697", 9) || // Dragon Quest Builders [JPN] [1.03]
+			!strncmp(titleid, "PCSH00221", 9)) { // Dragon Quest Builders [ASA]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
+
+		if (config_is_ib_enabled(config)) {
+			uint8_t movs_r0_width[4], movs_r3_height[4];
+			uint32_t offset_w_h = 0;
+			make_thumb2_t2_mov(0, 1, config->ib_width, movs_r0_width);
+			make_thumb2_t2_mov(3, 1, config->ib_height, movs_r3_height);
+
+			if (!strncmp(titleid, "PCSB00981", 9)) {
+				offset_w_h = 0x271F62;
+			} else if (!strncmp(titleid, "PCSE00912", 9)) {
+				offset_w_h = 0x271F5E;
+			} else if (!strncmp(titleid, "PCSG00697", 9)) {
+				offset_w_h = 0x26AC1E;
+			} else if (!strncmp(titleid, "PCSH00221", 9)) {
+				offset_w_h = 0x26BD42;
+			}
+
+			injectData(eboot_info->modid, 0, offset_w_h, &movs_r0_width, sizeof(movs_r0_width));
+			injectData(eboot_info->modid, 0, offset_w_h - 0x6, &movs_r3_height, sizeof(movs_r3_height));
 		}
 
 		return 1;
