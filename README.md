@@ -102,6 +102,7 @@ NOTE: If some options are left out, the plugin will use their default values (fo
 | Asphalt: Injection | PCSB00040 <br/> PCSE00007 | Internal res. | 720x408 | 960x544 | |
 | Borderlands 2 | PCSF00570 <br/> PCSE00383 | Framebuffer | 960x544 | OFF | Only works at 960x544 and 640x368 |
 | Dead or Alive 5 Plus | PCSB00296 <br/> PCSE00235 <br/> PCSG00167 | Internal res. | 720x408 | 960x544 | |
+| Dragon Quest Builders | PCSB00981 <br/> PCSE00912 <br/> PCSG00697 <br/> PCSH00221 | Internal res. | 720x408 | 960x544 | |
 | F1 2011 | PCSB00027 | Internal res. | 640x384 | 960x544 | |
 | God of War Collection | PCSF00438 <br/> PCSA00126 <br/> PCSC00059 | Framebuffer <br/> FPS cap | 720x408 <br/> 30 | 960x544 <br/> 60 | Both GoW 1 + 2 |
 | Hatsune Miku: Project Diva f | PCSB00419 <br/> PCSE00326 <br/> PCSG00074 | FPS cap | 30 | OFF | At 60fps menu is double speed, gameplay remains normal |

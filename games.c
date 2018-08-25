@@ -620,6 +620,35 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
+	else if (!strncmp(titleid, "PCSB00981", 9) || // Dragon Quest Builders [EUR]
+			!strncmp(titleid, "PCSE00912", 9) || // Dragon Quest Builders [USA]
+			!strncmp(titleid, "PCSG00697", 9) || // Dragon Quest Builders [JPN] [1.03]
+			!strncmp(titleid, "PCSH00221", 9)) { // Dragon Quest Builders [ASA]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_ENABLED, FT_DISABLED, config);
+
+		if (config_is_ib_enabled(config)) {
+			uint8_t movs_r0_width[4], movs_r3_height[4];
+			uint32_t offset_w_h = 0;
+			make_thumb2_t2_mov(0, 1, config->ib_width, movs_r0_width);
+			make_thumb2_t2_mov(3, 1, config->ib_height, movs_r3_height);
+
+			if (!strncmp(titleid, "PCSB00981", 9)) {
+				offset_w_h = 0x271F62;
+			} else if (!strncmp(titleid, "PCSE00912", 9)) {
+				offset_w_h = 0x271F5E;
+			} else if (!strncmp(titleid, "PCSG00697", 9)) {
+				offset_w_h = 0x26AC1E;
+			} else if (!strncmp(titleid, "PCSH00221", 9)) {
+				offset_w_h = 0x26BD42;
+			}
+
+			injectData(eboot_info->modid, 0, offset_w_h, &movs_r0_width, sizeof(movs_r0_width));
+			injectData(eboot_info->modid, 0, offset_w_h - 0x6, &movs_r3_height, sizeof(movs_r3_height));
+		}
+
+		return 1;
+	}
 
 	return 0;
 }
