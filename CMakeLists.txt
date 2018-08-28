@@ -30,6 +30,7 @@ target_link_libraries(VitaGrafix
   taihen_stub
   SceAppMgr_stub
   SceDisplay_stub
+  SceCtrl_stub
   kuio_stub
   k
   gcc

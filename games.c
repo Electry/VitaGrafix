@@ -9,6 +9,7 @@
 #include "games.h"
 
 int sceDisplayWaitVblankStartMulti(unsigned int vcount);
+int sceCtrlPeekBufferPositive2(int port, SceCtrlData *pad_data, int count);
 
 int sceDisplaySetFrameBuf_withWait(const SceDisplayFrameBuf *pParam, int sync) {
 	int ret = TAI_CONTINUE(int, hooks_ref[0], pParam, sync);
@@ -16,6 +17,13 @@ int sceDisplaySetFrameBuf_withWait(const SceDisplayFrameBuf *pParam, int sync) {
 	sceDisplayWaitVblankStartMulti(0x2);
 
 	return ret;
+}
+
+int sceCtrlReadBufferPositive_peekPatched(int port, SceCtrlData *pad_data, int count) {
+	return sceCtrlPeekBufferPositive(port, pad_data, count);
+}
+int sceCtrlReadBufferPositive2_peekPatched(int port, SceCtrlData *pad_data, int count) {
+	return sceCtrlPeekBufferPositive2(port, pad_data, count);
 }
 
 uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config *config) {
@@ -50,8 +58,13 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 			// dword_819706A4  DCD 2  ; DATA XREF: seg000:8104F722
 			injectData(eboot_info->modid, 0, 0x9706A4, &data32_vblank, sizeof(data32_vblank));
+
+			if (config->fps == FPS_60) {
+				hookFunctionImport(0x67E7AB83, sceCtrlReadBufferPositive_peekPatched);
+				hookFunctionImport(0xC4226A3E, sceCtrlReadBufferPositive2_peekPatched);
+			}
 		}
-		
+
 		return 1;
 	}
 	else if (!strncmp(titleid, "PCSB00245", 9) || // Persona 4 Golden [EUR]
