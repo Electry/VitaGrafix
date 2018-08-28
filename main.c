@@ -12,6 +12,7 @@
 #include "main.h"
 
 #define MAX_INJECTS_NUM 15
+#define MAX_HOOKS_NUM   2
 
 // sceDisplaySetFrameBuf hook
 static SceUID sceDisplaySetFrameBuf_hookid;
@@ -20,6 +21,11 @@ static tai_hook_ref_t sceDisplaySetFrameBuf_hookref = {0};
 // eboot patches
 static uint8_t injects_num = 0;
 static SceUID injects[MAX_INJECTS_NUM] = {0};
+
+// eboot hooks
+static uint8_t hooks_num = 0;
+static SceUID hooks[MAX_HOOKS_NUM] = {0};
+tai_hook_ref_t hooks_ref[MAX_HOOKS_NUM] = {0};
 
 static char titleid[16];
 static tai_module_info_t info = {0};
@@ -32,6 +38,14 @@ static VG_Config config;
 void injectData(SceUID modid, int segidx, uint32_t offset, const void *data, size_t size) {
 	injects[injects_num] = taiInjectData(modid, segidx, offset, data, size);
 	injects_num++;
+}
+void hookFunction(SceUID modid, int segidx, uint32_t offset, int thumb, const void *func) {
+	hooks[hooks_num] = taiHookFunctionOffset(&hooks_ref[hooks_num], modid, segidx, offset, thumb, func);
+	hooks_num++;
+}
+void hookFunctionImport(uint32_t nid, const void *func) {
+	hooks[hooks_num] = taiHookFunctionImport(&hooks_ref[hooks_num], TAI_MAIN_MODULE, TAI_ANY_LIBRARY, nid, func);
+	hooks_num++;
 }
 
 int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
@@ -124,6 +138,11 @@ int module_stop(SceSize argc, const void *args) {
 	while (injects_num-- > 0) {
 		if (injects[injects_num] >= 0)
 			taiInjectRelease(injects[injects_num]);
+	}
+
+	while (hooks_num-- > 0) {
+		if (hooks[hooks_num] >= 0)
+			taiHookRelease(hooks[hooks_num], hooks_ref[hooks_num]);
 	}
 
 	return SCE_KERNEL_STOP_SUCCESS;
