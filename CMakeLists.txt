@@ -29,6 +29,7 @@ add_executable(VitaGrafix
 target_link_libraries(VitaGrafix
   taihen_stub
   SceAppMgr_stub
+  SceDisplay_stub
   kuio_stub
   k
   gcc

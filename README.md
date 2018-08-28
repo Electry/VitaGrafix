@@ -118,6 +118,7 @@ NOTE: If some options are left out, the plugin will use their default values (fo
 | MXGP: The Official Motocross Videogame | PCSB00470 <br/> PCSE00530 | Internal res. | 704x448 | 960x544 | |
 | Persona 4 Golden | PCSB00245 <br/> PCSE00120 <br/> PCSG00004 <br/> PCSG00563 <br/> PCSH00021 | Internal res. | 840x476 | 960x544 | |
 | Ridge Racer | PCSB00048 <br/> PCSE00001 <br/> PCSG00001 | Internal res. | 720x408 | 960x544 | |
+| The Amazing Spider-Man | PCSB00428 | Internal res. <br/> FPS cap | 704x400 <br/> 60 | OFF <br/> OFF | Only few resolutions work properly (704x400, 480x272 known working). 960x544 causes GPU crash |
 | Utawarerumono: Mask of Deception / Itsuwari no Kamen | PCSB01093 <br/> PCSE00959 <br/> PCSG00617 | Internal res. | 672x384 | 960x544 | |
 | Utawarerumono: Mask of Truth / Futari no Hakuoro | PCSB01145 <br/> PCSE01102 <br/> PCSG00838 | Internal res. | 672x384 | 960x544 | |
 | World of Final Fantasy | PCSB00951 <br/> PCSE00880 <br/> PCSH00223 <br/> PCSG00709 | Internal res. | 640x384 | 800x480 | Only few resolutions work properly (with visible effects and no glitches) |

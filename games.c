@@ -1,11 +1,22 @@
 #include <psp2/types.h>
 #include <libk/string.h>
+#include <vitasdk.h>
 #include <taihen.h>
 
 #include "tools.h"
 #include "config.h"
 #include "main.h"
 #include "games.h"
+
+int sceDisplayWaitVblankStartMulti(unsigned int vcount);
+
+int sceDisplaySetFrameBuf_withWait(const SceDisplayFrameBuf *pParam, int sync) {
+	int ret = TAI_CONTINUE(int, hooks_ref[0], pParam, sync);
+
+	sceDisplayWaitVblankStartMulti(0x2);
+
+	return ret;
+}
 
 uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config *config) {
 	if (!strncmp(titleid, "PCSF00243", 9) || // Killzone Mercenary [EUR] [1.12]
@@ -717,6 +728,24 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 			injectData(eboot_info->modid, 0, offset_w_h, &movs_r0_width, sizeof(movs_r0_width));
 			injectData(eboot_info->modid, 0, offset_w_h - 0x6, &movs_r3_height, sizeof(movs_r3_height));
+		}
+
+		return 1;
+	}
+	else if (!strncmp(titleid, "PCSB00428", 9)) { // The Amazing Spider-Man [EUR]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_ENABLED, config);
+		config_set_default(FT_DISABLED, FT_DISABLED, FT_DISABLED, config);
+
+		if (config_is_ib_enabled(config)) {
+			uint8_t movs_r1_width_r0_height[4];
+			make_thumb2_t2_mov(1, 1, config->ib_width, movs_r1_width_r0_height);
+			make_thumb2_t2_mov(0, 1, config->ib_height, &movs_r1_width_r0_height[4]);
+
+			injectData(eboot_info->modid, 0, 0x16CD7E, &movs_r1_width_r0_height, sizeof(movs_r1_width_r0_height));
+		}
+		if (config_is_fps_enabled(config)) {
+			if (config->fps == FPS_30) // Force 2 vblank wait
+				hookFunctionImport(0x7A410B64, sceDisplaySetFrameBuf_withWait);
 		}
 
 		return 1;
