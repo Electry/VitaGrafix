@@ -620,6 +620,36 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
+	else if (!strncmp(titleid, "PCSB01007", 9) || // Hatsune Miku: Project Diva X [EUR]
+			!strncmp(titleid, "PCSE00867", 9) || // Hatsune Miku: Project Diva X [USA]
+			!strncmp(titleid, "PCSH00176", 9)) { // Hatsune Miku: Project Diva X [ASA]
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
+		config_set_default(FT_DISABLED, FT_DISABLED, FT_DISABLED, config);
+
+		if (config_is_ib_enabled(config)) {
+			uint8_t movs_r2_width[4], movs_r3_height[4];
+			uint8_t movs_lr_width[4], movs_r12_height[4];
+			uint32_t offset_w_h_1 = 0, offset_w_h_2 = 0;
+			make_thumb2_t2_mov(2, 1, config->ib_width, movs_r2_width);
+			make_thumb2_t2_mov(3, 1, config->ib_height, movs_r3_height);
+			make_thumb2_t2_mov(REGISTER_LR, 1, config->ib_width, movs_lr_width);
+			make_thumb2_t2_mov(12, 1, config->ib_height, movs_r12_height);
+
+			if (!strncmp(titleid, "PCSB01007", 9) || // X [EUR/USA]
+					!strncmp(titleid, "PCSE00867", 9)) {
+				offset_w_h_1 = 0x2643BA; offset_w_h_2 = 0x2653D2;
+			} else if (!strncmp(titleid, "PCSH00176", 9)) { // X
+				offset_w_h_1 = 0x230D5A; offset_w_h_2 = 0x231A86;
+			}
+
+			injectData(eboot_info->modid, 0, offset_w_h_1, &movs_r2_width, sizeof(movs_r2_width));
+			injectData(eboot_info->modid, 0, offset_w_h_1 + 0x6, &movs_r3_height, sizeof(movs_r3_height));
+			injectData(eboot_info->modid, 0, offset_w_h_2, &movs_lr_width, sizeof(movs_lr_width));
+			injectData(eboot_info->modid, 0, offset_w_h_2 + 0x6, &movs_r12_height, sizeof(movs_r12_height));
+		}
+
+		return 1;
+	}
 	else if (!strncmp(titleid, "PCSB00316", 9) || // MotoGP 13 [EUR] [1.02]
 			!strncmp(titleid, "PCSE00409", 9)) {  // MotoGP 13 [USA]
 		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
