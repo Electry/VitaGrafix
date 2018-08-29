@@ -549,9 +549,32 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 			!strncmp(titleid, "PCSE00434", 9) || // Hatsune Miku: Project Diva f 2nd [USA]
 			!strncmp(titleid, "PCSG00205", 9) || // Hatsune Miku: Project Diva f 2nd [JPN] [1.01]
 			!strncmp(titleid, "PCSH00088", 9)) { // Hatsune Miku: Project Diva f 2nd [ASA]
-		config_set_unsupported(FT_UNSUPPORTED, FT_UNSUPPORTED, FT_ENABLED, config);
+		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_ENABLED, config);
 		config_set_default(FT_DISABLED, FT_DISABLED, FT_DISABLED, config);
 
+		if (config_is_ib_enabled(config)) {
+			uint8_t movs_r3_width[4], movs_r4_height[4];
+			uint8_t movs_r5_width[4], movs_r6_height[4];
+			uint32_t offset_w_h_1 = 0, offset_w_h_2 = 0;
+			make_thumb2_t2_mov(3, 0, config->ib_width, movs_r3_width);
+			make_thumb2_t2_mov(4, 0, config->ib_height, movs_r4_height);
+			make_thumb2_t2_mov(5, 1, config->ib_width, movs_r5_width);
+			make_thumb2_t2_mov(6, 1, config->ib_height, movs_r6_height);
+
+			if (!strncmp(titleid, "PCSB00554", 9) || // f 2nd [EUR/USA]
+					!strncmp(titleid, "PCSE00434", 9)) {
+				offset_w_h_1 = 0x25E34A; offset_w_h_2 = 0x25D500;
+			} else if (!strncmp(titleid, "PCSG00205", 9)) { // f 2nd [JPN] [1.01]
+				offset_w_h_1 = 0x25A6B6; offset_w_h_2 = 0x25986C;
+			} else if (!strncmp(titleid, "PCSH00088", 9)) { // f 2nd [ASA]
+				offset_w_h_1 = 0x25E4CA; offset_w_h_2 = 0x25D680;
+			}
+
+			injectData(eboot_info->modid, 0, offset_w_h_1, &movs_r3_width, sizeof(movs_r3_width));
+			injectData(eboot_info->modid, 0, offset_w_h_1 + 0x8, &movs_r4_height, sizeof(movs_r4_height));
+			injectData(eboot_info->modid, 0, offset_w_h_2, &movs_r5_width, sizeof(movs_r5_width));
+			injectData(eboot_info->modid, 0, offset_w_h_2 + 0x8, &movs_r6_height, sizeof(movs_r6_height));
+		}
 		if (config_is_fps_enabled(config)) {
 			uint8_t movs_r0_vblank[2];
 			uint8_t vmov_s1_1float[4] = {0xF7, 0xEE, 0x00, 0x0A};
