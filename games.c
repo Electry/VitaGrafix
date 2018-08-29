@@ -545,6 +545,34 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
+	else if (!strncmp(titleid, "PCSB00554", 9) || // Hatsune Miku: Project Diva f 2nd [EUR]
+			!strncmp(titleid, "PCSE00434", 9) || // Hatsune Miku: Project Diva f 2nd [USA]
+			!strncmp(titleid, "PCSG00205", 9) || // Hatsune Miku: Project Diva f 2nd [JPN] [1.01]
+			!strncmp(titleid, "PCSH00088", 9)) { // Hatsune Miku: Project Diva f 2nd [ASA]
+		config_set_unsupported(FT_UNSUPPORTED, FT_UNSUPPORTED, FT_ENABLED, config);
+		config_set_default(FT_DISABLED, FT_DISABLED, FT_DISABLED, config);
+
+		if (config_is_fps_enabled(config)) {
+			uint8_t movs_r0_vblank[2];
+			uint8_t vmov_s1_1float[4] = {0xF7, 0xEE, 0x00, 0x0A};
+			uint32_t offset_vblank = 0, offset_pvspeed = 0;
+			make_thumb_t1_mov(0, config->fps == FPS_60 ? 0x1 : 0x2, movs_r0_vblank);
+
+			if (!strncmp(titleid, "PCSB00554", 9) || // f 2nd [EUR/USA/ASA]
+					!strncmp(titleid, "PCSE00434", 9) ||
+					!strncmp(titleid, "PCSH00088", 9)) {
+				offset_vblank = 0xA994; offset_pvspeed = 0xAAF2;
+			} else if (!strncmp(titleid, "PCSG00205", 9)) { // f 2nd [JPN] [1.01]
+				offset_vblank = 0xA95C; offset_pvspeed = 0xAABA;
+			}
+
+			injectData(eboot_info->modid, 0, offset_vblank, &movs_r0_vblank, sizeof(movs_r0_vblank));
+			if (config->fps == FPS_60) // patch PV anim speed
+				injectData(eboot_info->modid, 0, offset_pvspeed, &vmov_s1_1float, sizeof(vmov_s1_1float));
+		}
+
+		return 1;
+	}
 	else if (!strncmp(titleid, "PCSB00316", 9) || // MotoGP 13 [EUR] [1.02]
 			!strncmp(titleid, "PCSE00409", 9)) {  // MotoGP 13 [USA]
 		config_set_unsupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED, config);
