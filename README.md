@@ -1,7 +1,10 @@
 # VitaGrafix
 VitaGrafix is a taiHEN plugin that allows you to change resolution and FPS cap of PS Vita games (to get better visuals, higher FPS or longer battery life).
 
-Heavily inspired by [vitaRescale](https://github.com/Rinnegatamante/vitaRescale) from Rinnegatamante, with added features and more supported games.
+## Credits
+- Rinnegatamante - for [vitaRescale](https://github.com/Rinnegatamante/vitaRescale)
+- InquisitionImplied - for finding patches of some of the games included in here
+- "the scene" - for giving us a change to do these things in the first place
 
 ## Installation
 #### If you experience crashes at h-encore exit / enso bootup, make sure you have the latest kuio (v1.2)
@@ -70,6 +73,7 @@ FPS=60         <- FPS cap. Setting this to OFF disables this feature.
                   Valid options:
                     60
                     30
+                    OFF
 ```
 
 ### Example config.txt
@@ -104,12 +108,12 @@ NOTE: If some options are left out, the plugin will use their default values (fo
 | Dead or Alive 5 Plus | PCSB00296 <br/> PCSE00235 <br/> PCSG00167 | Internal res. | 720x408 | 960x544 | |
 | Dragon Quest Builders | PCSB00981 <br/> PCSE00912 <br/> PCSG00697 <br/> PCSH00221 | Internal res. | 720x408 | 960x544 | |
 | F1 2011 | PCSB00027 | Internal res. | 640x384 | 960x544 | |
-| God of War Collection | PCSF00438 <br/> PCSA00126 <br/> PCSC00059 | Framebuffer <br/> FPS cap | 720x408 <br/> 30 | 960x544 <br/> 60 | Both GoW 1 + 2 |
+| God of War Collection | PCSF00438 <br/> PCSA00126 <br/> PCSC00059 | Framebuffer <br/> FPS cap | 720x408 <br/> 30 | 960x544 <br/> 60 | |
 | Hatsune Miku: Project Diva f | PCSB00419 <br/> PCSE00326 <br/> PCSG00074 | Internal res. <br/> FPS cap | 640x352 <br/> 30 | OFF <br/> OFF | At 60 FPS menu is double speed |
 | Hatsune Miku: Project Diva f 2nd | PCSB00554 <br/> PCSE00434 <br/> PCSG00205 <br/> PCSH00088 | Internal res. <br/> FPS cap | 720x408 <br/> 30 | OFF <br/> OFF | At 60 FPS menu is double speed |
 | Hatsune Miku: Project Diva X | PCSB01007 <br/> PCSE00867 <br/> PCSH00176 | Internal res. | 720x408 | OFF | |
-| Jak and Daxter Collection | PCSF00247 <br/> PCSF00248 <br/> PCSF00249 <br/> PCSF00250 <br/> PCSA00080 | Framebuffer | 720x408 | 960x544 | All 3 games |
-| Killzone: Mercenary | PCSF00243 <br/> PCSF00403 <br/> PCSA00107 <br/> PCSC00045 <br/> PCSD00071 | Internal res. <br/> FPS cap | Dynamic <br/> 30 | OFF <br/> OFF | Particles are rendered separately. |
+| Jak and Daxter Collection | PCSF00247 <br/> PCSF00248 <br/> PCSF00249 <br/> PCSF00250 <br/> PCSA00080 | Framebuffer | 720x408 | 960x544 | |
+| Killzone: Mercenary | PCSF00243 <br/> PCSF00403 <br/> PCSA00107 <br/> PCSC00045 <br/> PCSD00071 | Internal res. <br/> FPS cap | Dynamic <br/> 30 | OFF <br/> OFF | |
 | LEGO Star Wars: The Force Awakens | PCSB00877 <br/> PCSE00791 | Internal res. | 640x368 | 720x408 | Game crashes when opening pause menu at high resolutions. |
 | LittleBigPlanet | PCSF00021 <br/> PCSA00017 <br/> PCSC00013 <br/> PCSD00006 | Internal res. | 720x408 | OFF | Particles cause artifacts at native res. |
 | Miracle Girls Festival | PCSG00610 | Internal res. | 720x408 | 960x544 | |
@@ -129,4 +133,4 @@ NOTE: If some options are left out, the plugin will use their default values (fo
 | WRC 5: FIA World Rally Championship | PCSB00762 | Framebuffer | 960x544 | OFF | |
 
 
-Adding support for each and every game requires manual disassembly of game's binary to find addresses in the game code where the resolution is set.
+Adding support for each and every game requires manual disassembly of game's binary to find addresses in the game code where the resolution is set. Some are easy to patch, others plainly impossible.
