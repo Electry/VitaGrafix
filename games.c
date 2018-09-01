@@ -793,6 +793,27 @@ uint8_t patch_game(const char *titleid, tai_module_info_t *eboot_info, VG_Config
 
 		return 1;
 	}
+	else if (!strncmp(titleid, "PCSA00096", 9)) { // Sly Cooper and the Thievius Raccoonus [USA]
+		config_set_unsupported(FT_ENABLED, FT_UNSUPPORTED, FT_ENABLED, config);
+		config_set_default(FT_ENABLED, FT_DISABLED, FT_ENABLED, config);
+
+		if (config_is_fb_enabled(config)) {
+			uint8_t movs_r1_width[4], movs_r1_height[4];
+			make_thumb2_t2_mov(1, 1, config->fb_width, movs_r1_width);
+			make_thumb2_t2_mov(1, 1, config->fb_height, movs_r1_height);
+
+			injectData(eboot_info->modid, 0, 0xE0AF8, &movs_r1_width, sizeof(movs_r1_width));
+			injectData(eboot_info->modid, 0, 0xE0AF8 + 0x6, &movs_r1_height, sizeof(movs_r1_height));
+		}
+		if (config_is_fps_enabled(config)) {
+			uint8_t movs_r0_vblank[2];
+			make_thumb_t1_mov(0, config->fps == FPS_60 ? 0x1 : 0x2, movs_r0_vblank);
+
+			injectData(eboot_info->modid, 0, 0x10C104, &movs_r0_vblank, sizeof(movs_r0_vblank));
+		}
+
+		return 1;
+	}
 
 	return 0;
 }
