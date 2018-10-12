@@ -1,194 +1,254 @@
-#include <psp2/types.h>
-#include <psp2/io/stat.h>
-#include <psp2/io/fcntl.h>
-
-#include <libk/stdio.h>
-#include <libk/stdlib.h>
-#include <libk/string.h>
-#include <kuio.h>
+#include <vitasdk.h>
+#include <taihen.h>
 
 #include "config.h"
+#include "main.h"
+#include "log.h"
 
-#define CONFIG_PATH "ux0:data/VitaGrafix/config.txt"
 
-void config_parse_resolution(char *buffer, SceOff i, uint16_t *width, uint16_t *height) {
-	*width = strtol(&buffer[i], NULL, 10);
-	while (buffer[i++] != 'x') {}
-	*height = strtol(&buffer[i], NULL, 10);
+static VG_ConfigSection g_config_section = CONFIG_NONE;
+
+static uint8_t vgConfigParseFeatureState(char chunk[], int pos, int end, const char option[], VG_FeatureState *out) {
+    if (!strncmp(&chunk[pos], option, strlen(option))) {
+        pos += strlen(option) + 1;
+        if (pos >= end)
+            return 0;
+
+        *out = (chunk[pos] == '0' || !strncmp(&chunk[pos], "OFF", 3)) ? FT_DISABLED : FT_ENABLED;
+        return 1;
+    }
+    return 0;
 }
 
-void config_parse_main(char *buffer, SceOff i, VG_Config *config) {
-	if (strncmp(&buffer[i], "ENABLED=", 8) == 0) {
-		i += 8;
-		config->enabled = buffer[i] == '0' ? FT_DISABLED : FT_ENABLED;
-	}
-	else if (strncmp(&buffer[i], "OSD=", 4) == 0) {
-		i += 4;
-		config->osd_enabled = buffer[i] == '0' ? FT_DISABLED : FT_ENABLED;
-	}
+static uint8_t vgConfigParseResolution(char chunk[], int pos, int end, const char option[], VG_FeatureState *ft, VG_Resolution *res, uint8_t *count) {
+    if (!strncmp(&chunk[pos], option, strlen(option))) {
+        pos += strlen(option) + 1;
+        if (pos >= end)
+            return 0;
+
+        *ft = (chunk[pos] == '0' || !strncmp(&chunk[pos], "OFF", 3)) ? FT_DISABLED : FT_ENABLED;
+        if (!*ft)
+            return 1;
+
+        // Single resolution
+        if (count == NULL) {
+            res->width = strtol(&chunk[pos], NULL, 10);
+            while (pos < end && chunk[pos++] != 'x') {}
+            res->height = strtol(&chunk[pos], NULL, 10);
+        // Multiple resolutions
+        } else {
+            while (pos < end-1 && *count < MAX_RES_COUNT) {
+                res[*count].width = strtol(&chunk[pos], NULL, 10);
+                while (pos < end && chunk[pos++] != 'x') {}
+                res[*count].height = strtol(&chunk[pos], NULL, 10);
+                while (pos < end && chunk[pos++] != ',') {}
+                (*count)++;
+            }
+        }
+
+        return 1;
+    }
+    return 0;
 }
 
-void config_parse_game(char *buffer, SceOff i, VG_Config *config) {
-	if (strncmp(&buffer[i], "ENABLED=", 8) == 0) {
-		i += 8;
-		config->game_enabled = buffer[i] == '0' ? FT_DISABLED : FT_ENABLED;
-	}
-	else if (strncmp(&buffer[i], "OSD=", 4) == 0) {
-		i += 4;
-		config->game_osd_enabled = buffer[i] == '0' ? FT_DISABLED : FT_ENABLED;
-	}
-	else if (strncmp(&buffer[i], "FPS=", 4) == 0) {
-		i += 4;
-		config->fps_enabled = strncmp(&buffer[i], "OFF", 3) == 0 ? FT_DISABLED : FT_ENABLED;
-		if (config->fps_enabled == FT_ENABLED)
-			config->fps = strncmp(&buffer[i], "30", 2) == 0 ? FPS_30 : FPS_60;
-	}
-	else if (strncmp(&buffer[i], "FB=", 3) == 0) {
-		i += 3;
-		config->fb_res_enabled = strncmp(&buffer[i], "OFF", 3) == 0 ? FT_DISABLED : FT_ENABLED;
-		if (config->fb_res_enabled == FT_ENABLED)
-			config_parse_resolution(buffer, i, &(config->fb_width), &(config->fb_height));
-	}
-	else if (strncmp(&buffer[i], "IB=", 3) == 0) {
-		i += 3;
-		config->ib_res_enabled = strncmp(&buffer[i], "OFF", 3) == 0 ? FT_DISABLED : FT_ENABLED;
-		if (config->ib_res_enabled == FT_ENABLED)
-			config_parse_resolution(buffer, i, &(config->ib_width), &(config->ib_height));
-	}
+static uint8_t vgConfigParseFramerate(char chunk[], int pos, int end, const char option[], VG_FeatureState *ft, VG_Fps *fps) {
+    if (!strncmp(&chunk[pos], option, strlen(option))) {
+        pos += strlen(option) + 1;
+        if (pos >= end)
+            return 0;
+
+        *ft = (chunk[pos] == '0' || !strncmp(&chunk[pos], "OFF", 3)) ? FT_DISABLED : FT_ENABLED;
+        if (!*ft)
+            return 1;
+
+        *fps = !strncmp(&chunk[pos], "30", 2) ? FPS_30 : FPS_60;
+        return 1;
+    }
+    return 0;
 }
 
-void config_set_unsupported(
-		VG_FeatureState fb_res,
-		VG_FeatureState ib_res,
-		VG_FeatureState fps,
-		VG_Config *config) {
-	if (fb_res == FT_UNSUPPORTED)
-		config->fb_res_enabled = fb_res;
-	if (ib_res == FT_UNSUPPORTED)
-		config->ib_res_enabled = ib_res;
-	if (fps == FT_UNSUPPORTED)
-		config->fps_enabled = fps;
+static uint8_t vgConfigParseMain(char chunk[], int pos, int end) {
+    if (vgConfigParseFeatureState(chunk, pos, end, "ENABLED", &g_main.config.enabled) ||
+        vgConfigParseFeatureState(chunk, pos, end, "OSD", &g_main.config.osd_enabled)) {
+            return 1;
+    }
+    vgLogPrintF("Failed parsing option in [MAIN] section, pos=%d, end=%d, string='%.*s'\n",
+            pos, end, ((end - pos) > 128 ? (128) : (end - pos)), &chunk[pos]);
+    return 0;
 }
 
-void config_set_default(
-		VG_FeatureState fb_res_enabled,
-		VG_FeatureState ib_res_enabled,
-		VG_FeatureState fps_enabled,
-		VG_Config *config) {
-	if (config->fb_res_enabled == FT_UNSPECIFIED)
-		config->fb_res_enabled = fb_res_enabled;
-	if (config->ib_res_enabled == FT_UNSPECIFIED)
-		config->ib_res_enabled = ib_res_enabled;
-	if (config->fps_enabled == FT_UNSPECIFIED)
-		config->fps_enabled = fps_enabled;
+static uint8_t vgConfigParseGame(char chunk[], int pos, int end) {
+    if (vgConfigParseFeatureState(chunk, pos, end, "ENABLED", &g_main.config.game_enabled) ||
+        vgConfigParseFeatureState(chunk, pos, end, "OSD", &g_main.config.game_osd_enabled) ||
+        vgConfigParseResolution(chunk, pos, end, "FB", &g_main.config.fb_enabled, &g_main.config.fb, NULL) ||
+        vgConfigParseResolution(chunk, pos, end, "IB", &g_main.config.ib_enabled, g_main.config.ib, &g_main.config.ib_count) ||
+        vgConfigParseFramerate(chunk, pos, end, "FPS", &g_main.config.fps_enabled, &g_main.config.fps)) {
+            return 1;
+    }
+    vgLogPrintF("Failed parsing option in [%s] section, pos=%d, end=%d, string='%.*s'\n",
+            g_main.titleid, pos, end, ((end - pos) > 128 ? (128) : (end - pos)), &chunk[pos]);
+    return 0;
 }
 
-void config_set_default_params(
-		VG_FeatureState fb_res_enabled,
-		uint16_t fb_width,
-		uint16_t fb_height,
-		VG_FeatureState ib_res_enabled,
-		uint16_t ib_width,
-		uint16_t ib_height,
-		VG_FeatureState fps_enabled,
-		VG_Fps fps,
-		VG_Config *config) {
-	if (config->fb_res_enabled == FT_UNSPECIFIED) {
-		config->fb_res_enabled = fb_res_enabled;
-		config->fb_width = fb_width;
-		config->fb_height = fb_height;
-	}
-	if (config->ib_res_enabled == FT_UNSPECIFIED) {
-		config->ib_res_enabled = ib_res_enabled;
-		config->ib_width = ib_width;
-		config->ib_height = ib_height;
-	}
-	if (config->fps_enabled == FT_UNSPECIFIED) {
-		config->fps_enabled = fps_enabled;
-		config->fps = fps;
-	}
+static uint8_t vgConfigParseLine(char chunk[], int pos, int end) {
+    // Ignore comments
+    if (chunk[pos] == '#')
+        return 1;
+
+    // Ignore spaces and tabs at the beginning
+    while (pos < end &&
+            (chunk[pos] == ' ' || chunk[pos] == '\t'||
+            chunk[pos] == '\r' || chunk[pos] == '\n')) { pos++; }
+    if (pos == end)
+        return 1; // Empty line
+
+    // Check for new section
+    if (!strncmp(&chunk[pos], "[MAIN]", 6)) {
+        vgLogPrintF("Found [MAIN] section, pos=%d\n", pos);
+        g_config_section = CONFIG_MAIN;
+        return 1;
+    } else if (chunk[pos] == '[') {
+        if ((pos + TITLEID_LEN + 1) < end && // does titleid even fit?
+                chunk[pos] == '[' &&
+                !strncmp(&chunk[pos + 1], g_main.titleid, TITLEID_LEN) &&
+                chunk[pos + TITLEID_LEN + 1] == ']') {
+            vgLogPrintF("Found [%s] section, pos=%d\n", g_main.titleid, pos, end);
+            g_config_section = CONFIG_GAME;
+            return 1;
+        } else {
+            g_config_section = CONFIG_NONE;
+            return 1; // Section for a different game
+        }
+    }
+
+    // Parse data
+    if (g_config_section == CONFIG_MAIN) {
+        if (vgConfigParseMain(chunk, pos, end))
+            return 1;
+    } else if (g_config_section == CONFIG_GAME) {
+        if (vgConfigParseGame(chunk, pos, end))
+            return 1;
+    } else if (g_config_section == CONFIG_NONE) {
+        return 1; // Section for a different game
+    }
+
+    return 0;
 }
 
-uint8_t config_is_fb_enabled(VG_Config *config) {
-	return config->enabled == FT_ENABLED &&
-			config->game_enabled == FT_ENABLED &&
-			config->fb_res_enabled == FT_ENABLED;
+void vgConfigParse() {
+    // Set defaults
+    g_main.config.enabled = FT_ENABLED;
+    g_main.config.osd_enabled = FT_ENABLED;
+    g_main.config.game_enabled = FT_ENABLED;
+    g_main.config.game_osd_enabled = FT_ENABLED;
+    g_main.config.fb_enabled = FT_DISABLED;
+    g_main.config.ib_enabled = FT_DISABLED;
+    g_main.config.fps_enabled = FT_DISABLED;
+    g_main.config_state = CONFIG_OK;
+
+    SceUID fd = sceIoOpen(CONFIG_PATH, SCE_O_RDONLY | SCE_O_CREAT, 0777);
+    if (fd < 0) {
+        g_main.config_state = CONFIG_OPEN_FAILED;
+        goto END;
+    }
+
+    int chunk_size = 0;
+    char chunk[CONFIG_CHUNK_SIZE] = "";
+    int pos = 0, end = 0;
+
+    while ((chunk_size = sceIoRead(fd, chunk, CONFIG_CHUNK_SIZE)) > 1) {
+#ifdef ENABLE_VERBOSE_LOGGING
+        vgLogPrintF("Parsing new chunk, size=%d\n", chunk_size);
+#endif
+        pos = 0;
+
+        // Read all lines in chunk
+        while (pos < chunk_size) {
+            end = -1;
+
+            // Find EOL
+            for (int i = pos; i < CONFIG_CHUNK_SIZE; i++) {
+                if (chunk[i] == '\n') {
+                    end = i;
+                    break;
+                }
+            }
+
+            // Did not find EOL in current chunk? read next sub-chunk
+            if (end == -1 && chunk_size == CONFIG_CHUNK_SIZE) {
+#ifdef ENABLE_VERBOSE_LOGGING
+                vgLogPrintF("Didnt find EOL in this chunk, pos=%d, seek=%d\n",
+                        pos, 0 - (CONFIG_CHUNK_SIZE - pos));
+#endif
+                // Single line is > CONFIG_CHUNK_SIZE chars
+                if (pos == 0) {
+                    vgLogPrintF("Line is > %d !\n", CONFIG_CHUNK_SIZE);
+                    g_main.config_state = CONFIG_BAD;
+                    goto END_CLOSE;
+                }
+                sceIoLseek(fd, 0 - (CONFIG_CHUNK_SIZE - pos), SCE_SEEK_CUR);
+                break;
+            // Found EOL, parse line
+            } else {
+                if (end == -1) { // When last line doesn't have EOL char
+#ifdef ENABLE_VERBOSE_LOGGING
+                    vgLogPrintF("Last line is missing EOL char\n");
+#endif
+                    end = CONFIG_CHUNK_SIZE;
+                }
+
+                if (!vgConfigParseLine(chunk, pos, end)) {
+                    vgLogPrintF("Failed to parse line, pos=%d, end=%d\n", pos, end);
+                    g_main.config_state = CONFIG_BAD;
+                    goto END_CLOSE;
+                }
+                pos = end + 1;
+            }
+        }
+
+        // EOF
+        if (chunk_size < CONFIG_CHUNK_SIZE)
+            break;
+    }
+
+END_CLOSE:
+    sceIoClose(fd);
+END:
+    return;
 }
-uint8_t config_is_ib_enabled(VG_Config *config) {
-	return config->enabled == FT_ENABLED &&
-			config->game_enabled == FT_ENABLED &&
-			config->ib_res_enabled == FT_ENABLED;
+
+void vgConfigSetSupported(
+        VG_FeatureState fb,
+        VG_FeatureState ib,
+        VG_FeatureState fps) {
+    if (fb == FT_UNSUPPORTED)
+        g_main.config.fb_enabled = fb;
+    if (ib == FT_UNSUPPORTED)
+        g_main.config.ib_enabled = ib;
+    if (fps == FT_UNSUPPORTED)
+        g_main.config.fps_enabled = fps;
 }
-uint8_t config_is_fps_enabled(VG_Config *config) {
-	return config->enabled == FT_ENABLED &&
-			config->game_enabled == FT_ENABLED &&
-			config->fps_enabled == FT_ENABLED;
-}
-uint8_t config_is_osd_enabled(VG_Config *config) {
-	return config->enabled == FT_ENABLED &&
-			config->osd_enabled == FT_ENABLED &&
-			config->game_osd_enabled == FT_ENABLED;
+void vgConfigSetSupportedIbCount(uint8_t count) {
+    g_main.config.ib_count = count;
 }
 
-VG_Config config_parse(const char *titleid) {
-	VG_Config config = {
-		FT_ENABLED, FT_ENABLED,
-		FT_ENABLED, FT_ENABLED,
-		FT_UNSPECIFIED, 960, 544,
-		FT_UNSPECIFIED, 960, 544,
-		FT_UNSPECIFIED, FPS_60
-	};
-
-	SceUID fd = -1;
-	SceOff fileSize = 0;
-
-	kuIoOpen(CONFIG_PATH, SCE_O_RDONLY, &fd);
-	if (fd < 0) {
-		return config;
-	}
-
-	kuIoLseek(fd, 0, SCE_SEEK_END);
-	kuIoTell(fd, &fileSize);
-	if (fileSize <= 0) {
-		return config;
-	}
-
-	kuIoLseek(fd, 0, SCE_SEEK_SET);
-
-	char buffer[fileSize];
-	memset(buffer, 0, fileSize);
-	kuIoRead(fd, buffer, fileSize);
-
-	char section = 0; // 1=main, 2=titleid
-
-	for (SceOff i = 0; i < fileSize; i++) {
-		// New section
-		if (buffer[i] == '[') {
-			if (strncmp(&buffer[i], "[MAIN]", 6) == 0) {
-				i += 7;
-				section = 1;
-			}
-			else if (strncmp(&buffer[i+1], titleid, 9) == 0) {
-				i += 12;
-				section = 2;
-			}
-			else {
-				section = 0;
-			}
-		}
-
-		// [MAIN]
-		if (section == 1) {
-			config_parse_main(buffer, i, &config);
-		}
-		// [titleid]
-		else if (section == 2) {
-			config_parse_game(buffer, i, &config);
-		}
-
-		while (i < fileSize && buffer[i] != '\n') { i++; }
-	}
-
-	kuIoClose(fd);
-	return config;
+uint8_t vgConfigIsFbEnabled() {
+    return g_main.config.enabled == FT_ENABLED &&
+            g_main.config.game_enabled == FT_ENABLED &&
+            g_main.config.fb_enabled == FT_ENABLED;
+}
+uint8_t vgConfigIsIbEnabled() {
+    return g_main.config.enabled == FT_ENABLED &&
+            g_main.config.game_enabled == FT_ENABLED &&
+            g_main.config.ib_enabled == FT_ENABLED;
+}
+uint8_t vgConfigIsFpsEnabled() {
+    return g_main.config.enabled == FT_ENABLED &&
+            g_main.config.game_enabled == FT_ENABLED &&
+            g_main.config.fps_enabled == FT_ENABLED;
+}
+uint8_t vgConfigIsOsdEnabled() {
+    return g_main.config.enabled == FT_ENABLED &&
+            g_main.config.osd_enabled == FT_ENABLED &&
+            g_main.config.game_osd_enabled == FT_ENABLED;
 }

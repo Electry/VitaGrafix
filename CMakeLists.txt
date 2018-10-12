@@ -14,8 +14,8 @@ include("${VITASDK}/share/vita.cmake" REQUIRED)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wl,-q -Wall -O3 -std=gnu99")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fno-rtti -fno-exceptions")
 
-if (NOT ${RELEASE})
-  add_definitions(-DENABLE_LOGGING)
+if (${DEBUG})
+  add_definitions(-DENABLE_VERBOSE_LOGGING)
 endif()
 
 add_executable(VitaGrafix
@@ -23,7 +23,8 @@ add_executable(VitaGrafix
   display.c
   config.c
   tools.c
-  games.c
+  patch.c
+  log.c
 )
 
 target_link_libraries(VitaGrafix
@@ -31,8 +32,10 @@ target_link_libraries(VitaGrafix
   SceAppMgr_stub
   SceDisplay_stub
   SceCtrl_stub
-  kuio_stub
-  k
+  SceKernelModulemgr_stub
+  SceLibKernel_stub
+  SceIofilemgr_stub
+  SceLibc_stub
   gcc
 )
 

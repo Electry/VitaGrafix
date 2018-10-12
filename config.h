@@ -1,64 +1,70 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
+#define MAX_RES_COUNT  2
+
+#define CONFIG_PATH       "ux0:data/VitaGrafix/config.txt"
+#define CONFIG_CHUNK_SIZE 1024
+
 typedef enum {
-	FT_DISABLED = 0,
-	FT_ENABLED,
-	FT_UNSPECIFIED,
-	FT_UNSUPPORTED
+    CONFIG_NONE,
+    CONFIG_MAIN,
+    CONFIG_GAME
+} VG_ConfigSection;
+
+typedef enum {
+    CONFIG_OK,
+    CONFIG_BAD,
+    CONFIG_OPEN_FAILED
+} VG_ConfigState;
+
+typedef enum {
+    FT_DISABLED = 0,
+    FT_ENABLED,
+    FT_UNSPECIFIED,
+    FT_UNSUPPORTED
 } VG_FeatureState;
 
 typedef enum {
-	FPS_60,
-	FPS_30
+    FPS_60,
+    FPS_30
 } VG_Fps;
 
 typedef struct {
-	VG_FeatureState enabled;
-	VG_FeatureState osd_enabled;
+    uint16_t width;
+    uint16_t height;
+} VG_Resolution;
 
-	VG_FeatureState game_enabled;
-	VG_FeatureState game_osd_enabled;
+typedef struct {
+    // [MAIN] options
+    VG_FeatureState enabled;
+    VG_FeatureState osd_enabled;
 
-	// Framebuffer
-	VG_FeatureState fb_res_enabled;
-	uint16_t fb_width;
-	uint16_t fb_height;
+    // [TITLEID] options
+    VG_FeatureState game_enabled;
+    VG_FeatureState game_osd_enabled;
 
-	// Internal buffer
-	VG_FeatureState ib_res_enabled;
-	uint16_t ib_width;
-	uint16_t ib_height;
+    // Framebuffer
+    VG_FeatureState fb_enabled;
+    VG_Resolution fb;
 
-	// Framerate
-	VG_FeatureState fps_enabled;
-	VG_Fps fps;
+    // Internal buffer
+    VG_FeatureState ib_enabled;
+    VG_Resolution ib[MAX_RES_COUNT];
+    uint8_t ib_count;
+
+    // Framerate
+    VG_FeatureState fps_enabled;
+    VG_Fps fps;
 } VG_Config;
 
-VG_Config config_parse(const char *titleid);
-void config_set_default(
-		VG_FeatureState fb_res_enabled,
-		VG_FeatureState ib_res_enabled,
-		VG_FeatureState fps_enabled,
-		VG_Config *config);
-void config_set_default_params(
-		VG_FeatureState fb_res_enabled,
-		uint16_t fb_width,
-		uint16_t fb_height,
-		VG_FeatureState ib_res_enabled,
-		uint16_t ib_width,
-		uint16_t ib_height,
-		VG_FeatureState fps_enabled,
-		VG_Fps fps,
-		VG_Config *config);
-void config_set_unsupported(
-		VG_FeatureState fb_res,
-		VG_FeatureState ib_res,
-		VG_FeatureState fps,
-		VG_Config *config);
-uint8_t config_is_fb_enabled(VG_Config *config);
-uint8_t config_is_ib_enabled(VG_Config *config);
-uint8_t config_is_fps_enabled(VG_Config *config);
-uint8_t config_is_osd_enabled(VG_Config *config);
+
+void vgConfigParse();
+void vgConfigSetSupported(VG_FeatureState fb, VG_FeatureState ib, VG_FeatureState fps);
+void vgConfigSetSupportedIbCount(uint8_t count);
+uint8_t vgConfigIsFbEnabled();
+uint8_t vgConfigIsIbEnabled();
+uint8_t vgConfigIsFpsEnabled();
+uint8_t vgConfigIsOsdEnabled();
 
 #endif

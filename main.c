@@ -1,149 +1,186 @@
-#include <libk/string.h>
-#include <libk/stdio.h>
-#include <libk/ctype.h>
-
 #include <vitasdk.h>
 #include <taihen.h>
 
 #include "display.h"
 #include "config.h"
 #include "tools.h"
-#include "games.h"
+#include "patch.h"
 #include "main.h"
+#include "log.h"
 
-#define MAX_INJECTS_NUM 15
-#define MAX_HOOKS_NUM   2
 
-// sceDisplaySetFrameBuf hook
-static SceUID sceDisplaySetFrameBuf_hookid;
-static tai_hook_ref_t sceDisplaySetFrameBuf_hookref = {0};
+VG_Main g_main = {0};
 
-// eboot patches
-static uint8_t injects_num = 0;
-static SceUID injects[MAX_INJECTS_NUM] = {0};
+void vgInjectData(int segidx, uint32_t offset, const void *data, size_t size) {
+    vgLogPrintF("Patching seg%03d : %08X to", segidx, offset);
+    for (size_t i = 0; i < size; i++) {
+        vgLogPrintF(" %02X", ((uint8_t *)data)[i]);
+    }
+    vgLogPrintF(", size=%d\n", size);
 
-// eboot hooks
-static uint8_t hooks_num = 0;
-static SceUID hooks[MAX_HOOKS_NUM] = {0};
-tai_hook_ref_t hooks_ref[MAX_HOOKS_NUM] = {0};
-
-static char titleid[16];
-static tai_module_info_t info = {0};
-
-static uint8_t supported_game = 0;
-static uint8_t timer = 150;
-
-static VG_Config config;
-
-void injectData(SceUID modid, int segidx, uint32_t offset, const void *data, size_t size) {
-	injects[injects_num] = taiInjectData(modid, segidx, offset, data, size);
-	injects_num++;
+    g_main.inject[g_main.inject_num] = taiInjectData(g_main.info.modid, segidx, offset, data, size);
+    g_main.inject_num++;
 }
-void hookFunction(SceUID modid, int segidx, uint32_t offset, int thumb, const void *func) {
-	hooks[hooks_num] = taiHookFunctionOffset(&hooks_ref[hooks_num], modid, segidx, offset, thumb, func);
-	hooks_num++;
+void vgHookFunction(int segidx, uint32_t offset, int thumb, const void *func) {
+    vgLogPrintF("Hooking seg%03d:%08X to 0x%X, thumb=%d", segidx, offset, func, thumb);
+
+    g_main.hook[g_main.hook_num] = taiHookFunctionOffset(&g_main.hook_ref[g_main.hook_num], g_main.info.modid, segidx, offset, thumb, func);
+    g_main.hook_num++;
 }
-void hookFunctionImport(uint32_t nid, const void *func) {
-	hooks[hooks_num] = taiHookFunctionImport(&hooks_ref[hooks_num], TAI_MAIN_MODULE, TAI_ANY_LIBRARY, nid, func);
-	hooks_num++;
+void vgHookFunctionImport(uint32_t nid, const void *func) {
+    vgLogPrintF("Hooking function import nid=0x%X to 0x%X", nid, func);
+
+    g_main.hook[g_main.hook_num] = taiHookFunctionImport(&g_main.hook_ref[g_main.hook_num], TAI_MAIN_MODULE, TAI_ANY_LIBRARY, nid, func);
+    g_main.hook_num++;
 }
 
 int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
 
-	if (timer > 0) {
-		updateFramebuf(pParam);
+    if (!g_main.timer) // Start OSD timer
+        g_main.timer = sceKernelGetProcessTimeLow();
 
-		int y = 5;
-		drawStringF(5, y, "%s: %s", titleid,
-					config.game_enabled  == FT_ENABLED ? "patched" : "disabled");
+    if (sceKernelGetProcessTimeLow() - g_main.timer < OSD_SHOW_DURATION) {
+        osdUpdateFrameBuf(pParam);
+        // Scale font size
+        if (pParam->width == 640)
+            osdSetTextScale(1);
+        else
+            osdSetTextScale(2);
 
-		if (config_is_fb_enabled(&config)) {
-			y += 20;
-			drawStringF(5, y, "Framebuffer: %dx%d", config.fb_width, config.fb_height);
-		}
-		if (config_is_ib_enabled(&config)) {
-			y += 20;
-			drawStringF(5, y, "Internal: %dx%d", config.ib_width, config.ib_height);
-		}
-		if (config_is_fps_enabled(&config)) {
-			y += 20;
-			drawStringF(5, y, "FPS cap: %d", config.fps == FPS_30 ? 30 : 60);
-		}
+        // TITLEID
+        int y = 5;
+        osdDrawStringF(5, y, "%s: %s", g_main.titleid,
+                    g_main.config.game_enabled == FT_ENABLED ? "patched" : "disabled");
 
-		timer--;
-	} else {
-		// Release no longer used hook
-		int ret = TAI_CONTINUE(int, sceDisplaySetFrameBuf_hookref, pParam, sync);
+        // Patch info
+        if (vgConfigIsFbEnabled()) {
+            osdDrawStringF(5, y += 20, "Framebuffer: %dx%d", g_main.config.fb.width, g_main.config.fb.height);
+        } else if (g_main.config.game_enabled == FT_ENABLED &&
+                    g_main.config.fb_enabled != FT_UNSUPPORTED) {
+            osdDrawStringF(5, y += 20, "Framebuffer: default");
+        }
+        if (vgConfigIsIbEnabled()) {
+            char buf[64] = "";
+            snprintf(buf, 64, "%dx%d", g_main.config.ib[0].width, g_main.config.ib[0].height);
+            for (uint8_t i = 1; i < g_main.config.ib_count; i++) {
+                snprintf(buf, 64, "%s, %dx%d", buf, g_main.config.ib[i].width, g_main.config.ib[i].height);
+            }
+            osdDrawStringF(5, y += 20, "Internal: %s", buf);
+        } else if (g_main.config.game_enabled == FT_ENABLED &&
+                    g_main.config.ib_enabled != FT_UNSUPPORTED) {
+            osdDrawStringF(5, y += 20, "Internal: default");
+        }
+        if (vgConfigIsFpsEnabled()) {
+            osdDrawStringF(5, y += 20, "FPS cap: %d", g_main.config.fps == FPS_30 ? 30 : 60);
+        } else if (g_main.config.game_enabled == FT_ENABLED &&
+                    g_main.config.fps_enabled != FT_UNSUPPORTED) {
+            osdDrawStringF(5, y += 20, "FPS cap: default");
+        }
 
-		taiHookRelease(sceDisplaySetFrameBuf_hookid, sceDisplaySetFrameBuf_hookref);
-		sceDisplaySetFrameBuf_hookid = -1;
-		return ret;
-	}
+        // Config info
+        if (g_main.config_state != CONFIG_OK) {
+            if (g_main.config_state == CONFIG_BAD) {
+                    osdDrawStringF(pParam->width / 2 - osdGetTextWidth(MSG_CONFIG_BAD) / 2,
+                                    pParam->height / 2 - 10,
+                                    MSG_CONFIG_BAD);
+            } else if (g_main.config_state == CONFIG_OPEN_FAILED) {
+                    osdDrawStringF(pParam->width / 2 - osdGetTextWidth(MSG_CONFIG_OPEN_FAILED) / 2,
+                                    pParam->height / 2 - 10,
+                                    MSG_CONFIG_OPEN_FAILED);
+            }
+        // Game info
+        } else if (g_main.support == GAME_WRONG_VERSION) {
+            osdDrawStringF(pParam->width / 2 - osdGetTextWidth(MSG_GAME_WRONG_VERSION) / 2,
+                            pParam->height / 2 - 10,
+                            MSG_GAME_WRONG_VERSION);
+        }
 
-	return TAI_CONTINUE(int, sceDisplaySetFrameBuf_hookref, pParam, sync);
+    } else {
+        // Release no longer used hook
+        int ret = TAI_CONTINUE(int, g_main.sceDisplaySetFrameBuf_hookref, pParam, sync);
+
+        taiHookRelease(g_main.sceDisplaySetFrameBuf_hookid, g_main.sceDisplaySetFrameBuf_hookref);
+        g_main.sceDisplaySetFrameBuf_hookid = -1;
+        return ret;
+    }
+
+    return TAI_CONTINUE(int, g_main.sceDisplaySetFrameBuf_hookref, pParam, sync);
 }
 
 void _start() __attribute__ ((weak, alias ("module_start")));
 int module_start(SceSize argc, const void *args) {
 
-	// Getting eboot.bin info
-	info.size = sizeof(tai_module_info_t);
-	taiGetModuleInfo(TAI_MAIN_MODULE, &info);
+    // Getting eboot.bin info
+    g_main.info.size = sizeof(tai_module_info_t);
+    taiGetModuleInfo(TAI_MAIN_MODULE, &g_main.info);
 
-	// Getting app titleid
-	sceAppMgrAppParamGetString(0, 12, titleid, 256);
+    g_main.sceInfo.size = sizeof(SceKernelModuleInfo);
+    sceKernelGetModuleInfo(g_main.info.modid, &g_main.sceInfo);
 
-	// Parse config
-	config = config_parse(titleid);
-	if (config.enabled == FT_DISABLED) {
-		return SCE_KERNEL_START_SUCCESS;
-	}
+    // Getting app titleid
+    sceAppMgrAppParamGetString(0, 12, g_main.titleid, 16);
 
-	// Patch the game
-	supported_game = patch_game(titleid, &info, &config);
+    // Create VG folder
+    sceIoMkdir(VG_FOLDER, 0777);
+    vgLogPrepare();
 
-	// If game is unsupported, mark it as disabled
-	if (!supported_game) {
-		config.game_enabled = FT_DISABLED;
-	}
+    vgLogPrintF("Title ID: %s\n", g_main.titleid);
 
-	// If no features are enabled, mark game as disabled
-	if (supported_game &&
-			!config_is_fb_enabled(&config) &&
-			!config_is_ib_enabled(&config) &&
-			!config_is_fps_enabled(&config)) {
-		config.game_enabled = FT_DISABLED;
-	}
+    // Parse config
+    vgConfigParse();
+    if (g_main.config.enabled == FT_DISABLED) {
+        return SCE_KERNEL_START_SUCCESS;
+    }
 
-	// Hook sceDisplaySetFrameBuf for OSD
-	if (supported_game && config_is_osd_enabled(&config)) {
-		sceDisplaySetFrameBuf_hookid = taiHookFunctionImport(
-				&sceDisplaySetFrameBuf_hookref,
-				TAI_MAIN_MODULE,
-				TAI_ANY_LIBRARY,
-				0x7A410B64,
-				sceDisplaySetFrameBuf_patched);
-		timer = 150; // Show OSD for 150 frames
-	}
+    // Patch the game
+    vgPatchGame();
 
-	return SCE_KERNEL_START_SUCCESS;
+    // If game is unsupported, mark it as disabled
+    if (g_main.support != GAME_SUPPORTED) {
+        g_main.config.game_enabled = FT_DISABLED;
+    }
+
+    // If no features are enabled, mark game as disabled
+    if (g_main.support == GAME_SUPPORTED &&
+            !vgConfigIsFbEnabled() &&
+            !vgConfigIsIbEnabled() &&
+            !vgConfigIsFpsEnabled()) {
+        g_main.config.game_enabled = FT_DISABLED;
+    }
+
+    // Hook sceDisplaySetFrameBuf for OSD
+    if ((g_main.support == GAME_SUPPORTED || g_main.support == GAME_WRONG_VERSION) &&
+            vgConfigIsOsdEnabled()) {
+        g_main.timer = 0;
+        g_main.sceDisplaySetFrameBuf_hookid = taiHookFunctionImport(
+                &g_main.sceDisplaySetFrameBuf_hookref,
+                TAI_MAIN_MODULE,
+                TAI_ANY_LIBRARY,
+                0x7A410B64,
+                sceDisplaySetFrameBuf_patched);
+    }
+
+    return SCE_KERNEL_START_SUCCESS;
 }
 
 int module_stop(SceSize argc, const void *args) {
 
-	if (supported_game && config_is_osd_enabled(&config) && sceDisplaySetFrameBuf_hookid >= 0) {
-		taiHookRelease(sceDisplaySetFrameBuf_hookid, sceDisplaySetFrameBuf_hookref);
-	}
+    // Release OSD hook
+    if ((g_main.support == GAME_SUPPORTED || g_main.support == GAME_WRONG_VERSION) &&
+            vgConfigIsOsdEnabled() && g_main.sceDisplaySetFrameBuf_hookid >= 0) {
+        taiHookRelease(g_main.sceDisplaySetFrameBuf_hookid, g_main.sceDisplaySetFrameBuf_hookref);
+    }
 
-	while (injects_num-- > 0) {
-		if (injects[injects_num] >= 0)
-			taiInjectRelease(injects[injects_num]);
-	}
+    // Release game patches
+    while (g_main.inject_num-- > 0) {
+        if (g_main.inject[g_main.inject_num] >= 0)
+            taiInjectRelease(g_main.inject[g_main.inject_num]);
+    }
+    // Release game hooks
+    while (g_main.hook_num-- > 0) {
+        if (g_main.hook[g_main.hook_num] >= 0)
+            taiHookRelease(g_main.hook[g_main.hook_num], g_main.hook_ref[g_main.hook_num]);
+    }
 
-	while (hooks_num-- > 0) {
-		if (hooks[hooks_num] >= 0)
-			taiHookRelease(hooks[hooks_num], hooks_ref[hooks_num]);
-	}
-
-	return SCE_KERNEL_STOP_SUCCESS;
+    return SCE_KERNEL_STOP_SUCCESS;
 }
