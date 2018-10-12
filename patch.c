@@ -763,4 +763,36 @@ void vgPatchGame() {
             vgInjectData(0, g_main.offset[0], &movs_r0_vblank, sizeof(movs_r0_vblank));
         }
     }
+    //
+    // The Ratched & Clank Trilogy / Ratched & Clank Collection
+    //
+    else if (vgPatchIsGame("PCSF00485", SELF_EBOOT, NID_ANY) ||    // EU (Ratchet & Clank 2)
+             vgPatchIsGame("PCSF00482", "rc2.self", 0x7a1d621c) || // EU
+             vgPatchIsGame("PCSA00133", "rc2.self", 0x7a1d621c)) { // US
+        vgConfigSetSupported(FT_ENABLED, FT_UNSUPPORTED, FT_UNSUPPORTED);
+
+        if (vgConfigIsFbEnabled()) {
+            uint8_t movs_r0_width[4], movs_r1_width[4], movs_r2_width[4];
+            uint8_t movs_r1_height[4], movs_r3_height[4];
+            vgMakeThumb2_T2_MOV(0, 1, g_main.config.fb.width, movs_r0_width);
+            vgMakeThumb2_T2_MOV(1, 1, g_main.config.fb.height, movs_r1_height);
+            vgMakeThumb2_T2_MOV(2, 1, g_main.config.fb.width, movs_r2_width);
+            vgMakeThumb2_T2_MOV(3, 1, g_main.config.fb.height, movs_r3_height);
+            vgMakeThumb2_T2_MOV(1, 1, g_main.config.fb.width, movs_r1_width);
+
+            if (g_main.config.fb.width > 720 || g_main.config.fb.height > 408) {
+                uint8_t movs_lr_parambufsize[4];
+                vgMakeThumb2_T2_MOV(REGISTER_LR, 1, (12 * 1024 * 1024), movs_lr_parambufsize); // 0xC00000
+
+                vgInjectData(0, 0x19054, &movs_lr_parambufsize, sizeof(movs_lr_parambufsize));
+            }
+
+            vgInjectData(0, 0x1D62, &movs_r0_width, sizeof(movs_r0_width));
+            vgInjectData(0, 0x1D62 + 4, &movs_r1_height, sizeof(movs_r1_height));
+            vgInjectData(0, 0x9A5320, &movs_r2_width, sizeof(movs_r2_width));
+            vgInjectData(0, 0x9A5320 + 6, &movs_r3_height, sizeof(movs_r3_height));
+            vgInjectData(0, 0x9A463C, &movs_r1_width, sizeof(movs_r1_width));
+            vgInjectData(0, 0x9A4646, &movs_r3_height, sizeof(movs_r3_height));
+        }
+    }
 }
