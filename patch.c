@@ -687,9 +687,18 @@ void vgPatchGame() {
         }
     }
     //
-    // Sly Cooper and the Thievius Raccoonus
+    // Sly Cooper / The Sly Trilogy
     //
-    else if (vgPatchIsGame("PCSA00096", SELF_EBOOT, NID_ANY)) { // US
+    else if (vgPatchIsGame("PCSF00269", SELF_EBOOT, NID_ANY) ||     // EU (Sly Cooper and the Thievius Raccoonus)
+             vgPatchIsGame("PCSF00270", SELF_EBOOT, NID_ANY) ||     // EU (Sly Cooper 2: Band of Thieves)
+             vgPatchIsGame("PCSF00271", SELF_EBOOT, NID_ANY) ||     // EU (Sly Cooper 3: Honor Among Thieves)
+             vgPatchIsGame("PCSF00338", "Sly1.self", 0x15bca5ba) || // EU
+             vgPatchIsGame("PCSF00338", "Sly1.self", 0x7288e791) || // EU
+             vgPatchIsGame("PCSA00096", SELF_EBOOT, NID_ANY) ||     // US (Sly Cooper and the Thievius Raccoonus)
+             vgPatchIsGame("PCSA00097", SELF_EBOOT, NID_ANY) ||     // US (Sly Cooper 2: Band of Thieves)
+             vgPatchIsGame("PCSA00098", SELF_EBOOT, NID_ANY) ||     // US (Sly Cooper 3: Honor Among Thieves)
+             vgPatchIsGame("PCSA00095", "Sly1.self", 0x605d1db1) || // US
+             vgPatchIsGame("PCSA00095", "Sly2.self", 0xdcd6b8bc)) { // US
         vgConfigSetSupported(FT_ENABLED, FT_UNSUPPORTED, FT_ENABLED);
 
         if (vgConfigIsFbEnabled()) {
@@ -697,14 +706,36 @@ void vgPatchGame() {
             vgMakeThumb2_T2_MOV(1, 1, g_main.config.fb.width, movs_r1_width);
             vgMakeThumb2_T2_MOV(1, 1, g_main.config.fb.height, movs_r1_height);
 
-            vgInjectData(0, 0xE0AF8, &movs_r1_width, sizeof(movs_r1_width));
-            vgInjectData(0, 0xE0AF8 + 6, &movs_r1_height, sizeof(movs_r1_height));
+            vgPatchAddOffset("PCSF00269", SELF_EBOOT, NID_ANY, 1, 0xE0A40);
+            vgPatchAddOffset("PCSF00270", SELF_EBOOT, NID_ANY, 1, 0x1155FC);
+            vgPatchAddOffset("PCSF00271", SELF_EBOOT, NID_ANY, 1, 0x1692AC);
+            vgPatchAddOffset("PCSF00338", "Sly1.self", 0x15bca5ba, 1, 0xE0A40);
+            vgPatchAddOffset("PCSF00338", "Sly2.self", 0x7288e791, 1, 0x1155FC);
+            vgPatchAddOffset("PCSA00096", SELF_EBOOT, NID_ANY, 1, 0xE0AF8);
+            vgPatchAddOffset("PCSA00097", SELF_EBOOT, NID_ANY, 1, 0x1155F8);
+            vgPatchAddOffset("PCSA00098", SELF_EBOOT, NID_ANY, 1, 0x1692A8);
+            vgPatchAddOffset("PCSA00095", "Sly1.self", 0x605d1db1, 1, 0xE0AF8);
+            vgPatchAddOffset("PCSA00095", "Sly2.self", 0xdcd6b8bc, 1, 0x1155F8);
+
+            vgInjectData(0, g_main.offset[0], &movs_r1_width, sizeof(movs_r1_width));
+            vgInjectData(0, g_main.offset[0] + 6, &movs_r1_height, sizeof(movs_r1_height));
         }
         if (vgConfigIsFpsEnabled()) {
             uint8_t movs_r0_vblank[2];
-            vgMakeThumb_T1_MOV(0, g_main.config.fps == FPS_60 ? 0x1 : 0x2, movs_r0_vblank);
+            vgMakeThumb_T1_MOV(0, g_main.config.fps == FPS_60 ? 1 : 2, movs_r0_vblank);
 
-            vgInjectData(0, 0x10C104, &movs_r0_vblank, sizeof(movs_r0_vblank));
+            vgPatchAddOffset("PCSF00269", SELF_EBOOT, NID_ANY, 1, 0x10C04C);
+            vgPatchAddOffset("PCSF00270", SELF_EBOOT, NID_ANY, 1, 0x12E63C);
+            vgPatchAddOffset("PCSF00271", SELF_EBOOT, NID_ANY, 1, 0x1822EC);
+            vgPatchAddOffset("PCSF00338", "Sly1.self", 0x15bca5ba, 1, 0x10C04C);
+            vgPatchAddOffset("PCSF00338", "Sly2.self", 0x7288e791, 1, 0x12E63C);
+            vgPatchAddOffset("PCSA00096", SELF_EBOOT, NID_ANY, 1, 0x10C104);
+            vgPatchAddOffset("PCSA00097", SELF_EBOOT, NID_ANY, 1, 0x12E638);
+            vgPatchAddOffset("PCSA00098", SELF_EBOOT, NID_ANY, 1, 0x1822E8);
+            vgPatchAddOffset("PCSA00095", "Sly1.self", 0x605d1db1, 1, 0x10C104);
+            vgPatchAddOffset("PCSA00095", "Sly2.self", 0xdcd6b8bc, 1, 0x12E638);
+
+            vgInjectData(0, g_main.offset[0], &movs_r0_vblank, sizeof(movs_r0_vblank));
         }
     }
 }
