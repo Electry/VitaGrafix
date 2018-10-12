@@ -738,4 +738,29 @@ void vgPatchGame() {
             vgInjectData(0, g_main.offset[0], &movs_r0_vblank, sizeof(movs_r0_vblank));
         }
     }
+    //
+    // Sly Cooper: Thieves in Time
+    //
+    else if (vgPatchIsGame("PCSF00156", SELF_EBOOT, NID_ANY) || // EU [1.01]
+             vgPatchIsGame("PCSF00206", SELF_EBOOT, NID_ANY) || // EU [1.01]
+             vgPatchIsGame("PCSF00207", SELF_EBOOT, NID_ANY) || // EU [1.01]
+             vgPatchIsGame("PCSF00208", SELF_EBOOT, NID_ANY) || // EU [1.01]
+             vgPatchIsGame("PCSF00209", SELF_EBOOT, NID_ANY) || // EU [1.01]
+             vgPatchIsGame("PCSA00068", SELF_EBOOT, NID_ANY)) { // US [1.01]
+        vgConfigSetSupported(FT_UNSUPPORTED, FT_UNSUPPORTED, FT_ENABLED);
+
+        if (vgConfigIsFpsEnabled()) {
+            uint8_t movs_r0_vblank[2];
+            vgMakeThumb_T1_MOV(0, g_main.config.fps == FPS_60 ? 1 : 2, movs_r0_vblank);
+
+            vgPatchAddOffset("PCSF00156", SELF_EBOOT, NID_ANY, 1, 0x3228AC);
+            vgPatchAddOffset("PCSF00206", SELF_EBOOT, NID_ANY, 1, 0x3228AC);
+            vgPatchAddOffset("PCSF00207", SELF_EBOOT, NID_ANY, 1, 0x3228AC);
+            vgPatchAddOffset("PCSF00208", SELF_EBOOT, NID_ANY, 1, 0x3228AC);
+            vgPatchAddOffset("PCSF00209", SELF_EBOOT, NID_ANY, 1, 0x3228AC);
+            vgPatchAddOffset("PCSA00068", SELF_EBOOT, NID_ANY, 1, 0x3228E4);
+
+            vgInjectData(0, g_main.offset[0], &movs_r0_vblank, sizeof(movs_r0_vblank));
+        }
+    }
 }
