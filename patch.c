@@ -652,7 +652,7 @@ void vgPatchGame() {
              vgPatchIsGame("PCSE00912", SELF_EBOOT, NID_ANY) || // US
              vgPatchIsGame("PCSG00697", SELF_EBOOT, NID_ANY) || // JP [1.03]
              vgPatchIsGame("PCSH00221", SELF_EBOOT, NID_ANY)) { // ASIA
-        vgConfigSetSupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED);
+        vgConfigSetSupported(FT_UNSUPPORTED, FT_ENABLED, FT_ENABLED);
 
         if (vgConfigIsIbEnabled()) {
             uint8_t movs_r0_width[4], movs_r3_height[4];
@@ -666,6 +666,10 @@ void vgPatchGame() {
 
             vgInjectData(0, g_main.offset[0], &movs_r0_width, sizeof(movs_r0_width));
             vgInjectData(0, g_main.offset[0] - 6, &movs_r3_height, sizeof(movs_r3_height));
+        }
+        if (vgConfigIsFpsEnabled()) {
+            if (g_main.config.fps == FPS_30)
+                vgHookFunctionImport(0x7A410B64, sceDisplaySetFrameBuf_withWait);
         }
     }
     //
