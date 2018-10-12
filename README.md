@@ -107,41 +107,43 @@ ENABLED=0
 NOTE: If some options are left out, the plugin will use their default values.
 
 ## Supported games
-| Game          | Title ID(s)   | Supported features | Game defaults | Notes |
-| ------------- | ------------- | ------------------ | ------------- | ----- |
-| Asphalt: Injection | PCSB00040 <br/> PCSE00007 | Internal res. | 720x408 | |
-| Borderlands 2 | PCSF00570 <br/> PCSE00383 | Framebuffer | 960x544 | Only works at 960x544 and 640x368 |
-| Dead or Alive 5 Plus | PCSB00296 <br/> PCSE00235 <br/> PCSG00167 | Internal res. | 720x408 | |
-| Dragon Quest Builders | PCSB00981 <br/> PCSE00912 <br/> PCSG00697 <br/> PCSH00221 | Internal res. | 720x408 | |
-| F1 2011 | PCSB00027 | Internal res. | 640x384 | |
-| God of War Collection | PCSF00438 <br/> PCSA00126 <br/> PCSC00059 | Framebuffer <br/> FPS cap | 720x408 <br/> 30 | |
-| Hatsune Miku: Project Diva f | PCSB00419 <br/> PCSE00326 <br/> PCSG00074 | Internal res. <br/> FPS cap | 640x352 <br/> 30 | At 60 FPS menu is double speed |
-| Hatsune Miku: Project Diva f 2nd | PCSB00554 <br/> PCSE00434 <br/> PCSG00205 <br/> PCSH00088 | Internal res. <br/> FPS cap | 720x408 <br/> 30 | At 60 FPS menu is double speed |
-| Hatsune Miku: Project Diva X | PCSB01007 <br/> PCSE00867 <br/> PCSH00176 | Internal res. | 720x408 | |
-| Jak and Daxter Collection | PCSF00247 <br/> PCSF00248 <br/> PCSF00249 <br/> PCSF00250 <br/> PCSA00080 | Framebuffer | 720x408 | |
-| Killzone: Mercenary | PCSF00243 <br/> PCSF00403 <br/> PCSA00107 <br/> PCSC00045 <br/> PCSD00071 | Internal res. <br/> FPS cap | Dynamic <br/> 30 | |
-| LEGO Star Wars: The Force Awakens | PCSB00877 <br/> PCSE00791 | Internal res. | 640x368 | Game crashes when opening pause menu at high resolutions. |
-| LittleBigPlanet | PCSF00021 <br/> PCSA00017 <br/> PCSC00013 <br/> PCSD00006 | Internal res. | 720x408 | Particles cause artifacts at native res. |
-| Miracle Girls Festival | PCSG00610 | Internal res. | 720x408 | |
-| MotoGP 13 | PCSB00316 <br/> PCSE00409 | Internal res. | 704x448 | |
-| MotoGP 14 | PCSE00529 | Internal res. | 704x448 | |
-| MUD - FIM Motocross World Championship | PCSB00182 | Internal res. | 704x448 | |
-| MXGP: The Official Motocross Videogame | PCSB00470 <br/> PCSE00530 | Internal res. | 704x448 | |
-| Ninja Gaiden Sigma 2 Plus | PCSB00294 <br/> PCSE00233 <br/> PCSG00157 | Internal res. | 864x480, 640x416 | |
-| Persona 4 Golden | PCSB00245 <br/> PCSE00120 <br/> PCSG00004 <br/> PCSG00563 <br/> PCSH00021 | Internal res. | 840x476 | |
-| Ratchet & Clank: Going Commando / Ratchet & Clank 2: Locked and Loaded | PCSF00485 <br/> PCSF00482 <br/> PCSA00133 | Framebuffer | 720x408 | Some UI elements are [clipped](https://user-images.githubusercontent.com/12598379/45221532-00ac1300-b2b2-11e8-8ca7-ca2f1ba6a54f.png) |
-| Ridge Racer | PCSB00048 <br/> PCSE00001 <br/> PCSG00001 | Internal res. | 720x408 | |
-| Sly Cooper and the Thievius Raccoonus | PCSF00269 <br/> PCSF00338 <br/> PCSA00095 <br/> PCSA00096 <br/> | Framebuffer <br/> FPS cap | 720x408 <br/> 30 | |
-| Sly Cooper 2: Band of Thieves | PCSF00270 <br/> PCSF00338 <br/> PCSA00095 <br/> PCSA00097 <br/> | Framebuffer <br/> FPS cap | 960x544 <br/> 30 | |
-| Sly Cooper 3: Honor Among Thieves | PCSF00271 <br/> PCSF00338 <br/> PCSA00095 <br/> PCSA00098 <br/> | Framebuffer <br/> FPS cap | 960x544 <br/> 30 | |
-| Sly Cooper: Thieves in Time | PCSF00156 <br/> PCSF00206 <br/> PCSF00207 <br/> PCSF00208 <br/> PCSF00209 <br/> PCSA00068 | FPS cap | 30 | |
-| The Amazing Spider-Man | PCSB00428 | Internal res. <br/> FPS cap | 704x400 <br/> 60 | Only few resolutions work properly (704x400, 480x272 known working). 960x544 causes GPU crash |
-| Utawarerumono: Mask of Deception / Itsuwari no Kamen | PCSB01093 <br/> PCSE00959 <br/> PCSG00617 | Internal res. | 672x384 | |
-| Utawarerumono: Mask of Truth / Futari no Hakuoro | PCSB01145 <br/> PCSE01102 <br/> PCSG00838 | Internal res. | 672x384 | |
-| World of Final Fantasy | PCSB00951 <br/> PCSE00880 <br/> PCSH00223 <br/> PCSG00709 | Internal res. | 640x384 | Only few resolutions work properly (with visible effects and no glitches) |
-| WRC 3: FIA World Rally Championship | PCSB00204 | Internal res. | 704x448 | |
-| WRC 4: FIA World Rally Championship | PCSB00345 <br/> PCSE00411 | Internal res. | 704x448 | |
-| WRC 5: FIA World Rally Championship | PCSB00762 | Framebuffer | 960x544 | |
+|   | Game          | Title ID(s)   | Supported features | Game defaults | Notes |
+| - | ------------- | ------------- | ------------------ | ------------- | ----- |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | Asphalt: Injection | PCSB00040 <br/> PCSE00007 | Internal res. | 720x408 | |
+| ![](https://placehold.it/50x50/eeee22/000000?text=+) | Borderlands 2 | PCSF00570 <br/> PCSE00383 | Framebuffer | 960x544 | Only works at 960x544 and 640x368 |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | Dead or Alive 5 Plus | PCSB00296 <br/> PCSE00235 <br/> PCSG00167 | Internal res. | 720x408 | |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | Dragon Quest Builders | PCSB00981 <br/> PCSE00912 <br/> PCSG00697 <br/> PCSH00221 | Internal res. | 720x408 | |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | F1 2011 | PCSB00027 | Internal res. | 640x384 | |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | God of War Collection | PCSF00438 <br/> PCSA00126 <br/> PCSC00059 | Framebuffer <br/> FPS cap | 720x408 <br/> 30 | |
+| ![](https://placehold.it/50x50/eeee22/000000?text=+) | Hatsune Miku: Project Diva f | PCSB00419 <br/> PCSE00326 <br/> PCSG00074 | Internal res. <br/> FPS cap | 640x352 <br/> 30 | At 60 FPS menu is double speed |
+| ![](https://placehold.it/50x50/eeee22/000000?text=+) | Hatsune Miku: Project Diva f 2nd | PCSB00554 <br/> PCSE00434 <br/> PCSG00205 <br/> PCSH00088 | Internal res. <br/> FPS cap | 720x408 <br/> 30 | At 60 FPS menu is double speed |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | Hatsune Miku: Project Diva X | PCSB01007 <br/> PCSE00867 <br/> PCSH00176 | Internal res. | 720x408 | |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | Jak and Daxter Collection | PCSF00247 <br/> PCSF00248 <br/> PCSF00249 <br/> PCSF00250 <br/> PCSA00080 | Framebuffer | 720x408 | |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | Killzone: Mercenary | PCSF00243 <br/> PCSF00403 <br/> PCSA00107 <br/> PCSC00045 <br/> PCSD00071 | Internal res. <br/> FPS cap | Dynamic <br/> 30 | |
+| ![](https://placehold.it/50x50/eeee22/000000?text=+) | LEGO Star Wars: The Force Awakens | PCSB00877 <br/> PCSE00791 | Internal res. | 640x368 | Game crashes when opening pause menu at high resolutions. |
+| ![](https://placehold.it/50x50/eeee22/000000?text=+) | LittleBigPlanet | PCSF00021 <br/> PCSA00017 <br/> PCSC00013 <br/> PCSD00006 | Internal res. | 720x408 | Particles cause artifacts at native res. |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | Miracle Girls Festival | PCSG00610 | Internal res. | 720x408 | |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | MotoGP 13 | PCSB00316 <br/> PCSE00409 | Internal res. | 704x448 | |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | MotoGP 14 | PCSE00529 | Internal res. | 704x448 | |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | MUD - FIM Motocross World Championship | PCSB00182 | Internal res. | 704x448 | |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | MXGP: The Official Motocross Videogame | PCSB00470 <br/> PCSE00530 | Internal res. | 704x448 | |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | Ninja Gaiden Sigma 2 Plus | PCSB00294 <br/> PCSE00233 <br/> PCSG00157 | Internal res. | 864x480, 640x416 | |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | Persona 4 Golden | PCSB00245 <br/> PCSE00120 <br/> PCSG00004 <br/> PCSG00563 <br/> PCSH00021 | Internal res. | 840x476 | |
+| ![](https://placehold.it/50x50/eeee22/000000?text=+) | Ratchet & Clank: Going Commando / Ratchet & Clank 2: Locked and Loaded | PCSF00485 <br/> PCSF00482 <br/> PCSA00133 | Framebuffer | 720x408 | Some UI elements are [clipped](https://user-images.githubusercontent.com/12598379/45221532-00ac1300-b2b2-11e8-8ca7-ca2f1ba6a54f.png) |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | Ridge Racer | PCSB00048 <br/> PCSE00001 <br/> PCSG00001 | Internal res. | 720x408 | |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | Sly Cooper and the Thievius Raccoonus | PCSF00269 <br/> PCSF00338 <br/> PCSA00095 <br/> PCSA00096 <br/> | Framebuffer <br/> FPS cap | 720x408 <br/> 30 | |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | Sly Cooper 2: Band of Thieves | PCSF00270 <br/> PCSF00338 <br/> PCSA00095 <br/> PCSA00097 <br/> | Framebuffer <br/> FPS cap | 960x544 <br/> 30 | |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | Sly Cooper 3: Honor Among Thieves | PCSF00271 <br/> PCSF00338 <br/> PCSA00095 <br/> PCSA00098 <br/> | Framebuffer <br/> FPS cap | 960x544 <br/> 30 | |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | Sly Cooper: Thieves in Time | PCSF00156 <br/> PCSF00206 <br/> PCSF00207 <br/> PCSF00208 <br/> PCSF00209 <br/> PCSA00068 | FPS cap | 30 | |
+| ![](https://placehold.it/50x50/eeee22/000000?text=+) | The Amazing Spider-Man | PCSB00428 | Internal res. <br/> FPS cap | 704x400 <br/> 60 | Only few resolutions work properly (704x400, 480x272 known working). 960x544 causes GPU crash |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | Utawarerumono: Mask of Deception / Itsuwari no Kamen | PCSB01093 <br/> PCSE00959 <br/> PCSG00617 | Internal res. | 672x384 | |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | Utawarerumono: Mask of Truth / Futari no Hakuoro | PCSB01145 <br/> PCSE01102 <br/> PCSG00838 | Internal res. | 672x384 | |
+| ![](https://placehold.it/50x50/eeee22/000000?text=+) | World of Final Fantasy | PCSB00951 <br/> PCSE00880 <br/> PCSH00223 <br/> PCSG00709 | Internal res. | 640x384 | Only few resolutions work properly (with visible effects and no glitches) |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | WRC 3: FIA World Rally Championship | PCSB00204 | Internal res. | 704x448 | |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | WRC 4: FIA World Rally Championship | PCSB00345 <br/> PCSE00411 | Internal res. | 704x448 | |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | WRC 5: FIA World Rally Championship | PCSB00762 | Framebuffer | 960x544 | |
 
+* ![](https://placehold.it/10x10/22bb22/000000?text=+) no issues
+* ![](https://placehold.it/10x10/eeee22/000000?text=+) playable, but with some minor issues (check *[Issues](https://github.com/Electry/VitaGrafix/issues)* section)
 
 Adding support for each and every game requires manual disassembly of game's binary to find addresses in the game code where the resolution is set. Some are easy to patch, others plainly impossible.
