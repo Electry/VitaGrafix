@@ -85,6 +85,12 @@ ENABLED=1
 OSD=0
 IB=960x544
 
+# Ninja Gaiden Sigma 2 Plus uses dynamic resolution scaling,
+# and switches between two specified IB resolutions when patched
+# (based on framerate)
+[PCSB00294]
+IB=960x544,720x408
+
 [PCSE00411]
 IB=864x492
 
@@ -121,6 +127,7 @@ NOTE: If some options are left out, the plugin will use their default values.
 | MotoGP 14 | PCSE00529 | Internal res. | 704x448 | |
 | MUD - FIM Motocross World Championship | PCSB00182 | Internal res. | 704x448 | |
 | MXGP: The Official Motocross Videogame | PCSB00470 <br/> PCSE00530 | Internal res. | 704x448 | |
+| Ninja Gaiden Sigma 2 Plus | PCSB00294 <br/> PCSE00233 <br/> PCSG00157 | Internal res. | 864x480, 640x416 | |
 | Persona 4 Golden | PCSB00245 <br/> PCSE00120 <br/> PCSG00004 <br/> PCSG00563 <br/> PCSH00021 | Internal res. | 840x476 | |
 | Ratchet & Clank: Going Commando / Ratchet & Clank 2: Locked and Loaded | PCSF00485 <br/> PCSF00482 <br/> PCSA00133 | Framebuffer | 720x408 | Some UI elements are [clipped](https://user-images.githubusercontent.com/12598379/45221532-00ac1300-b2b2-11e8-8ca7-ca2f1ba6a54f.png) |
 | Ridge Racer | PCSB00048 <br/> PCSE00001 <br/> PCSG00001 | Internal res. | 720x408 | |

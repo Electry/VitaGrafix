@@ -795,4 +795,40 @@ void vgPatchGame() {
             vgInjectData(0, 0x9A4646, &movs_r3_height, sizeof(movs_r3_height));
         }
     }
+    //
+    // Ninja Gaiden Sigma 2 Plus
+    //
+    else if (vgPatchIsGame("PCSB00294", SELF_EBOOT, NID_ANY) || // EU
+             vgPatchIsGame("PCSE00233", SELF_EBOOT, NID_ANY) || // US
+             vgPatchIsGame("PCSG00157", SELF_EBOOT, NID_ANY)) { // JP
+        vgConfigSetSupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED);
+        vgConfigSetSupportedIbCount(2);
+
+        if (vgConfigIsIbEnabled()) {
+            uint8_t large_patch[30] = {
+                0x00, 0x00, 0x00, 0x00, // MOVS.W  R0, #width1
+                0x00, 0x00, 0x00, 0x00, // MOVS.W  R1, #height1
+                0x0E, 0x90,             // STR     R0, [SP,#0x38]
+                0x0F, 0x91,             // STR     R1, [SP,#0x3C]
+                0x00, 0x00, 0x00, 0x00, // MOVS.W  R0, #width2
+                0x00, 0x00, 0x00, 0x00, // MOVS.W  R1, #height2
+                0x10, 0x90,             // STR     R0, [SP,#0x40]
+                0x11, 0x91,             // STR     R1, [SP,#0x44]
+                0x12, 0x90,             // STR     R0, [SP,#0x48]
+                0x00, 0xBF,             // NOP
+                0x00, 0xBF,             // NOP
+                                        // STR     R1, [SP,#0x4C]
+            };
+            vgMakeThumb2_T2_MOV(0, 1, g_main.config.ib[0].width, &large_patch[0]);
+            vgMakeThumb2_T2_MOV(1, 1, g_main.config.ib[0].height, &large_patch[4]);
+            vgMakeThumb2_T2_MOV(0, 1, g_main.config.ib[1].width, &large_patch[12]);
+            vgMakeThumb2_T2_MOV(1, 1, g_main.config.ib[1].height, &large_patch[16]);
+
+            vgPatchAddOffset("PCSB00294", SELF_EBOOT, NID_ANY, 1, 0x54A8A);
+            vgPatchAddOffset("PCSE00233", SELF_EBOOT, NID_ANY, 1, 0x54A8A);
+            vgPatchAddOffset("PCSG00157", SELF_EBOOT, NID_ANY, 1, 0x5393E);
+
+            vgInjectData(0, g_main.offset[0], &large_patch, sizeof(large_patch));
+        }
+    }
 }
