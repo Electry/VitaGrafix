@@ -274,6 +274,7 @@ void vgPatchGame() {
     // Borderlands 2
     //
     else if (vgPatchIsGame("PCSF00570", SELF_EBOOT, NID_ANY) || // EU [1.07]
+             vgPatchIsGame("PCSF00576", SELF_EBOOT, NID_ANY) || // EU [1.07]
              vgPatchIsGame("PCSE00383", SELF_EBOOT, NID_ANY)) { // US [1.09]
         vgConfigSetSupported(FT_ENABLED, FT_UNSUPPORTED, FT_UNSUPPORTED);
 
