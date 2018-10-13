@@ -843,4 +843,20 @@ void vgPatchGame() {
             vgInjectData(0, g_main.offset[0], &large_patch, sizeof(large_patch));
         }
     }
+    //
+    // Ratchet & Clank: QForce / Ratchet & Clank: Full Frontal Assault
+    //
+    else if (vgPatchIsGame("PCSF00191", SELF_EBOOT, NID_ANY) || // EU [1.01]
+             vgPatchIsGame("PCSA00086", SELF_EBOOT, NID_ANY)) { // US [1.01]
+        vgConfigSetSupported(FT_ENABLED, FT_UNSUPPORTED, FT_UNSUPPORTED);
+
+        if (vgConfigIsFbEnabled()) {
+            uint8_t movs_r3_width[4], movs_r4_height[4];
+            vgMakeThumb2_T2_MOV(3, 1, g_main.config.fb.width, movs_r3_width);
+            vgMakeThumb2_T2_MOV(4, 1, g_main.config.fb.height, movs_r4_height);
+
+            vgInjectData(0, 0x5557C2, &movs_r3_width, sizeof(movs_r3_width));
+            vgInjectData(0, 0x5557C2 + 8, &movs_r4_height, sizeof(movs_r4_height));
+        }
+    }
 }
