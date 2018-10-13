@@ -860,4 +860,19 @@ void vgPatchGame() {
             vgInjectData(0, 0x5557C2 + 8, &movs_r4_height, sizeof(movs_r4_height));
         }
     }
+    //
+    // Utawarerumono: Chiriyuku Mono he no Komoriuta
+    //
+    else if (vgPatchIsGame("PCSG01079", SELF_EBOOT, NID_ANY)) { // JP [1.02]
+        vgConfigSetSupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED);
+
+        if (vgConfigIsIbEnabled()) {
+            uint8_t mov_r0_width[4], mov_r1_height[4];
+            vgMakeArm_A1_MOV(0, 0, g_main.config.ib[0].width, mov_r0_width);
+            vgMakeArm_A1_MOV(1, 0, g_main.config.ib[0].height, mov_r1_height);
+
+            vgInjectData(0, 0x137808, &mov_r0_width, sizeof(mov_r0_width));
+            vgInjectData(0, 0x137808 + 8, &mov_r1_height, sizeof(mov_r1_height));
+        }
+    }
 }
