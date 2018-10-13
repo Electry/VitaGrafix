@@ -129,7 +129,9 @@ NOTE: If some options are left out, the plugin will use their default values.
 | ![](https://placehold.it/50x50/22bb22/000000?text=+) | MXGP: The Official Motocross Videogame | PCSB00470 <br/> PCSE00530 | Internal res. | 704x448 | |
 | ![](https://placehold.it/50x50/22bb22/000000?text=+) | Ninja Gaiden Sigma 2 Plus | PCSB00294 <br/> PCSE00233 <br/> PCSG00157 | Internal res. | 864x480, 640x416 | |
 | ![](https://placehold.it/50x50/22bb22/000000?text=+) | Persona 4 Golden | PCSB00245 <br/> PCSE00120 <br/> PCSG00004 <br/> PCSG00563 <br/> PCSH00021 | Internal res. | 840x476 | |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | Ratchet & Clank | PCSF00484 <br/> PCSF00482 <br/> PCSA00133 | Framebuffer | 720x408 | |
 | ![](https://placehold.it/50x50/eeee22/000000?text=+) | Ratchet & Clank: Going Commando / Ratchet & Clank 2: Locked and Loaded | PCSF00485 <br/> PCSF00482 <br/> PCSA00133 | Framebuffer | 720x408 | Some UI elements are [clipped](https://user-images.githubusercontent.com/12598379/45221532-00ac1300-b2b2-11e8-8ca7-ca2f1ba6a54f.png) |
+| ![](https://placehold.it/50x50/eeee22/000000?text=+) | Ratchet & Clank: Up Your Arsenal / Ratchet & Clank 3 | PCSF00486 <br/> PCSF00482 <br/> PCSA00133 | Framebuffer | 720x408 | Some UI elements are [clipped](https://user-images.githubusercontent.com/12598379/45221532-00ac1300-b2b2-11e8-8ca7-ca2f1ba6a54f.png) |
 | ![](https://placehold.it/50x50/22bb22/000000?text=+) | Ridge Racer | PCSB00048 <br/> PCSE00001 <br/> PCSG00001 | Internal res. | 720x408 | |
 | ![](https://placehold.it/50x50/22bb22/000000?text=+) | Sly Cooper and the Thievius Raccoonus | PCSF00269 <br/> PCSF00338 <br/> PCSA00095 <br/> PCSA00096 <br/> | Framebuffer <br/> FPS cap | 720x408 <br/> 30 | |
 | ![](https://placehold.it/50x50/22bb22/000000?text=+) | Sly Cooper 2: Band of Thieves | PCSF00270 <br/> PCSF00338 <br/> PCSA00095 <br/> PCSA00097 <br/> | Framebuffer <br/> FPS cap | 960x544 <br/> 30 | |
