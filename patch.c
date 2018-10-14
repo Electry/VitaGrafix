@@ -308,8 +308,15 @@ void vgPatchGame() {
             vgMakeThumb2_T2_MOV(4, 1, g_main.config.ib[0].width, movs_r4_width);
             vgMakeThumb2_T2_MOV(5, 1, g_main.config.ib[0].height, movs_r5_height);
 
-            vgPatchAddOffset("PCSB00877", SELF_EBOOT, NID_ANY, 2, 0x1F313E, 0x4650);
-            vgPatchAddOffset("PCSE00791", SELF_EBOOT, NID_ANY, 2, 0x1F315E, 0x4508);
+            vgPatchAddOffset("PCSB00877", SELF_EBOOT, NID_ANY, 3, 0x1F313E, 0x4650, 0x2241C4);
+            vgPatchAddOffset("PCSE00791", SELF_EBOOT, NID_ANY, 3, 0x1F315E, 0x4508, 0x2241E4);
+
+            if (g_main.config.ib[0].width > 640 || g_main.config.ib[0].height > 368) {
+                uint8_t movs_r1_parambufsize[4];
+                vgMakeThumb2_T2_MOV(1, 1, (10 * 1024 * 1024), movs_r1_parambufsize);
+
+                vgInjectData(0, g_main.offset[2], &movs_r1_parambufsize, sizeof(movs_r1_parambufsize));
+            }
 
             vgInjectData(0, g_main.offset[0], &movs_r4_width, sizeof(movs_r4_width));
             vgInjectData(0, g_main.offset[0] + 6, &movs_r5_height, sizeof(movs_r5_height));
