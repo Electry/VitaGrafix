@@ -882,4 +882,40 @@ void vgPatchGame() {
             vgInjectData(0, 0x137808 + 8, &mov_r1_height, sizeof(mov_r1_height));
         }
     }
+    //
+    // Dragon Ball Z: Battle of Z
+    //
+    else if (vgPatchIsGame("PCSB00396", SELF_EBOOT, NID_ANY) || // EU [1.01]
+             vgPatchIsGame("PCSE00305", SELF_EBOOT, NID_ANY) || // US [1.01]
+             vgPatchIsGame("PCSG00213", SELF_EBOOT, NID_ANY)) { // JP [1.01]
+        vgConfigSetSupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED);
+
+        if (vgConfigIsIbEnabled()) {
+            uint8_t mov_r0_width[4], mov_r1_height[4];
+            uint8_t mov_r2_width[4], mov_r3_height[4];
+            uint8_t mov_r3_width[4], mov_r5_height[4], mov_r6_height[4];
+            vgMakeArm_A1_MOV(0, 0, g_main.config.ib[0].width, mov_r0_width);
+            vgMakeArm_A1_MOV(1, 0, g_main.config.ib[0].height, mov_r1_height);
+            vgMakeArm_A1_MOV(2, 0, g_main.config.ib[0].width, mov_r2_width);
+            vgMakeArm_A1_MOV(3, 0, g_main.config.ib[0].height, mov_r3_height);
+            vgMakeArm_A1_MOV(3, 0, g_main.config.ib[0].width, mov_r3_width);
+            vgMakeArm_A1_MOV(5, 0, g_main.config.ib[0].height, mov_r5_height);
+            vgMakeArm_A1_MOV(6, 0, g_main.config.ib[0].height, mov_r6_height);
+
+            vgPatchAddOffset("PCSB00396", SELF_EBOOT, NID_ANY, 5, 0x63E8D0, 0x63CE94, 0x63D200, 0x63DA1C, 0x63FF1C);
+            vgPatchAddOffset("PCSE00305", SELF_EBOOT, NID_ANY, 5, 0x63E8A0, 0x63CE64, 0x63D1D0, 0x63D9EC, 0x63FEEC);
+            vgPatchAddOffset("PCSG00213", SELF_EBOOT, NID_ANY, 5, 0x63DE3C, 0x63C400, 0x63C76C, 0x63CF88, 0x63F488);
+
+            vgInjectData(0, g_main.offset[0], &mov_r0_width, sizeof(mov_r0_width));
+            vgInjectData(0, g_main.offset[0] + 8, &mov_r1_height, sizeof(mov_r1_height));
+            vgInjectData(0, g_main.offset[1], &mov_r0_width, sizeof(mov_r0_width));
+            vgInjectData(0, g_main.offset[1] + 8, &mov_r1_height, sizeof(mov_r1_height));
+            vgInjectData(0, g_main.offset[2], &mov_r2_width, sizeof(mov_r2_width));
+            vgInjectData(0, g_main.offset[2] + 8, &mov_r3_height, sizeof(mov_r3_height));
+            vgInjectData(0, g_main.offset[3], &mov_r3_width, sizeof(mov_r3_width));
+            vgInjectData(0, g_main.offset[3] + 8, &mov_r5_height, sizeof(mov_r5_height));
+            vgInjectData(0, g_main.offset[4], &mov_r3_width, sizeof(mov_r3_width));
+            vgInjectData(0, g_main.offset[4] + 8, &mov_r6_height, sizeof(mov_r6_height));
+        }
+    }
 }
