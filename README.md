@@ -3,6 +3,7 @@ VitaGrafix is a taiHEN plugin that allows you to change resolution and FPS cap o
 
 ## Credits
 - Rinnegatamante - for [vitaRescale](https://github.com/Rinnegatamante/vitaRescale)
+- dots_tb - for [ioPlus](https://github.com/CelesteBlue-dev/PSVita-RE-tools/tree/master/ioPlus/ioPlus-0.1)
 - InquisitionImplied - for finding patches of some of the games included in here
 - "the scene" - for giving us a chance to do these things in the first place
 
@@ -128,7 +129,7 @@ NOTE: If some options are left out, the plugin will use their default values.
 | ![](https://placehold.it/50x50/22bb22/000000?text=+) | MotoGP 14 | PCSE00529 | Internal res. | 704x448 | |
 | ![](https://placehold.it/50x50/22bb22/000000?text=+) | MUD - FIM Motocross World Championship | PCSB00182 | Internal res. | 704x448 | |
 | ![](https://placehold.it/50x50/22bb22/000000?text=+) | MXGP: The Official Motocross Videogame | PCSB00470 <br/> PCSE00530 | Internal res. | 704x448 | |
-| ![](https://placehold.it/50x50/22bb22/000000?text=+) | Ninja Gaiden Sigma 2 Plus | PCSB00294 <br/> PCSE00233 <br/> PCSG00157 | Internal res. | 864x480, 640x416 | |
+| ![](https://placehold.it/50x50/22bb22/000000?text=+) | Ninja Gaiden Sigma 2 Plus | PCSB00294 <br/> PCSE00233 <br/> PCSG00157 | 2x Internal res. | 864x480, 640x416 | |
 | ![](https://placehold.it/50x50/22bb22/000000?text=+) | Persona 4 Golden | PCSB00245 <br/> PCSE00120 <br/> PCSG00004 <br/> PCSG00563 <br/> PCSH00021 | Internal res. | 840x476 | |
 | ![](https://placehold.it/50x50/22bb22/000000?text=+) | Ratchet & Clank | PCSF00484 <br/> PCSF00482 <br/> PCSA00133 | Framebuffer | 720x408 | |
 | ![](https://placehold.it/50x50/eeee22/000000?text=+) | Ratchet & Clank: Going Commando / Ratchet & Clank 2: Locked and Loaded | PCSF00485 <br/> PCSF00482 <br/> PCSA00133 | Framebuffer | 720x408 | Some UI elements are [clipped](https://user-images.githubusercontent.com/12598379/45221532-00ac1300-b2b2-11e8-8ca7-ca2f1ba6a54f.png) |
@@ -148,7 +149,7 @@ NOTE: If some options are left out, the plugin will use their default values.
 | ![](https://placehold.it/50x50/22bb22/000000?text=+) | WRC 4: FIA World Rally Championship | PCSB00345 <br/> PCSE00411 | Internal res. | 704x448 | |
 | ![](https://placehold.it/50x50/22bb22/000000?text=+) | WRC 5: FIA World Rally Championship | PCSB00762 | Framebuffer | 960x544 | |
 
-* ![](https://placehold.it/10x10/22bb22/000000?text=+) no issues
+* ![](https://placehold.it/10x10/22bb22/000000?text=+) no known issues
 * ![](https://placehold.it/10x10/eeee22/000000?text=+) playable, but with some minor issues (check *[Issues](https://github.com/Electry/VitaGrafix/issues)* section)
 
 Adding support for each and every game requires manual disassembly of game's binary to find addresses in the game code where the resolution is set. Some are easy to patch, others plainly impossible.
