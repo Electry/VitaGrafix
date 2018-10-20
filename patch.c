@@ -445,12 +445,12 @@ void vgPatchGame() {
     else if (vgPatchIsGame("PCSF00248", SELF_EBOOT, NID_ANY) ||  // EU (Jak1)
              vgPatchIsGame("PCSF00249", SELF_EBOOT, NID_ANY) ||  // EU (Jak2)
              vgPatchIsGame("PCSF00250", SELF_EBOOT, NID_ANY) ||  // EU (Jak3)
-             vgPatchIsGame("PCSF00247", SELF_ANY, 0x109d6ad5) || // EU (Jak1.self)
-             vgPatchIsGame("PCSF00247", SELF_ANY, 0x15059015) || // EU (Jak2.self)
-             vgPatchIsGame("PCSF00247", SELF_ANY, 0x790ebad9) || // EU (Jak3.self)
-             vgPatchIsGame("PCSA00080", SELF_ANY, 0x109d6ad5) || // US (Jak1.self)
-             vgPatchIsGame("PCSA00080", SELF_ANY, 0x15059015) || // US (Jak2.self)
-             vgPatchIsGame("PCSA00080", SELF_ANY, 0x790ebad9)) { // US (Jak3.self)
+             vgPatchIsGame("PCSF00247", "Jak1.self", 0x109d6ad5) || // EU (Jak1.self)
+             vgPatchIsGame("PCSF00247", "Jak2.self", 0x15059015) || // EU (Jak2.self)
+             vgPatchIsGame("PCSF00247", "Jak3.self", 0x790ebad9) || // EU (Jak3.self)
+             vgPatchIsGame("PCSA00080", "Jak1.self", 0x109d6ad5) || // US (Jak1.self)
+             vgPatchIsGame("PCSA00080", "Jak2.self", 0x15059015) || // US (Jak2.self)
+             vgPatchIsGame("PCSA00080", "Jak3.self", 0x790ebad9)) { // US (Jak3.self)
         vgConfigSetSupported(FT_ENABLED, FT_UNSUPPORTED, FT_UNSUPPORTED);
 
         if (vgConfigIsFbEnabled()) {
@@ -461,12 +461,12 @@ void vgPatchGame() {
             vgPatchAddOffset("PCSF00248", SELF_EBOOT, NID_ANY, 2, 0x1B250, 0x1B260);  // EU (Jak1)
             vgPatchAddOffset("PCSF00249", SELF_EBOOT, NID_ANY, 2, 0x211F2, 0x211FA);  // EU (Jak2)
             vgPatchAddOffset("PCSF00250", SELF_EBOOT, NID_ANY, 2, 0x26096, 0x2609E);  // EU (Jak3)
-            vgPatchAddOffset("PCSF00247", SELF_ANY, 0x109d6ad5, 2, 0x1B250, 0x1B260); // EU (Jak1.self)
-            vgPatchAddOffset("PCSF00247", SELF_ANY, 0x15059015, 2, 0x211F2, 0x211FA); // EU (Jak2.self)
-            vgPatchAddOffset("PCSF00247", SELF_ANY, 0x790ebad9, 2, 0x26096, 0x2609E); // EU (Jak3.self)
-            vgPatchAddOffset("PCSA00080", SELF_ANY, 0x109d6ad5, 2, 0x1B250, 0x1B260); // US (Jak1.self)
-            vgPatchAddOffset("PCSA00080", SELF_ANY, 0x15059015, 2, 0x211F2, 0x211FA); // US (Jak2.self)
-            vgPatchAddOffset("PCSA00080", SELF_ANY, 0x790ebad9, 2, 0x26096, 0x2609E); // US (Jak3.self)
+            vgPatchAddOffset("PCSF00247", "Jak1.self", 0x109d6ad5, 2, 0x1B250, 0x1B260); // EU (Jak1.self)
+            vgPatchAddOffset("PCSF00247", "Jak2.self", 0x15059015, 2, 0x211F2, 0x211FA); // EU (Jak2.self)
+            vgPatchAddOffset("PCSF00247", "Jak3.self", 0x790ebad9, 2, 0x26096, 0x2609E); // EU (Jak3.self)
+            vgPatchAddOffset("PCSA00080", "Jak1.self", 0x109d6ad5, 2, 0x1B250, 0x1B260); // US (Jak1.self)
+            vgPatchAddOffset("PCSA00080", "Jak2.self", 0x15059015, 2, 0x211F2, 0x211FA); // US (Jak2.self)
+            vgPatchAddOffset("PCSA00080", "Jak3.self", 0x790ebad9, 2, 0x26096, 0x2609E); // US (Jak3.self)
 
             vgInjectData(0, g_main.offset[0], &movs_r0_width, sizeof(movs_r0_width));
             vgInjectData(0, g_main.offset[1], &movs_r0_height, sizeof(movs_r0_height));
@@ -776,7 +776,7 @@ void vgPatchGame() {
         }
     }
     //
-    // The Ratched & Clank Trilogy / Ratched & Clank Collection
+    // The Ratchet & Clank Trilogy / Ratchet & Clank Collection
     //
     else if (vgPatchIsGame("PCSF00484", SELF_EBOOT, NID_ANY) ||    // EU (Ratchet & Clank 1)
              vgPatchIsGame("PCSF00482", "rc1.self", 0x0a02a884) || // EU

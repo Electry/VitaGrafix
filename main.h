@@ -23,8 +23,8 @@
 
 typedef enum {
     GAME_UNSUPPORTED,
-    GAME_SELF_SHELL,
     GAME_WRONG_VERSION,
+    GAME_SELF_SHELL,
     GAME_SUPPORTED
 } VG_GameSupport;
 
