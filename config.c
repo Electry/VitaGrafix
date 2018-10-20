@@ -143,6 +143,7 @@ void vgConfigParse() {
     g_main.config.game_osd_enabled = FT_ENABLED;
     g_main.config.fb_enabled = FT_DISABLED;
     g_main.config.ib_enabled = FT_DISABLED;
+    g_main.config.ib_count = 0;
     g_main.config.fps_enabled = FT_DISABLED;
     g_main.config_state = CONFIG_OK;
 
@@ -229,7 +230,16 @@ void vgConfigSetSupported(
         g_main.config.fps_enabled = fps;
 }
 void vgConfigSetSupportedIbCount(uint8_t count) {
-    g_main.config.ib_count = count;
+    if (count < g_main.config.ib_count) {
+        // User specified more res. than is supported
+        g_main.config.ib_count = count;
+    } else {
+        // User did not specify enough res.
+        for (uint8_t i = g_main.config.ib_count; i < count; i++) {
+            g_main.config.ib[i].width = g_main.config.ib[i - 1].width;
+            g_main.config.ib[i].height = g_main.config.ib[i - 1].height;
+        }
+    }
 }
 
 uint8_t vgConfigIsFbEnabled() {
