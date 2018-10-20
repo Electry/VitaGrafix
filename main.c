@@ -22,13 +22,13 @@ void vgInjectData(int segidx, uint32_t offset, const void *data, size_t size) {
     g_main.inject_num++;
 }
 void vgHookFunction(int segidx, uint32_t offset, int thumb, const void *func) {
-    vgLogPrintF("Hooking seg%03d:%08X to 0x%X, thumb=%d", segidx, offset, func, thumb);
+    vgLogPrintF("Hooking seg%03d:%08X to 0x%X, thumb=%d\n", segidx, offset, func, thumb);
 
     g_main.hook[g_main.hook_num] = taiHookFunctionOffset(&g_main.hook_ref[g_main.hook_num], g_main.info.modid, segidx, offset, thumb, func);
     g_main.hook_num++;
 }
 void vgHookFunctionImport(uint32_t nid, const void *func) {
-    vgLogPrintF("Hooking function import nid=0x%X to 0x%X", nid, func);
+    vgLogPrintF("Hooking function import nid=0x%X to 0x%X\n", nid, func);
 
     g_main.hook[g_main.hook_num] = taiHookFunctionImport(&g_main.hook_ref[g_main.hook_num], TAI_MAIN_MODULE, TAI_ANY_LIBRARY, nid, func);
     g_main.hook_num++;
