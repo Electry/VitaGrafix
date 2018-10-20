@@ -337,10 +337,17 @@ void vgPatchGame() {
             vgMakeThumb2_T2_MOV(5, 1, g_main.config.ib[0].width, movs_r5_width);
             vgMakeThumb2_T2_MOV(0, 1, g_main.config.ib[0].height, movs_r0_height);
 
-            vgPatchAddOffset("PCSB00951", SELF_EBOOT, NID_ANY, 1, 0x22C9E6);
-            vgPatchAddOffset("PCSE00880", SELF_EBOOT, NID_ANY, 1, 0x22C9FE);
-            vgPatchAddOffset("PCSH00223", SELF_EBOOT, NID_ANY, 1, 0x22CA16);
-            vgPatchAddOffset("PCSG00709", SELF_EBOOT, NID_ANY, 1, 0x22C9DE);
+            vgPatchAddOffset("PCSB00951", SELF_EBOOT, NID_ANY, 2, 0x22C9E6, 0x429568);
+            vgPatchAddOffset("PCSE00880", SELF_EBOOT, NID_ANY, 2, 0x22C9FE, 0x429580);
+            vgPatchAddOffset("PCSH00223", SELF_EBOOT, NID_ANY, 2, 0x22CA16, 0x429598);
+            vgPatchAddOffset("PCSG00709", SELF_EBOOT, NID_ANY, 2, 0x22C9DE, 0x429560);
+
+            if (g_main.config.ib[0].width > 640 || g_main.config.ib[0].height > 384) {
+                uint8_t movs_r1_uncache[4];
+                vgMakeThumb2_T2_MOV(1, 1, 0x5800000 - (4 * 1024 * 1024), movs_r1_uncache);
+
+                vgInjectData(0, g_main.offset[1], &movs_r1_uncache, sizeof(movs_r1_uncache));
+            }
 
             vgInjectData(0, g_main.offset[0], &movs_r5_width, sizeof(movs_r5_width));
             vgInjectData(0, g_main.offset[0] + 6, &movs_r0_height, sizeof(movs_r0_height));
