@@ -230,10 +230,7 @@ void vgConfigSetSupported(
         g_main.config.fps_enabled = fps;
 }
 void vgConfigSetSupportedIbCount(uint8_t count) {
-    if (count < g_main.config.ib_count) {
-        // User specified more res. than is supported
-        g_main.config.ib_count = count;
-    } else {
+    if (g_main.config.ib_count > 0 && count > g_main.config.ib_count) {
         // User did not specify enough res.
         for (uint8_t i = g_main.config.ib_count; i < count; i++) {
             g_main.config.ib[i].width = g_main.config.ib[i - 1].width;
