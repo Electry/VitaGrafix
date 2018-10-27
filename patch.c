@@ -925,4 +925,54 @@ void vgPatchGame() {
             vgInjectData(0, g_main.offset[4] + 8, &mov_r6_height, sizeof(mov_r6_height));
         }
     }
+    //
+    // Wipeout 2048
+    //
+    else if (vgPatchIsGame("PCSF00007", SELF_EBOOT, NID_ANY) || // EU [1.04]
+             vgPatchIsGame("PCSA00015", SELF_EBOOT, NID_ANY) || // US [1.04]
+             vgPatchIsGame("PCSC00006", SELF_EBOOT, NID_ANY) || // JP [1.04]
+             vgPatchIsGame("PCSD00005", SELF_EBOOT, NID_ANY)) { // ASIA [1.04]
+        vgConfigSetSupported(FT_UNSUPPORTED, FT_ENABLED, FT_ENABLED);
+        vgConfigSetSupportedIbCount(14);
+
+        if (vgConfigIsIbEnabled()) {
+            vgPatchAddOffset("PCSF00007", SELF_EBOOT, NID_ANY, 4, 0x2941D0, 0x294206, 0x2941F8, 0x424870);
+            vgPatchAddOffset("PCSA00015", SELF_EBOOT, NID_ANY, 4, 0x2941D0, 0x294206, 0x2941F8, 0x424870);
+            vgPatchAddOffset("PCSC00006", SELF_EBOOT, NID_ANY, 4, 0x2941D4, 0x29420A, 0x2941FC, 0x424870);
+            vgPatchAddOffset("PCSD00005", SELF_EBOOT, NID_ANY, 4, 0x2941D4, 0x29420A, 0x2941FC, 0x424870);
+
+            if (g_main.config.ib_count == 1) {
+                uint8_t movs_r0_1[2], branch_0x36[2] = {0x19, 0xE0};
+                vgMakeThumb_T1_MOV(0, 1, movs_r0_1);
+
+                vgInjectData(0, g_main.offset[0], &branch_0x36, sizeof(branch_0x36));
+                vgInjectData(0, g_main.offset[1], &movs_r0_1, sizeof(movs_r0_1));
+            } else {
+                uint8_t movs_r4_1[2], cmp_r4_1[2] = {0x01, 0x2C};
+                vgMakeThumb_T1_MOV(4, 1, movs_r4_1);
+
+                vgInjectData(0, g_main.offset[2], &cmp_r4_1, sizeof(cmp_r4_1));
+                vgInjectData(0, g_main.offset[2] + 4, &movs_r4_1, sizeof(movs_r4_1));
+            }
+
+            uint32_t data32_w_h[14 * 2];
+            for (uint8_t i = 0; i < 14; i++) {
+                data32_w_h[i * 2] = g_main.config.ib[i].width;
+                data32_w_h[i * 2 + 1] = g_main.config.ib[i].height;
+            }
+            vgInjectData(0, g_main.offset[3] + 8, &data32_w_h, sizeof(data32_w_h));
+        }
+
+        if (vgConfigIsFpsEnabled()) {
+            vgPatchAddOffset("PCSF00007", SELF_EBOOT, NID_ANY, 1, 0x2F5D2E);
+            vgPatchAddOffset("PCSA00015", SELF_EBOOT, NID_ANY, 1, 0x2F5D2E);
+            vgPatchAddOffset("PCSC00006", SELF_EBOOT, NID_ANY, 1, 0x2F5D32);
+            vgPatchAddOffset("PCSD00005", SELF_EBOOT, NID_ANY, 1, 0x2F5D32);
+
+            if (g_main.config.fps == FPS_60) {
+                uint8_t nop[2] = {0x00, 0xBF};
+                vgInjectData(0, g_main.offset[0], &nop, sizeof(nop));
+            }
+        }
+    }
 }

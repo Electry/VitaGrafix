@@ -1,7 +1,7 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
-#define MAX_RES_COUNT  2
+#define MAX_RES_COUNT     16
 
 #define CONFIG_PATH       "ux0:data/VitaGrafix/config.txt"
 #define CONFIG_CHUNK_SIZE 1024

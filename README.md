@@ -144,6 +144,7 @@ NOTE: If some options are left out, the plugin will use their default values.
 | ![](https://placehold.it/20/22bb22/000000?text=+) | Utawarerumono: Mask of Deception / Itsuwari no Kamen | PCSB01093 <br/> PCSE00959 <br/> PCSG00617 | Internal res. | 672x384 | |
 | ![](https://placehold.it/20/22bb22/000000?text=+) | Utawarerumono: Mask of Truth / Futari no Hakuoro | PCSB01145 <br/> PCSE01102 <br/> PCSG00838 | Internal res. | 672x384 | |
 | ![](https://placehold.it/20/22bb22/000000?text=+) | Utawarerumono: Chiriyuku Mono he no Komoriuta | PCSG01079 | Internal res. | 672x384 | |
+| ![](https://placehold.it/20/22bb22/000000?text=+) | Wipeout 2048 | PCSF00007 <br/> PCSA00015 <br/> PCSC00006 <br/> PCSD00005 | 14x Internal res. <br/> FPS cap | up to 960x544 <br/> 30 | |
 | ![](https://placehold.it/20/eeee22/000000?text=+) | World of Final Fantasy | PCSB00951 <br/> PCSE00880 <br/> PCSH00223 <br/> PCSG00709 | Internal res. | 640x384 | |
 | ![](https://placehold.it/20/22bb22/000000?text=+) | WRC 3: FIA World Rally Championship | PCSB00204 | Internal res. | 704x448 | |
 | ![](https://placehold.it/20/22bb22/000000?text=+) | WRC 4: FIA World Rally Championship | PCSB00345 <br/> PCSE00411 | Internal res. | 704x448 | |
