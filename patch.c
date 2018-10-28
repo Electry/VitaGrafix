@@ -1020,4 +1020,28 @@ void vgPatchGame() {
             vgInjectData(0, g_main.offset[2], &movs_r2_w_r3_h, sizeof(movs_r2_w_r3_h));
         }
     }
+    //
+    // The Legend of Heroes: Trails of Cold Steel II
+    //
+    else if (vgPatchIsGame("PCSB01016", SELF_EBOOT, NID_ANY) || // EU
+             vgPatchIsGame("PCSE00896", SELF_EBOOT, NID_ANY) || // US [1.01]
+             vgPatchIsGame("PCSG00354", SELF_EBOOT, NID_ANY) || // JP [1.03]
+             vgPatchIsGame("PCSH00075", SELF_EBOOT, NID_ANY)) { // ASIA [1.03]
+        vgConfigSetSupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED);
+
+        if (vgConfigIsIbEnabled()) {
+            uint8_t movs_r1_w_r2_h[8];
+            vgMakeThumb2_T2_MOV(1, 1, g_main.config.ib[0].width, movs_r1_w_r2_h);
+            vgMakeThumb2_T2_MOV(2, 1, g_main.config.ib[0].height, &movs_r1_w_r2_h[4]);
+
+            vgPatchAddOffset("PCSB01016", SELF_EBOOT, NID_ANY, 3, 0x139B8C, 0x1399EC, 0x1399AC);
+            vgPatchAddOffset("PCSE00896", SELF_EBOOT, NID_ANY, 3, 0x139AA4, 0x139904, 0x1398C4);
+            vgPatchAddOffset("PCSG00354", SELF_EBOOT, NID_ANY, 3, 0x1395C4, 0x139422, 0x1393DE);
+            vgPatchAddOffset("PCSH00075", SELF_EBOOT, NID_ANY, 3, 0x139BE8, 0x139A48, 0x139A08);
+
+            vgInjectData(0, g_main.offset[0], &movs_r1_w_r2_h, sizeof(movs_r1_w_r2_h));
+            vgInjectData(0, g_main.offset[1], &movs_r1_w_r2_h, sizeof(movs_r1_w_r2_h));
+            vgInjectData(0, g_main.offset[2], &movs_r1_w_r2_h, sizeof(movs_r1_w_r2_h));
+        }
+    }
 }
