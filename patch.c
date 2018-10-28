@@ -975,4 +975,23 @@ void vgPatchGame() {
             }
         }
     }
+    //
+    // Fate/EXTELLA LINK / The Umbral Star
+    //
+    else if (vgPatchIsGame("PCSG01091", SELF_EBOOT, NID_ANY) || // JP [1.07]
+             vgPatchIsGame("PCSH10121", SELF_EBOOT, NID_ANY)) { // ASIA [1.02]
+        vgConfigSetSupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED);
+
+        if (vgConfigIsIbEnabled()) {
+            uint8_t mov_r0_width[4], mov_r0_height[4];
+            vgMakeThumb2_T2_MOV(0, 0, g_main.config.ib[0].width, mov_r0_width);
+            vgMakeThumb2_T2_MOV(0, 0, g_main.config.ib[0].height, mov_r0_height);
+
+            vgPatchAddOffset("PCSG01091", SELF_EBOOT, NID_ANY, 1, 0x6C919C);
+            vgPatchAddOffset("PCSH10121", SELF_EBOOT, NID_ANY, 1, 0x6CEF98);
+
+            vgInjectData(0, g_main.offset[0], &mov_r0_width, sizeof(mov_r0_width));
+            vgInjectData(0, g_main.offset[0] + 6, &mov_r0_height, sizeof(mov_r0_height));
+        }
+    }
 }

@@ -115,6 +115,7 @@ NOTE: If some options are left out, the plugin will use their default values.
 | ![](https://placehold.it/20/22bb22/000000?text=+) | Dead or Alive 5 Plus | PCSB00296 <br/> PCSE00235 <br/> PCSG00167 | Internal res. | 720x408 | |
 | ![](https://placehold.it/20/22bb22/000000?text=+) | Dragon Ball Z: Battle of Z | PCSB00396 <br/> PCSE00305 <br/> PCSG00213 | Internal res. | 704x448 | |
 | ![](https://placehold.it/20/22bb22/000000?text=+) | Dragon Quest Builders | PCSB00981 <br/> PCSE00912 <br/> PCSG00697 <br/> PCSH00221 | Internal res. <br/> FPS cap | 720x408 <br/> 60 | |
+| ![](https://placehold.it/20/22bb22/000000?text=+) | Fate/EXTELLA LINK (The Umbral Star) | PCSG01091 <br/> PCSH10121 | Internal res. | 720x408 | |
 | ![](https://placehold.it/20/22bb22/000000?text=+) | F1 2011 | PCSB00027 | Internal res. | 640x384 | |
 | ![](https://placehold.it/20/22bb22/000000?text=+) | God of War Collection | PCSF00438 <br/> PCSA00126 <br/> PCSC00059 | Framebuffer <br/> FPS cap | 720x408 <br/> 30 | |
 | ![](https://placehold.it/20/eeee22/000000?text=+) | Hatsune Miku: Project Diva f | PCSB00419 <br/> PCSE00326 <br/> PCSG00074 | Internal res. <br/> FPS cap | 640x352 <br/> 30 | [#120](https://github.com/Electry/VitaGrafix/issues/120), [#81](https://github.com/Electry/VitaGrafix/issues/81) |
