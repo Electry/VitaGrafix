@@ -994,4 +994,30 @@ void vgPatchGame() {
             vgInjectData(0, g_main.offset[0] + 6, &mov_r0_height, sizeof(mov_r0_height));
         }
     }
+    //
+    // The Legend of Heroes: Trails of Cold Steel / Eiyuu Densetsu: Sen no Kiseki
+    //
+    else if (vgPatchIsGame("PCSB00866", SELF_EBOOT, NID_ANY) || // EU [1.01]
+             vgPatchIsGame("PCSE00786", SELF_EBOOT, NID_ANY) || // US [1.02]
+             vgPatchIsGame("PCSG00195", SELF_EBOOT, NID_ANY) || // JP [1.03]
+             vgPatchIsGame("PCSH00074", SELF_EBOOT, NID_ANY)) { // ASIA [1.03]
+        vgConfigSetSupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED);
+
+        if (vgConfigIsIbEnabled()) {
+            uint8_t movs_r1_w_r2_h[8], movs_r2_w_r3_h[8];
+            vgMakeThumb2_T2_MOV(1, 1, g_main.config.ib[0].width, movs_r1_w_r2_h);
+            vgMakeThumb2_T2_MOV(2, 1, g_main.config.ib[0].height, &movs_r1_w_r2_h[4]);
+            vgMakeThumb2_T2_MOV(2, 1, g_main.config.ib[0].width, movs_r2_w_r3_h);
+            vgMakeThumb2_T2_MOV(3, 1, g_main.config.ib[0].height, &movs_r2_w_r3_h[4]);
+
+            vgPatchAddOffset("PCSB00866", SELF_EBOOT, NID_ANY, 3, 0xF9AD6, 0xF9910, 0xF9946);
+            vgPatchAddOffset("PCSE00786", SELF_EBOOT, NID_ANY, 3, 0xF99F2, 0xF982C, 0xF9862);
+            vgPatchAddOffset("PCSG00195", SELF_EBOOT, NID_ANY, 3, 0xF971A, 0xF9554, 0xF958A);
+            vgPatchAddOffset("PCSH00074", SELF_EBOOT, NID_ANY, 3, 0xF9B32, 0xF996C, 0xF99A2);
+
+            vgInjectData(0, g_main.offset[0], &movs_r1_w_r2_h, sizeof(movs_r1_w_r2_h));
+            vgInjectData(0, g_main.offset[1], &movs_r1_w_r2_h, sizeof(movs_r1_w_r2_h));
+            vgInjectData(0, g_main.offset[2], &movs_r2_w_r3_h, sizeof(movs_r2_w_r3_h));
+        }
+    }
 }
