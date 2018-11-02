@@ -1044,4 +1044,40 @@ void vgPatchGame() {
             vgInjectData(0, g_main.offset[2], &movs_r1_w_r2_h, sizeof(movs_r1_w_r2_h));
         }
     }
+    //
+    // Assassin's Creed III: Liberation
+    //
+    else if (vgPatchIsGame("PCSB00074", SELF_EBOOT, NID_ANY) || // EU [1.02]
+             vgPatchIsGame("PCSE00053", SELF_EBOOT, NID_ANY)) { // US [1.02]
+        vgConfigSetSupported(FT_UNSUPPORTED, FT_ENABLED, FT_ENABLED);
+
+        if (vgConfigIsIbEnabled()) {
+            uint8_t movs_r0_width[4], movs_r0_height[4];
+            vgMakeThumb2_T2_MOV(0, 1, g_main.config.ib[0].width, movs_r0_width);
+            vgMakeThumb2_T2_MOV(0, 1, g_main.config.ib[0].height, movs_r0_height);
+
+            if (g_main.config.ib[0].width > 720 || g_main.config.ib[0].height > 408) {
+                uint8_t movs_r1_gxm_parambuf[4];
+                uint32_t data32_mem_colsurf = 0x1100000 + (9 * 1024 * 1024);
+                uint32_t data32_mem_dssurf  = 0x400000  + (1 * 1024 * 1024);
+                uint32_t data32_mem_tex     = 0x3B00000 - (2 * 1024 * 1024);
+                vgMakeThumb2_T2_MOV(1, 1, 0x1000000 - (8 * 1024 * 1024), movs_r1_gxm_parambuf);
+
+                vgInjectData(0, 0xBB4C, &movs_r1_gxm_parambuf, sizeof(movs_r1_gxm_parambuf));
+                vgInjectData(1, 0x32C, &data32_mem_colsurf, sizeof(data32_mem_colsurf));
+                vgInjectData(1, 0x32C + 16, &data32_mem_dssurf, sizeof(data32_mem_dssurf));
+                vgInjectData(1, 0x32C + 96, &data32_mem_tex, sizeof(data32_mem_tex));
+            }
+
+            vgInjectData(0, 0xE9E8, &movs_r0_width, sizeof(movs_r0_width));
+            vgInjectData(0, 0xE9E8 + 6, &movs_r0_height, sizeof(movs_r0_height));
+        }
+
+        if (vgConfigIsFpsEnabled()) {
+            uint8_t movs_r0_vblank[4];
+            vgMakeThumb_T1_MOV(0, g_main.config.fps == FPS_60 ? 1 : 2, movs_r0_vblank);
+
+            vgInjectData(0, 0xCBC2, &movs_r0_vblank, sizeof(movs_r0_vblank));
+        }
+    }
 }

@@ -110,6 +110,7 @@ NOTE: If some options are left out, the plugin will use their default values.
 ## Supported games
 |   | Game          | Title ID(s)   | Supported features | Game defaults | Notes.............. |
 | - | ------------- | ------------- | ------------------ | ------------- | ------------------- |
+| ![](https://placehold.it/20/22bb22/000000?text=+) | Assassin's Creed III: Liberation | PCSB00074 <br/> PCSE00053 | Internal res. <br/> FPS cap. | 720x408 <br/> 30 | |
 | ![](https://placehold.it/20/22bb22/000000?text=+) | Asphalt: Injection | PCSB00040 <br/> PCSE00007 | Internal res. | 720x408 | |
 | ![](https://placehold.it/20/eeee22/000000?text=+) | Borderlands 2 | PCSF00570 <br/> PCSF00576 <br/> PCSE00383 | Framebuffer | 960x544 | [#119](https://github.com/Electry/VitaGrafix/issues/119) |
 | ![](https://placehold.it/20/22bb22/000000?text=+) | Dead or Alive 5 Plus | PCSB00296 <br/> PCSE00235 <br/> PCSG00167 | Internal res. | 720x408 | |
