@@ -1106,4 +1106,25 @@ void vgPatchGame() {
             vgInjectData(0, g_main.offset[0] + 18, &movs_r1_h2, sizeof(movs_r1_h2));
         }
     }
+    //
+    // Resident Evil: Revelations 2
+    //
+    else if (vgPatchIsGame("PCSF00728", SELF_EBOOT, NID_ANY) || // EU [1.04]
+             vgPatchIsGame("PCSE00608", SELF_EBOOT, NID_ANY) || // US [1.04]
+             vgPatchIsGame("PCSG00594", SELF_EBOOT, NID_ANY)) { // JP [1.04]
+        vgConfigSetSupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED);
+
+        if (vgConfigIsIbEnabled()) {
+            uint8_t movs_r1_width[4], movs_r1_height[4];
+            vgMakeThumb2_T2_MOV(1, 1, g_main.config.ib[0].width, movs_r1_width);
+            vgMakeThumb2_T2_MOV(1, 1, g_main.config.ib[0].height, movs_r1_height);
+
+            vgPatchAddOffset("PCSF00728", SELF_EBOOT, NID_ANY, 1, 0xCCFE76);
+            vgPatchAddOffset("PCSE00608", SELF_EBOOT, NID_ANY, 1, 0xCCFE7A);
+            vgPatchAddOffset("PCSG00594", SELF_EBOOT, NID_ANY, 1, 0xCCFF3A);
+
+            vgInjectData(0, g_main.offset[0], &movs_r1_width, sizeof(movs_r1_width));
+            vgInjectData(0, g_main.offset[0] + 8, &movs_r1_height, sizeof(movs_r1_height));
+        }
+    }
 }
