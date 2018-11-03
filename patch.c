@@ -1080,4 +1080,30 @@ void vgPatchGame() {
             vgInjectData(0, 0xCBC2, &movs_r0_vblank, sizeof(movs_r0_vblank));
         }
     }
+    //
+    // Dead or Alive Xtreme 3: Venus
+    //
+    else if (vgPatchIsGame("PCSG00773", SELF_EBOOT, NID_ANY) || // JP (F2P) [1.16]
+             vgPatchIsGame("PCSH00250", SELF_EBOOT, NID_ANY) || // ASIA [1.15]
+             vgPatchIsGame("PCSH00281", SELF_EBOOT, NID_ANY)) { // ASIA (F2P) [1.15]
+        vgConfigSetSupported(FT_UNSUPPORTED, FT_ENABLED, FT_UNSUPPORTED);
+        vgConfigSetSupportedIbCount(2);
+
+        if (vgConfigIsIbEnabled()) {
+            uint8_t movs_r1_w1[4], movs_r1_h1[4], movs_r1_w2[4], movs_r1_h2[4];
+            vgMakeThumb2_T2_MOV(1, 1, g_main.config.ib[0].width, movs_r1_w1);
+            vgMakeThumb2_T2_MOV(1, 1, g_main.config.ib[0].height, movs_r1_h1);
+            vgMakeThumb2_T2_MOV(1, 1, g_main.config.ib[1].width, movs_r1_w2);
+            vgMakeThumb2_T2_MOV(1, 1, g_main.config.ib[1].height, movs_r1_h2);
+
+            vgPatchAddOffset("PCSG00773", SELF_EBOOT, NID_ANY, 1, 0x217B82);
+            vgPatchAddOffset("PCSH00250", SELF_EBOOT, NID_ANY, 1, 0x217732);
+            vgPatchAddOffset("PCSH00281", SELF_EBOOT, NID_ANY, 1, 0x217F4A);
+
+            vgInjectData(0, g_main.offset[0], &movs_r1_w1, sizeof(movs_r1_w1));
+            vgInjectData(0, g_main.offset[0] + 6, &movs_r1_h1, sizeof(movs_r1_h1));
+            vgInjectData(0, g_main.offset[0] + 12, &movs_r1_w2, sizeof(movs_r1_w2));
+            vgInjectData(0, g_main.offset[0] + 18, &movs_r1_h2, sizeof(movs_r1_h2));
+        }
+    }
 }

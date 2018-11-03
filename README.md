@@ -114,6 +114,7 @@ NOTE: If some options are left out, the plugin will use their default values.
 | ![](https://placehold.it/20/22bb22/000000?text=+) | Asphalt: Injection | PCSB00040 <br/> PCSE00007 | Internal res. | 720x408 | |
 | ![](https://placehold.it/20/eeee22/000000?text=+) | Borderlands 2 | PCSF00570 <br/> PCSF00576 <br/> PCSE00383 | Framebuffer | 960x544 | [#119](https://github.com/Electry/VitaGrafix/issues/119) |
 | ![](https://placehold.it/20/22bb22/000000?text=+) | Dead or Alive 5 Plus | PCSB00296 <br/> PCSE00235 <br/> PCSG00167 | Internal res. | 720x408 | |
+| ![](https://placehold.it/20/22bb22/000000?text=+) | Dead or Alive Xtreme 3: Venus | PCSG00773 <br/> PCSH00250 <br/> PCSH00281 | 2x Internal res. | 736x416, 640x368 | |
 | ![](https://placehold.it/20/22bb22/000000?text=+) | Dragon Ball Z: Battle of Z | PCSB00396 <br/> PCSE00305 <br/> PCSG00213 | Internal res. | 704x448 | |
 | ![](https://placehold.it/20/22bb22/000000?text=+) | Dragon Quest Builders | PCSB00981 <br/> PCSE00912 <br/> PCSG00697 <br/> PCSH00221 | Internal res. <br/> FPS cap | 720x408 <br/> 60 | |
 | ![](https://placehold.it/20/22bb22/000000?text=+) | Fate/EXTELLA LINK (The Umbral Star) | PCSG01091 <br/> PCSH10121 | Internal res. | 720x408 | |
