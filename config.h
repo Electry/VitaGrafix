@@ -1,22 +1,15 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 
-#define MAX_RES_COUNT     16
+#define MAX_RES_COUNT      16
 
-#define CONFIG_PATH       "ux0:data/VitaGrafix/config.txt"
-#define CONFIG_CHUNK_SIZE 1024
+#define CONFIG_PATH        "ux0:data/VitaGrafix/config.txt"
 
 typedef enum {
     CONFIG_NONE,
     CONFIG_MAIN,
     CONFIG_GAME
 } VG_ConfigSection;
-
-typedef enum {
-    CONFIG_OK,
-    CONFIG_BAD,
-    CONFIG_OPEN_FAILED
-} VG_ConfigState;
 
 typedef enum {
     FT_DISABLED = 0,

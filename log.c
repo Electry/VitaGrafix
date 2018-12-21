@@ -2,6 +2,7 @@
 #include <taihen.h>
 
 #include "config.h"
+#include "io.h"
 #include "main.h"
 #include "log.h"
 

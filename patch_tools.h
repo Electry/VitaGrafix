@@ -1,5 +1,5 @@
-#ifndef _TOOLS_H_
-#define _TOOLS_H_
+#ifndef _PATCH_TOOLS_H_
+#define _PATCH_TOOLS_H_
 
 #define REGISTER_LR 14
 

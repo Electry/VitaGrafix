@@ -1,6 +1,6 @@
 #include <vitasdk.h>
 
-#include "tools.h"
+#include "patch_tools.h"
 
 /*
  * T1 MOVS <Rd>,#<imm8>    # Outside IT block.
@@ -15,8 +15,8 @@
 void vgMakeThumb_T1_MOV(uint8_t reg, uint8_t value, uint8_t out[2]) {
     memset(out, 0, 2);
 
-    out[1] |= 0b00100000;	// Move immediate
-    out[1] |= reg;			// Rd
+    out[1] |= 0b00100000;   // Move immediate
+    out[1] |= reg;          // Rd
     out[0] |= value;
 }
 
@@ -32,12 +32,12 @@ void vgMakeThumb_T1_MOV(uint8_t reg, uint8_t value, uint8_t out[2]) {
 void vgMakeThumb2_T2_MOV(uint8_t reg, uint8_t setflags, uint32_t value, uint8_t out[4]) {
     memset(out, 0, 4);
 
-    out[1] |= 0b11110000;		// Data processing (12-bit)
-    out[0] |= 0b01000000;		// OPcode
-    out[0] |= 0b00001111;		// Rn
+    out[1] |= 0b11110000;       // Data processing (12-bit)
+    out[0] |= 0b01000000;       // OPcode
+    out[0] |= 0b00001111;       // Rn
     if (setflags)
-        out[0] |= 0b00010000;	// S
-    out[3] |= reg;			// Rd
+        out[0] |= 0b00010000;   // S
+    out[3] |= reg;              // Rd
 
     uint16_t imm12 = 0;
 

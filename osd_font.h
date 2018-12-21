@@ -5,7 +5,7 @@
 #define FONT_WIDTH  6
 #define FONT_HEIGHT 10
 //---------------------------------------------------------------------------------
-static const unsigned char font[] = {
+static const unsigned char g_font[] = {
 
     /* 0 0x00 '^@' */
     0x00, /* 00000000 */
@@ -3079,4 +3079,4 @@ static const unsigned char font[] = {
     0x00, /* 00000000 */
     0x00, /* 00000000 */
 };
-const int font_size = sizeof(font);
+const int g_font_size = sizeof(g_font);

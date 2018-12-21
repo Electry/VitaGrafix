@@ -20,11 +20,14 @@ endif()
 
 add_executable(VitaGrafix
   main.c
-  display.c
-  config.c
-  tools.c
-  patch.c
+  osd.c
+  io.c
   log.c
+  config.c
+  patch.c
+  patch_gens.c
+  patch_tools.c
+  patch_hooks.c
 )
 
 target_link_libraries(VitaGrafix
