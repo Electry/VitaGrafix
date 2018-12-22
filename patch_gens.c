@@ -61,6 +61,38 @@ VG_IoParseState vgPatchParseGenValue(
             *value = g_main.config.fps == FPS_60 ? 1 : 2;
             return IO_OK;
         }
+        if (!strncmp(&chunk[pos], "<+,", 3) ||
+                !strncmp(&chunk[pos], "<-,", 3) ||
+                !strncmp(&chunk[pos], "<*,", 3) ||
+                !strncmp(&chunk[pos], "</,", 3)) {
+            int token_pos = pos + 3;
+            int inner_open = 0;
+            uint32_t a, b;
+
+            if (vgPatchParseGenValue(chunk, token_pos, end, &a))
+                return IO_BAD;
+
+            while (token_pos < end - 2 && (inner_open > 0 || chunk[token_pos] != ',')) {
+                // Allow stacking, e.g.: </,<*,<ib_w>,10>,10>
+                if (chunk[token_pos] == '<')
+                    inner_open++;
+                if (chunk[token_pos] == '>')
+                    inner_open--;
+                token_pos++;
+            }
+            if (vgPatchParseGenValue(chunk, token_pos + 1, end, &b))
+                return IO_BAD;
+
+            if (chunk[pos + 1] == '+')
+                *value = a + b;
+            else if (chunk[pos + 1] == '-')
+                *value = a - b;
+            else if (chunk[pos + 1] == '*')
+                *value = a * b;
+            else if (chunk[pos + 1] == '/')
+                *value = a / b;
+            return IO_OK;
+        }
 
         vgLogPrintF("[PATCH] ERROR: Invalid macro!\n");
         return IO_BAD; // Invalid macro
@@ -102,7 +134,7 @@ VG_IoParseState vgPatchParseGen_uint16(
 
     if (!strncmp(&chunk[pos], "uint16", 6)) {
         int token_end = pos;
-        uint32_t value;
+        uint32_t value = 0;
         while (chunk[token_end] != ')') { token_end++; }
 
         if (vgPatchParseGenValue(chunk, pos + 7, token_end, &value))
@@ -127,7 +159,7 @@ VG_IoParseState vgPatchParseGen_uint32(
 
     if (!strncmp(&chunk[pos], "uint32", 6)) {
         int token_end = pos;
-        uint32_t value;
+        uint32_t value = 0;
         while (chunk[token_end] != ')') { token_end++; }
 
         if (vgPatchParseGenValue(chunk, pos + 7, token_end, &value))
@@ -154,7 +186,7 @@ VG_IoParseState vgPatchParseGen_fl32(
 
     if (!strncmp(&chunk[pos], "fl32", 4)) {
         int token_end = pos;
-        uint32_t value;
+        uint32_t value = 0;
         while (chunk[token_end] != ')') { token_end++; }
 
         if (vgPatchParseGenValue(chunk, pos + 5, token_end, &value))
