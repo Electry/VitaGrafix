@@ -45,8 +45,10 @@ static VG_IoParseState vgPatchParseAddress(
     *segment = strtoul(&chunk[pos], NULL, 10); // always base 10
     
     while (chunk[pos] != ':' && pos < end) { pos++; }
-    if (pos >= end)
+    if (pos >= end) {
+        vgLogPrintF("[PATCH] ERROR: Syntax error: missing address?\n");
         return IO_BAD;
+    }
 
     *offset = strtoul(&chunk[pos + 1], NULL, 0);
 
@@ -79,6 +81,25 @@ static VG_IoParseState vgPatchParseRepeat(
 
 static VG_IoParseState vgPatchParsePatch(const char chunk[], int pos, int end) {
 
+    // Check for hook & apply if any
+    if (chunk[pos] == '>') {
+        void *hookPtr;
+        uint32_t importNid;
+        uint8_t shallHook = 0;
+
+        if (vgPatchParseHook(chunk, pos, end, &importNid, &hookPtr, &shallHook)) {
+            return IO_BAD;
+        }
+
+        // Apply
+        if (shallHook) {
+            vgHookFunctionImport(importNid, hookPtr);
+        }
+
+        return IO_OK;
+    }
+
+    // Regular patch
     int token_begin = pos, token_end = pos;
     uint8_t segment = 0;
     uint32_t offset = 0;
@@ -90,53 +111,36 @@ static VG_IoParseState vgPatchParsePatch(const char chunk[], int pos, int end) {
     if (vgPatchParseAddress(chunk, token_begin, token_end, &segment, &offset))
         return IO_BAD;
 
-    // Skip leading spaces
+    // Skip leading whitespaces
     token_begin = ++token_end;
     while (isspace(chunk[token_begin])) { token_begin++; }
     while (chunk[token_end] != ')') { token_end++; }
 
-    // Parse hook & apply
-    if (chunk[token_begin] == '>') {
-        void *hookPtr;
-        uint32_t importNid;
-        uint8_t shallHook = 0;
+    // Parse generator & generate patch
+    if (vgPatchParseGen(chunk, token_begin, token_end, patch_data, &patch_data_len)) {
+        return IO_BAD;
+    }
 
-        if (vgPatchParseHook(chunk, token_begin, token_end, &importNid, &hookPtr, &shallHook)) {
+    // Parse repeat (optional)
+    token_begin = ++token_end;
+    while (token_begin < end && isspace(chunk[token_begin])) { token_begin++; }
+    token_end = token_begin;
+    if (token_begin < end) {
+        while (!isspace(chunk[token_end])) { token_end++; }
+        if (vgPatchParseRepeat(chunk, token_begin, token_end, patch_data, &patch_data_len)) {
             return IO_BAD;
         }
-
-        // Apply
-        if (shallHook) {
-            vgHookFunctionImport(importNid, hookPtr);
-        }
     }
-    // Parse generator, generate patch & apply
-    else {
-        if (vgPatchParseGen(chunk, token_begin, token_end, patch_data, &patch_data_len)) {
-            return IO_BAD;
-        }
-
-        // Parse repeat (optional)
-        token_begin = ++token_end;
-        while (token_begin < end && isspace(chunk[token_begin])) { token_begin++; }
-        token_end = token_begin;
-        if (token_begin < end) {
-            while (!isspace(chunk[token_end])) { token_end++; }
-            if (vgPatchParseRepeat(chunk, token_begin, token_end, patch_data, &patch_data_len)) {
-                return IO_BAD;
-            }
-        }
-        /*
-        vgLogPrintF("Patch data: ");
-        for (int i = 0; i < patch_data_len; i++) {
-            vgLogPrintF("%X ", patch_data[i]);
-        }
-        vgLogPrintF("\n");
-        */
-
-        // Apply
-        vgInjectData(segment, offset, patch_data, patch_data_len);
+    /*
+    vgLogPrintF("Patch data: ");
+    for (int i = 0; i < patch_data_len; i++) {
+        vgLogPrintF("%X ", patch_data[i]);
     }
+    vgLogPrintF("\n");
+    */
+
+    // Apply patch
+    vgInjectData(segment, offset, patch_data, patch_data_len);
 
     return IO_OK;
 }
@@ -180,8 +184,16 @@ static VG_IoParseState vgPatchParseSection(const char chunk[], int pos, int end)
     if (vgPatchIsGame(titleid, self, nid)) {
         g_patch_section = PATCH_GAME;
     } else {
-        g_patch_section = PATCH_NONE;
+        // If previous patch section didn't have any patches ->
+        // we are in a combined section and we shall continue
+        if (g_patch_type != PATCH_TYPE_NONE) {
+            // otherwise:
+            g_patch_section = PATCH_NONE;
+        }
     }
+
+    // Reset patch type
+    g_patch_type = PATCH_TYPE_NONE;
 
 #ifdef ENABLE_VERBOSE_LOGGING
     vgLogPrintF("[PATCH] Found section [%s] [%s] [0x%X]\n", titleid, self, nid);
@@ -230,13 +242,11 @@ static VG_IoParseState vgPatchParseLine(const char chunk[], int pos, int end) {
     else if (g_patch_section == PATCH_GAME) {
         // Check for new patch type
         if (chunk[pos] == '@') {
-            if (!vgPatchParsePatchType(chunk, pos, end))
-                return IO_OK;
+            return vgPatchParsePatchType(chunk, pos, end);
         }
         // Parse & apply patches
         else if (g_patch_type != PATCH_TYPE_OFF) {
-            if (!vgPatchParsePatch(chunk, pos, end))
-                return IO_OK;
+            return vgPatchParsePatch(chunk, pos, end);
         }
     }
 
@@ -249,7 +259,7 @@ void vgPatchParse() {
 
     vgLogPrintF("[PATCH] Parsing patchlist.txt\n");
     g_main.patch_state = vgIoParse(PATCH_PATH, vgPatchParseLine);
-    vgLogPrintF("[PATCH] %u total patches found\n", g_patch_count);
+    vgLogPrintF("[PATCH] %u total patches found in patchlist.txt\n", g_patch_count);
 
     vgConfigSetSupported(g_patch_support[0], g_patch_support[1], g_patch_support[2]);
 }

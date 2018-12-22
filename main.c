@@ -97,6 +97,7 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
         }
     }
 
+    osdSetBgColor(0, 0, 0, 200);
     // Config info
     if (g_main.config_state != IO_OK) {
         if (g_main.config_state == IO_BAD) {

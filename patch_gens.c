@@ -35,8 +35,9 @@ VG_IoParseState vgPatchParseGenValue(
                     return IO_BAD;
                 }
 
-                vgConfigSetSupportedIbCount(ib_n); // Raise supp. IB count
+                vgConfigSetSupportedIbCount(ib_n + 1); // Raise supp. IB count
                 *value = g_main.config.ib[ib_n].width;
+                return IO_OK;
             }
         }
         if (!strncmp(&chunk[pos], "<ib_h", 5)) {
@@ -51,8 +52,9 @@ VG_IoParseState vgPatchParseGenValue(
                     return IO_BAD;
                 }
 
-                vgConfigSetSupportedIbCount(ib_n); // Raise supp. IB count
+                vgConfigSetSupportedIbCount(ib_n + 1); // Raise supp. IB count
                 *value = g_main.config.ib[ib_n].height;
+                return IO_OK;
             }
         }
         if (!strncmp(&chunk[pos], "<vblank>", 8)) {
@@ -85,6 +87,7 @@ VG_IoParseState vgPatchParseGen(
         return IO_OK;
     }
 
+    vgLogPrintF("[PATCH] ERROR: Invalid generator!\n");
     return IO_BAD;
 }
 
