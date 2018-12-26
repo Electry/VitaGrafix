@@ -13,7 +13,7 @@
 #define VG_FOLDER          "ux0:data/VitaGrafix/"
 
 
-#define MAX_INJECT_NUM 30
+#define MAX_INJECT_NUM 40
 #define MAX_HOOK_NUM   10
 
 #define TITLEID_LEN  9
