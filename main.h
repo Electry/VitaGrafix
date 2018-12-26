@@ -2,7 +2,7 @@
 #define _MAIN_H_
 
 #define SECOND             1000000
-#define OSD_SHOW_DURATION  20 * SECOND
+#define OSD_SHOW_DURATION  5 * SECOND
 
 #define MSG_CONFIG_BAD          "Config file is either corrupt or contains invalid options!"
 #define MSG_PATCH_BAD           "Patch file is invalid or contains syntax error! Check log.txt"
