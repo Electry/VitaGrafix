@@ -28,6 +28,7 @@ VG_IoParseState vgIoParse(const char *path, uint8_t (*parseLineFn)(const char ch
     int chunk_size = 0;
     char chunk[IO_CHUNK_SIZE] = "";
     int pos = 0, end = 0;
+    int line_counter = 0;
 
     while ((chunk_size = sceIoRead(fd, chunk, IO_CHUNK_SIZE)) > 1) {
 #ifdef ENABLE_VERBOSE_LOGGING
@@ -60,6 +61,8 @@ VG_IoParseState vgIoParse(const char *path, uint8_t (*parseLineFn)(const char ch
             }
             // Found EOL, parse line
             else {
+                line_counter++;
+
                 // Last chunk, last line, no EOL?
                 if (end == -1) {
                     vgLogPrintF("[IO] WARN: Last line is missing EOL char!\n");
@@ -77,7 +80,7 @@ VG_IoParseState vgIoParse(const char *path, uint8_t (*parseLineFn)(const char ch
 
                 // Parse valid line
                 if (parseLineFn(chunk, pos, end) != IO_OK) {
-                    vgLogPrintF("[IO] ERROR: Failed to parse line, pos=%d, end=%d\n", pos, end);
+                    vgLogPrintF("[IO] ERROR: Failed to parse line %d, pos=%d, end=%d\n", line_counter, pos, end);
                     ret = IO_BAD;
                     goto END_CLOSE;
                 }
