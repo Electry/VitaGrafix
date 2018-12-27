@@ -30,7 +30,7 @@ VG_IoParseState vgPatchParseGenValue(
             }
             else if (chunk[pos + 5] == ',') {
                 uint8_t ib_n = strtoul(&chunk[pos + 6], NULL, 10);
-                if (ib_n < 0 || ib_n >= MAX_RES_COUNT) {
+                if (ib_n >= MAX_RES_COUNT) {
                     vgLogPrintF("[PATCH] ERROR: Accessed [%u] IB res out of range!\n", ib_n);
                     return IO_BAD;
                 }
@@ -47,7 +47,7 @@ VG_IoParseState vgPatchParseGenValue(
             }
             else if (chunk[pos + 5] == ',') {
                 uint8_t ib_n = strtoul(&chunk[pos + 6], NULL, 10);
-                if (ib_n < 0 || ib_n >= MAX_RES_COUNT) {
+                if (ib_n >= MAX_RES_COUNT) {
                     vgLogPrintF("[PATCH] ERROR: Accessed [%u] IB res out of range!\n", ib_n);
                     return IO_BAD;
                 }
@@ -234,6 +234,12 @@ VG_IoParseState vgPatchParseGen_bytes(
 
             while (isspace(chunk[token_end])) { token_end++; }
         }
+
+        if (*patch_data_len == PATCH_MAX_LENGTH && chunk[token_end] != ')') {
+            vgLogPrintF("[PATCH] ERROR: Patch too long!\n");
+            return IO_BAD;
+        }
+
         return IO_OK;
     }
 

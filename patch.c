@@ -42,15 +42,25 @@ static VG_IoParseState vgPatchParseAddress(
         const char chunk[], int pos, int end,
         uint8_t *segment, uint32_t *offset) {
 
-    *segment = strtoul(&chunk[pos], NULL, 10); // always base 10
-    
+    char *next;
+
+    *segment = strtoul(&chunk[pos], &next, 10); // always base 10
+    if (*next != ':') {
+        vgLogPrintF("[PATCH] ERROR: Syntax error: missing ':'\n");
+        return IO_BAD;
+    }
+
     while (chunk[pos] != ':' && pos < end) { pos++; }
     if (pos >= end) {
         vgLogPrintF("[PATCH] ERROR: Syntax error: missing address?\n");
         return IO_BAD;
     }
 
-    *offset = strtoul(&chunk[pos + 1], NULL, 0);
+    *offset = strtoul(&chunk[pos + 1], &next, 0);
+    if (!isspace(*next)) {
+        vgLogPrintF("[PATCH] ERROR: Syntax error: invalid address\n");
+        return IO_BAD;
+    }
 
     //vgLogPrintF("Address: %d:0x%X\n", *segment, *offset);
 
@@ -169,13 +179,22 @@ static VG_IoParseState vgPatchParseSection(const char chunk[], int pos, int end)
     if (chunk[separator] == ',') {
         int nextsep = separator + 1;
         while (chunk[nextsep] != ',' && chunk[nextsep] != ']') { nextsep++; }
+        if (nextsep == separator + 1) {
+            vgLogPrintF("[PATCH] ERROR: Syntax error!\n");
+            return IO_BAD;
+        }
         
         // SELF
         strncpy(self, &chunk[separator + 1], nextsep - (separator + 1));
 
         // NID
         if (chunk[nextsep] == ',') {
-            nid = strtoul(&chunk[nextsep + 1], NULL, 0);
+            char *end;
+            nid = strtoul(&chunk[nextsep + 1], &end, 0);
+            if (*end != ']') {
+                vgLogPrintF("[PATCH] ERROR: Syntax error!\n");
+                return IO_BAD;
+            }
         }
     }
 
@@ -221,9 +240,6 @@ static VG_IoParseState vgPatchParsePatchType(const char chunk[], int pos, int en
         }
     } else {
         g_patch_type = PATCH_TYPE_NONE;
-    }
-
-    if (g_patch_type == PATCH_TYPE_NONE) {
         vgLogPrintF("[PATCH] ERROR: Unknown patch type!\n");
         return IO_BAD;
     }
