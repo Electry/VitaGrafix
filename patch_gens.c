@@ -68,8 +68,13 @@ VG_IoParseState vgPatchParseGenValue(
                 !strncmp(&chunk[pos], "<&,", 3) ||
                 !strncmp(&chunk[pos], "<|,", 3) ||
                 !strncmp(&chunk[pos], "<l,", 3) ||
-                !strncmp(&chunk[pos], "<r,", 3)) {
+                !strncmp(&chunk[pos], "<r,", 3) ||
+                !strncmp(&chunk[pos], "<min,", 5) ||
+                !strncmp(&chunk[pos], "<max,", 5)) {
             int token_pos = pos + 3;
+            if (chunk[pos + 1] == 'm') {
+                token_pos += 2;
+            }
             int inner_open = 0;
             uint32_t a, b;
 
@@ -103,6 +108,10 @@ VG_IoParseState vgPatchParseGenValue(
                 *value = a << b;
             else if (chunk[pos + 1] == 'r')
                 *value = a >> b;
+            else if (chunk[pos + 1] == 'm' && chunk[pos + 3] == 'n')
+                *value = a < b ? a : b;
+            else if (chunk[pos + 1] == 'm' && chunk[pos + 3] == 'x')
+                *value = a > b ? a : b;
             return IO_OK;
         }
 
