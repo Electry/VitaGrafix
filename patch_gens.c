@@ -165,7 +165,7 @@ VG_IoParseState vgPatchParseGen_uint16(
         const char chunk[], int pos, int end,
         uint8_t patch_data[], uint8_t *patch_data_len) {
 
-    if (!strncmp(&chunk[pos], "uint16", 6)) {
+    if (!strncmp(&chunk[pos], "uint16(", 7)) {
         int token_end = pos;
         uint32_t value = 0;
         while (chunk[token_end] != ')') { token_end++; }
@@ -190,7 +190,7 @@ VG_IoParseState vgPatchParseGen_uint32(
         const char chunk[], int pos, int end,
         uint8_t patch_data[], uint8_t *patch_data_len) {
 
-    if (!strncmp(&chunk[pos], "uint32", 6)) {
+    if (!strncmp(&chunk[pos], "uint32(", 7)) {
         int token_end = pos;
         uint32_t value = 0;
         while (chunk[token_end] != ')') { token_end++; }
@@ -217,7 +217,7 @@ VG_IoParseState vgPatchParseGen_fl32(
         const char chunk[], int pos, int end,
         uint8_t patch_data[], uint8_t *patch_data_len) {
 
-    if (!strncmp(&chunk[pos], "fl32", 4)) {
+    if (!strncmp(&chunk[pos], "fl32(", 5)) {
         int token_end = pos;
         uint32_t value = 0;
         while (chunk[token_end] != ')') { token_end++; }
@@ -247,7 +247,7 @@ VG_IoParseState vgPatchParseGen_bytes(
         const char chunk[], int pos, int end,
         uint8_t patch_data[], uint8_t *patch_data_len) {
 
-    if (!strncmp(&chunk[pos], "bytes", 5)) {
+    if (!strncmp(&chunk[pos], "bytes(", 6)) {
         int token_end = pos;
         uint32_t value;
 
@@ -286,7 +286,7 @@ VG_IoParseState vgPatchParseGen_nop(
         const char chunk[], int pos, int end,
         uint8_t patch_data[], uint8_t *patch_data_len) {
 
-    if (!strncmp(&chunk[pos], "nop", 3)) {
+    if (!strncmp(&chunk[pos], "nop(", 4)) {
         *patch_data_len = 2;
         patch_data[0] = 0x00;
         patch_data[1] = 0xBF;
@@ -303,7 +303,7 @@ VG_IoParseState vgPatchParseGen_bkpt(
         const char chunk[], int pos, int end,
         uint8_t patch_data[], uint8_t *patch_data_len) {
 
-    if (!strncmp(&chunk[pos], "bkpt", 4)) {
+    if (!strncmp(&chunk[pos], "bkpt(", 5)) {
         *patch_data_len = 2;
         patch_data[0] = 0x00;
         patch_data[1] = 0xBE;
@@ -320,7 +320,7 @@ VG_IoParseState vgPatchParseGen_a1_mov(
         const char chunk[], int pos, int end,
         uint8_t patch_data[], uint8_t *patch_data_len) {
 
-    if (!strncmp(&chunk[pos], "a1_mov", 6)) {
+    if (!strncmp(&chunk[pos], "a1_mov(", 7)) {
         int token_end = pos;
         uint32_t value;
 
@@ -355,7 +355,7 @@ VG_IoParseState vgPatchParseGen_t1_mov(
         const char chunk[], int pos, int end,
         uint8_t patch_data[], uint8_t *patch_data_len) {
 
-    if (!strncmp(&chunk[pos], "t1_mov", 6)) {
+    if (!strncmp(&chunk[pos], "t1_mov(", 7)) {
         int token_end = pos;
         uint32_t value;
 
@@ -383,7 +383,7 @@ VG_IoParseState vgPatchParseGen_t2_mov(
         const char chunk[], int pos, int end,
         uint8_t patch_data[], uint8_t *patch_data_len) {
 
-    if (!strncmp(&chunk[pos], "t2_mov", 6)) {
+    if (!strncmp(&chunk[pos], "t2_mov(", 7)) {
         int token_end = pos;
         uint32_t value;
 
@@ -418,7 +418,7 @@ VG_IoParseState vgPatchParseGen_t3_mov(
         const char chunk[], int pos, int end,
         uint8_t patch_data[], uint8_t *patch_data_len) {
 
-    if (!strncmp(&chunk[pos], "t3_mov", 6)) {
+    if (!strncmp(&chunk[pos], "t3_mov(", 7)) {
         int token_end = pos;
         uint32_t value;
 
@@ -446,7 +446,7 @@ VG_IoParseState vgPatchParseGen_t1_movt(
         const char chunk[], int pos, int end,
         uint8_t patch_data[], uint8_t *patch_data_len) {
 
-    if (!strncmp(&chunk[pos], "t1_movt", 7)) {
+    if (!strncmp(&chunk[pos], "t1_movt(", 8)) {
         int token_end = pos;
         uint32_t value;
 
