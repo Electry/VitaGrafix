@@ -45,4 +45,12 @@ VG_IoParseState vgPatchParseGen_t2_mov(
         const char chunk[], int pos, int end,
         uint8_t patch_data[], uint8_t *patch_data_len);
 
+VG_IoParseState vgPatchParseGen_t3_mov(
+        const char chunk[], int pos, int end,
+        uint8_t patch_data[], uint8_t *patch_data_len);
+
+VG_IoParseState vgPatchParseGen_t1_movt(
+        const char chunk[], int pos, int end,
+        uint8_t patch_data[], uint8_t *patch_data_len);
+
 #endif

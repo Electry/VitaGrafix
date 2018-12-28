@@ -136,7 +136,9 @@ VG_IoParseState vgPatchParseGen(
             !vgPatchParseGen_bkpt(chunk, pos, end, patch_data, patch_data_len) ||
             !vgPatchParseGen_a1_mov(chunk, pos, end, patch_data, patch_data_len) ||
             !vgPatchParseGen_t1_mov(chunk, pos, end, patch_data, patch_data_len) ||
-            !vgPatchParseGen_t2_mov(chunk, pos, end, patch_data, patch_data_len)) {
+            !vgPatchParseGen_t2_mov(chunk, pos, end, patch_data, patch_data_len) ||
+            !vgPatchParseGen_t3_mov(chunk, pos, end, patch_data, patch_data_len) ||
+            !vgPatchParseGen_t1_movt(chunk, pos, end, patch_data, patch_data_len)) {
         return IO_OK;
     }
 
@@ -396,6 +398,62 @@ VG_IoParseState vgPatchParseGen_t2_mov(
             return IO_BAD;
 
         vgMakeThumb2_T2_MOV(reg, setflags, value, patch_data);
+        return IO_OK;
+    }
+
+    return IO_BAD;
+}
+
+VG_IoParseState vgPatchParseGen_t3_mov(
+        const char chunk[], int pos, int end,
+        uint8_t patch_data[], uint8_t *patch_data_len) {
+
+    if (!strncmp(&chunk[pos], "t3_mov", 6)) {
+        int token_end = pos;
+        uint32_t value;
+
+        *patch_data_len = 4;
+        uint32_t reg = 0;
+
+        while (chunk[token_end] != ',') { token_end++; }
+        if (vgPatchParseGenValue(chunk, pos + 7, token_end, &reg))
+            return IO_BAD;
+
+        token_end++;
+        pos = token_end;
+        while (chunk[token_end] != ')') { token_end++; }
+        if (vgPatchParseGenValue(chunk, pos, token_end, &value))
+            return IO_BAD;
+
+        vgMakeThumb2_T3_MOV(reg, value, patch_data);
+        return IO_OK;
+    }
+
+    return IO_BAD;
+}
+
+VG_IoParseState vgPatchParseGen_t1_movt(
+        const char chunk[], int pos, int end,
+        uint8_t patch_data[], uint8_t *patch_data_len) {
+
+    if (!strncmp(&chunk[pos], "t1_movt", 7)) {
+        int token_end = pos;
+        uint32_t value;
+
+        *patch_data_len = 4;
+        uint32_t reg = 0;
+
+        while (chunk[token_end] != ',') { token_end++; }
+        if (vgPatchParseGenValue(chunk, pos + 8, token_end, &reg))
+            return IO_BAD;
+
+        token_end++;
+        pos = token_end;
+        while (chunk[token_end] != ')') { token_end++; }
+        if (vgPatchParseGenValue(chunk, pos, token_end, &value))
+            return IO_BAD;
+
+        vgMakeThumb2_T1_MOVT(reg, value, patch_data);
         return IO_OK;
     }
 

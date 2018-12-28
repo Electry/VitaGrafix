@@ -23,11 +23,11 @@ void vgMakeThumb_T1_MOV(uint8_t reg, uint8_t value, uint8_t out[2]) {
 /*
  * T2 MOV{S}<c>.W <Rd>,#<const>
  *
- * 11110           i 0      0010   S 1111 - 0  000  0000 00000000
+ * 11110           x 0      0010   x 1111 - 0  xxx  xxxx xxxxxxxx
  * Data processing i 12-bit OPcode S Rn     DP imm3 Rd   imm8
  *
  * byte 1   byte 0     byte 3   byte 2
- * 11110i00 010S1111 - 00000000 00000000
+ * 11110x00 010x1111 - 0xxxxxxx xxxxxxxx
  */
 void vgMakeThumb2_T2_MOV(uint8_t reg, uint8_t setflags, uint32_t value, uint8_t out[4]) {
     memset(out, 0, 4);
@@ -59,13 +59,57 @@ void vgMakeThumb2_T2_MOV(uint8_t reg, uint8_t setflags, uint32_t value, uint8_t 
 }
 
 /*
+ * T3 MOVW<c> <Rd>,#<imm16>
+ *
+ * 11110           x 10     0  1    00  xxxx - 0  xxx  xxxx xxxxxxxx
+ * Data processing i 16-bit OP Move OP2 imm4   DP imm3 Rd   imm8
+ *
+ * byte 1   byte 0     byte 3   byte 2
+ * 11110x10 0100xxxx - 0xxxxxxx xxxxxxxx
+ */
+void vgMakeThumb2_T3_MOV(uint8_t reg, uint16_t value, uint8_t out[4]) {
+    memset(out, 0, 4);
+
+    out[1] |= 0b11110010; // Data processing (16-bit)
+    out[0] |= 0b01000000; // Move, plain (16-bit)
+    out[3] |= reg;        // Rd
+
+    out[0] |= (value & 0b1111000000000000) >> 12;   // imm4
+    out[1] |= (value & 0b0000100000000000) >> 9;    // i
+    out[3] |= (value & 0b0000011100000000) >> 4;    // imm3
+    out[2] |= (value & 0b0000000011111111);         // imm8
+}
+
+/*
+ * T1 MOVT<c> <Rd>,#<imm16>
+ *
+ * 11110           x 10     1  1    00  xxxx - 0  xxx  xxxx xxxxxxxx
+ * Data processing i 16-bit OP Move OP2 imm4   DP imm3 Rd   imm8
+ *
+ * byte 1   byte 0     byte 3   byte 2
+ * 11110x10 1100xxxx - 0xxxxxxx xxxxxxxx
+ */
+void vgMakeThumb2_T1_MOVT(uint8_t reg, uint16_t value, uint8_t out[4]) {
+    memset(out, 0, 4);
+
+    out[1] |= 0b11110010; // Data processing (16-bit)
+    out[0] |= 0b11000000; // Move top, plain (16-bit)
+    out[3] |= reg;        // Rd
+
+    out[0] |= (value & 0b1111000000000000) >> 12;   // imm4
+    out[1] |= (value & 0b0000100000000000) >> 9;    // i
+    out[3] |= (value & 0b0000011100000000) >> 4;    // imm3
+    out[2] |= (value & 0b0000000011111111);         // imm8
+}
+
+/*
  * A1 MOV{S}<c> <Rd>,#<const>
  *
- * 1110      00 1         1101   S 0000 xxxx xxxxxxxxxxxx
- * Condition DP Immediate OPcode s Rn   Rd   imm12
+ * 1110      00 1         1101   x 0000 xxxx xxxxxxxxxxxx
+ * Condition DP Immediate OPcode S Rn   Rd   imm12
  *
  * byte 3   byte 2   byte 1   byte 0
- * 11100011 101s0000 rrrrxxxx xxxx xxxx
+ * 11100011 101x0000 xxxxxxxx xxxx xxxx
  */
 void vgMakeArm_A1_MOV(uint8_t reg, uint8_t setflags, uint32_t value, uint8_t out[4]) {
     memset(out, 0, 4);
