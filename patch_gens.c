@@ -114,6 +114,16 @@ VG_IoParseState vgPatchParseGenValue(
                 *value = a > b ? a : b;
             return IO_OK;
         }
+        if (!strncmp(&chunk[pos], "<to_fl,", 7)) {
+            uint32_t a;
+
+            if (vgPatchParseGenValue(chunk, pos + 7, end, &a))
+                return IO_BAD;
+
+            float a_fl = (float)a;
+            memcpy(value, &a_fl, sizeof(uint32_t));
+            return IO_OK;
+        }
 
         vgLogPrintF("[PATCH] ERROR: Invalid macro!\n");
         return IO_BAD; // Invalid macro
