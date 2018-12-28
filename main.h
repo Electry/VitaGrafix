@@ -4,14 +4,16 @@
 #define SECOND             1000000
 #define OSD_SHOW_DURATION  5 * SECOND
 
-#define MSG_CONFIG_BAD          "Config file is either corrupt or contains invalid options!"
-#define MSG_PATCH_BAD           "Patch file is invalid or contains syntax error! Check log.txt"
-#define MSG_CONFIG_OPEN_FAILED  "Failed to open config file. Do you have ioPlus installed?"
-#define MSG_PATCH_OPEN_FAILED   "Failed to open patch file. Do you have ioPlus installed?"
-#define MSG_GAME_WRONG_VERSION  "Your game version is not supported! Update/refer to README.md"
+#define OSD_MSG_CONFIG_BAD           "Config file contains invalid options!"
+#define OSD_MSG_PATCH_BAD            "Patch file is invalid or contains syntax error!"
+#define OSD_MSG_PATCH_BAD_2          "Check log.txt for more info"
+#define OSD_MSG_CONFIG_OPEN_FAILED   "Failed to open config file."
+#define OSD_MSG_PATCH_OPEN_FAILED    "Failed to open patch file."
+#define OSD_MSG_IOPLUS_HINT          "Do you have ioPlus installed?"
+#define OSD_MSG_GAME_WRONG_VERSION   "Your game version is not supported!"
+#define OSD_MSG_GAME_WRONG_VERSION_2 "Please update your game."
 
 #define VG_FOLDER          "ux0:data/VitaGrafix/"
-
 
 #define MAX_INJECT_NUM 40
 #define MAX_HOOK_NUM   10

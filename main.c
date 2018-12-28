@@ -50,7 +50,11 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
 
     osdUpdateFrameBuf(pParam);
     osdSetBgColor(0, 0, 0, 200);
-    osdFastDrawRectangle(20, 20, 320, 70);
+    if (g_main.config.ib_count > 1) {
+        osdFastDrawRectangle(20, 20, 340, 70);
+    } else {
+        osdFastDrawRectangle(20, 20, 260, 70);
+    }
 
     osdDrawLogo(30, 30);
 
@@ -60,8 +64,11 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
     osdSetTextScale(2);
 
     int y = 62;
-    if (g_main.config.game_enabled != FT_ENABLED) {
-        osdDrawStringF(120, y, "disabled");
+    if (g_main.config.game_enabled != FT_ENABLED ||
+            g_main.support == GAME_WRONG_VERSION ||
+            g_main.config_state != IO_OK ||
+            g_main.patch_state != IO_OK) {
+        osdDrawStringF(120, y, "Disabled");
     } else {
         // FPS cap patched
         if (vgConfigIsFpsEnabled()) {
@@ -71,7 +78,7 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
         // FPS cap unpatched
         else if (g_main.config.game_enabled == FT_ENABLED &&
                     g_main.config.fps_enabled != FT_UNSUPPORTED) {
-            osdDrawStringF(120, y, "Default FPS");
+            osdDrawStringF(120, y, "FPS: default");
             y -= 20;
         }
 
@@ -83,7 +90,7 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
         else if (vgConfigIsIbEnabled()) {
             char buf[16] = "";
             if (g_main.config.ib_count > 1) {
-                snprintf(buf, 16, " > %dx%d",
+                snprintf(buf, 16, " >> %dx%d",
                             g_main.config.ib[g_main.config.ib_count - 1].width,
                             g_main.config.ib[g_main.config.ib_count - 1].height);
             }
@@ -101,32 +108,44 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
     // Config info
     if (g_main.config_state != IO_OK) {
         if (g_main.config_state == IO_BAD) {
-                osdDrawStringF(pParam->width / 2 - osdGetTextWidth(MSG_CONFIG_BAD) / 2,
+                osdDrawStringF(pParam->width / 2 - osdGetTextWidth(OSD_MSG_CONFIG_BAD) / 2,
                                 pParam->height / 2 - 10,
-                                MSG_CONFIG_BAD);
+                                OSD_MSG_CONFIG_BAD);
         } else if (g_main.config_state == IO_OPEN_FAILED) {
-                osdDrawStringF(pParam->width / 2 - osdGetTextWidth(MSG_CONFIG_OPEN_FAILED) / 2,
-                                pParam->height / 2 - 10,
-                                MSG_CONFIG_OPEN_FAILED);
+                osdDrawStringF(pParam->width / 2 - osdGetTextWidth(OSD_MSG_CONFIG_OPEN_FAILED) / 2,
+                                pParam->height / 2 - 20,
+                                OSD_MSG_CONFIG_OPEN_FAILED);
+                osdDrawStringF(pParam->width / 2 - osdGetTextWidth(OSD_MSG_IOPLUS_HINT) / 2,
+                                pParam->height / 2,
+                                OSD_MSG_IOPLUS_HINT);
         }
     }
     // Patchlist info
     else if (g_main.patch_state != IO_OK) {
         if (g_main.patch_state == IO_BAD) {
-                osdDrawStringF(pParam->width / 2 - osdGetTextWidth(MSG_PATCH_BAD) / 2,
-                                pParam->height / 2 - 10,
-                                MSG_PATCH_BAD);
+                osdDrawStringF(pParam->width / 2 - osdGetTextWidth(OSD_MSG_PATCH_BAD) / 2,
+                                pParam->height / 2 - 20,
+                                OSD_MSG_PATCH_BAD);
+                osdDrawStringF(pParam->width / 2 - osdGetTextWidth(OSD_MSG_PATCH_BAD_2) / 2,
+                                pParam->height / 2,
+                                OSD_MSG_PATCH_BAD_2);
         } else if (g_main.patch_state == IO_OPEN_FAILED) {
-                osdDrawStringF(pParam->width / 2 - osdGetTextWidth(MSG_PATCH_OPEN_FAILED) / 2,
-                                pParam->height / 2 - 10,
-                                MSG_PATCH_OPEN_FAILED);
+                osdDrawStringF(pParam->width / 2 - osdGetTextWidth(OSD_MSG_PATCH_OPEN_FAILED) / 2,
+                                pParam->height / 2 - 20,
+                                OSD_MSG_PATCH_OPEN_FAILED);
+                osdDrawStringF(pParam->width / 2 - osdGetTextWidth(OSD_MSG_IOPLUS_HINT) / 2,
+                                pParam->height / 2,
+                                OSD_MSG_IOPLUS_HINT);
         }
     }
     // Game info
     else if (g_main.support == GAME_WRONG_VERSION) {
-        osdDrawStringF(pParam->width / 2 - osdGetTextWidth(MSG_GAME_WRONG_VERSION) / 2,
-                        pParam->height / 2 - 10,
-                        MSG_GAME_WRONG_VERSION);
+        osdDrawStringF(pParam->width / 2 - osdGetTextWidth(OSD_MSG_GAME_WRONG_VERSION) / 2,
+                        pParam->height / 2 - 20,
+                        OSD_MSG_GAME_WRONG_VERSION);
+        osdDrawStringF(pParam->width / 2 - osdGetTextWidth(OSD_MSG_GAME_WRONG_VERSION_2) / 2,
+                        pParam->height / 2,
+                        OSD_MSG_GAME_WRONG_VERSION_2);
     }
 
     return TAI_CONTINUE(int, g_main.sceDisplaySetFrameBuf_hookref, pParam, sync);
@@ -165,17 +184,9 @@ int module_start(SceSize argc, const void *args) {
     // Parse patchlist
     vgPatchParse();
 
-    // If no features are enabled, mark game as disabled
-    if (g_main.support == GAME_SUPPORTED &&
-            !vgConfigIsFbEnabled() &&
-            !vgConfigIsIbEnabled() &&
-            !vgConfigIsFpsEnabled()) {
-        g_main.config.game_enabled = FT_DISABLED;
-    }
-
     // Hook sceDisplaySetFrameBuf for OSD
-    if ((g_main.support == GAME_SUPPORTED || g_main.support == GAME_WRONG_VERSION) &&
-            vgConfigIsOsdEnabled()) {
+    if (((g_main.support == GAME_SUPPORTED || g_main.support == GAME_WRONG_VERSION) &&
+            vgConfigIsOsdEnabled()) || g_main.config_state != IO_OK || g_main.patch_state != IO_OK) {
         g_main.timer = 0;
         g_main.sceDisplaySetFrameBuf_hookid = taiHookFunctionImport(
                     &g_main.sceDisplaySetFrameBuf_hookref,
