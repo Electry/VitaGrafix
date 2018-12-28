@@ -173,6 +173,8 @@ int module_start(SceSize argc, const void *args) {
     vgLogPrepare();
 
     vgLogPrintF("[MAIN] Title ID: %s\n", g_main.titleid);
+    vgLogPrintF("[MAIN] SELF: %s\n", g_main.sceInfo.path);
+    vgLogPrintF("[MAIN] NID: 0x%X\n", g_main.info.module_nid);
     vgLogPrintF("=======================================\n");
 
     // Parse config
