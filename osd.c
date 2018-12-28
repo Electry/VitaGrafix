@@ -117,7 +117,7 @@ void osdDrawRectangle(int x, int y, int width, int height) {
         }
         return;
     }
-    
+
     for (int yy = y; yy < y + height; yy++) {
         for (int xx = x; xx < x + width; xx++) {
             RGBA *pixelRGB = (RGBA *)g_framebuf.base + yy * g_framebuf.pitch + xx;

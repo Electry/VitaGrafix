@@ -325,13 +325,13 @@ VG_IoParseState vgPatchParseGen_a1_mov(
         while (chunk[token_end] != ',') { token_end++; }
         if (vgPatchParseGenValue(chunk, pos, token_end, &reg))
             return IO_BAD;
-            
+
         token_end++;
         pos = token_end;
         while (chunk[token_end] != ')') { token_end++; }
         if (vgPatchParseGenValue(chunk, pos, token_end, &value))
             return IO_BAD;
-            
+
         vgMakeArm_A1_MOV(reg, setflags, value, patch_data);
         return IO_OK;
     }
@@ -388,7 +388,7 @@ VG_IoParseState vgPatchParseGen_t2_mov(
         while (chunk[token_end] != ',') { token_end++; }
         if (vgPatchParseGenValue(chunk, pos, token_end, &reg))
             return IO_BAD;
-            
+
         token_end++;
         pos = token_end;
         while (chunk[token_end] != ')') { token_end++; }

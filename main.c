@@ -153,7 +153,7 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
 
 void _start() __attribute__ ((weak, alias ("module_start")));
 int module_start(SceSize argc, const void *args) {
-    
+
     // Get eboot.bin info
     g_main.info.size = sizeof(tai_module_info_t);
     g_main.sceInfo.size = sizeof(SceKernelModuleInfo);

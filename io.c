@@ -18,7 +18,7 @@ int vgIoFindEOL(const char chunk[], int pos, int end) {
 
 VG_IoParseState vgIoParse(const char *path, uint8_t (*parseLineFn)(const char chunk[], int pos, int end)) {
     VG_IoParseState ret = IO_OK;
-    
+
     SceUID fd = sceIoOpen(path, SCE_O_RDONLY | SCE_O_CREAT, 0777);
     if (fd < 0) {
         ret = IO_OPEN_FAILED;

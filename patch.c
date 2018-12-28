@@ -193,7 +193,7 @@ static VG_IoParseState vgPatchParseSection(const char chunk[], int pos, int end)
             vgLogPrintF("[PATCH] ERROR: Syntax error!\n");
             return IO_BAD;
         }
-        
+
         // SELF
         strncpy(self, &chunk[separator + 1], nextsep - (separator + 1));
 
