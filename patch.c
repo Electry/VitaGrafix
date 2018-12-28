@@ -103,6 +103,11 @@ static VG_IoParseState vgPatchParsePatch(const char chunk[], int pos, int end) {
 
         // Apply
         if (shallHook) {
+            if (g_main.hook_num >= MAX_HOOK_NUM) {
+                vgLogPrintF("[PATCH] ERROR: Number of hooks exceed maximum allowed!\n");
+                return IO_BAD;
+            }
+
             vgHookFunctionImport(importNid, hookPtr);
         }
 
@@ -148,6 +153,11 @@ static VG_IoParseState vgPatchParsePatch(const char chunk[], int pos, int end) {
     }
     vgLogPrintF("\n");
     */
+
+    if (g_main.inject_num >= MAX_INJECT_NUM) {
+        vgLogPrintF("[PATCH] ERROR: Number of patches exceed maximum allowed!\n");
+        return IO_BAD;
+    }
 
     // Apply patch
     vgInjectData(segment, offset, patch_data, patch_data_len);
