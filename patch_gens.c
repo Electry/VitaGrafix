@@ -9,6 +9,21 @@
 #include "patch_tools.h"
 #include "main.h"
 
+int vgPatchGetNextMacroArgPos(const char chunk[], int pos, int end) {
+    int inner_open = 0;
+
+    while (pos < end - 3 && (inner_open > 0 || chunk[pos] != ',')) {
+        // Allow stacking, e.g.: </,<*,<ib_w>,10>,10>
+        if (chunk[pos] == '<')
+            inner_open++;
+        if (chunk[pos] == '>')
+            inner_open--;
+        pos++;
+    }
+
+    return pos + 1;
+}
+
 VG_IoParseState vgPatchParseGenValue(
         const char chunk[], int pos, int end,
         uint32_t *value) {
@@ -75,21 +90,14 @@ VG_IoParseState vgPatchParseGenValue(
             if (chunk[pos + 1] == 'm') {
                 token_pos += 2;
             }
-            int inner_open = 0;
             uint32_t a, b;
 
             if (vgPatchParseGenValue(chunk, token_pos, end, &a))
                 return IO_BAD;
 
-            while (token_pos < end - 2 && (inner_open > 0 || chunk[token_pos] != ',')) {
-                // Allow stacking, e.g.: </,<*,<ib_w>,10>,10>
-                if (chunk[token_pos] == '<')
-                    inner_open++;
-                if (chunk[token_pos] == '>')
-                    inner_open--;
-                token_pos++;
-            }
-            if (vgPatchParseGenValue(chunk, token_pos + 1, end, &b))
+            token_pos = vgPatchGetNextMacroArgPos(chunk, token_pos, end);
+
+            if (vgPatchParseGenValue(chunk, token_pos, end, &b))
                 return IO_BAD;
 
             if (chunk[pos + 1] == '+')
@@ -122,6 +130,46 @@ VG_IoParseState vgPatchParseGenValue(
 
             float a_fl = (float)a;
             memcpy(value, &a_fl, sizeof(uint32_t));
+            return IO_OK;
+        }
+        if (!strncmp(&chunk[pos], "<if_eq,", 7) ||
+                !strncmp(&chunk[pos], "<if_gt,", 7) ||
+                !strncmp(&chunk[pos], "<if_lt,", 7) ||
+                !strncmp(&chunk[pos], "<if_ge,", 7) ||
+                !strncmp(&chunk[pos], "<if_le,", 7)) {
+            int token_pos = pos + 7;
+            uint32_t a, b, c, d;
+
+            if (vgPatchParseGenValue(chunk, token_pos, end, &a))
+                return IO_BAD;
+
+            token_pos = vgPatchGetNextMacroArgPos(chunk, token_pos, end);
+            if (vgPatchParseGenValue(chunk, token_pos, end, &b))
+                return IO_BAD;
+
+            token_pos = vgPatchGetNextMacroArgPos(chunk, token_pos, end);
+            if (vgPatchParseGenValue(chunk, token_pos, end, &c))
+                return IO_BAD;
+
+            token_pos = vgPatchGetNextMacroArgPos(chunk, token_pos, end);
+            if (vgPatchParseGenValue(chunk, token_pos, end, &d))
+                return IO_BAD;
+
+            if (chunk[pos + 4] == 'e') {
+                *value = a == b ? c : d;
+            } else if (chunk[pos + 4] == 'g') {
+                if (chunk[pos + 5] == 't') {
+                    *value = a > b ? c : d;
+                } else {
+                    *value = a >= b ? c : d;
+                }
+            } else if (chunk[pos + 4] == 'l') {
+                if (chunk[pos + 5] == 't') {
+                    *value = a < b ? c : d;
+                } else {
+                    *value = a <= b ? c : d;
+                }
+            }
             return IO_OK;
         }
 
