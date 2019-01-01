@@ -23,6 +23,12 @@ typedef enum {
     FPS_30
 } VG_Fps;
 
+typedef enum {
+    MSAA_4X,
+    MSAA_2X,
+    MSAA_NONE
+} VG_Msaa;
+
 typedef struct {
     uint16_t width;
     uint16_t height;
@@ -49,15 +55,20 @@ typedef struct {
     // Framerate
     VG_FeatureState fps_enabled;
     VG_Fps fps;
+
+    // MSAA
+    VG_FeatureState msaa_enabled;
+    VG_Msaa msaa;
 } VG_Config;
 
 
 void vgConfigParse();
-void vgConfigSetSupported(VG_FeatureState fb, VG_FeatureState ib, VG_FeatureState fps);
+void vgConfigSetSupported(VG_FeatureState fb, VG_FeatureState ib, VG_FeatureState fps, VG_FeatureState msaa);
 void vgConfigSetSupportedIbCount(uint8_t count);
 uint8_t vgConfigIsFbEnabled();
 uint8_t vgConfigIsIbEnabled();
 uint8_t vgConfigIsFpsEnabled();
+uint8_t vgConfigIsMsaaEnabled();
 uint8_t vgConfigIsOsdEnabled();
 
 #endif

@@ -14,7 +14,8 @@ typedef enum {
     PATCH_TYPE_OFF,
     PATCH_TYPE_FB,
     PATCH_TYPE_IB,
-    PATCH_TYPE_FPS
+    PATCH_TYPE_FPS,
+    PATCH_TYPE_MSAA
 } VG_PatchType;
 
 void vgPatchParse();

@@ -13,7 +13,8 @@
 static VG_PatchSection g_patch_section = PATCH_NONE;
 static VG_PatchType g_patch_type = PATCH_TYPE_NONE;
 static uint32_t g_patch_count = 0;
-static VG_FeatureState g_patch_support[] = {FT_UNSUPPORTED, FT_UNSUPPORTED, FT_UNSUPPORTED};
+static VG_FeatureState g_patch_support[] = // FB, IB, FPS, MSAA
+    {FT_UNSUPPORTED, FT_UNSUPPORTED, FT_UNSUPPORTED, FT_UNSUPPORTED};
 
 static uint8_t vgPatchIsGame(const char titleid[], const char self[], uint32_t nid) {
     VG_GameSupport supp = GAME_UNSUPPORTED;
@@ -248,6 +249,11 @@ static VG_IoParseState vgPatchParsePatchType(const char chunk[], int pos, int en
         if (vgConfigIsFpsEnabled()) {
             g_patch_type = PATCH_TYPE_FPS;
         }
+    } else if (!strncmp(&chunk[pos], "@MSAA", 5)) {
+        g_patch_support[3] = FT_ENABLED;
+        if (vgConfigIsMsaaEnabled()) {
+            g_patch_type = PATCH_TYPE_MSAA;
+        }
     } else {
         g_patch_type = PATCH_TYPE_NONE;
         vgLogPrintF("[PATCH] ERROR: Unknown patch type!\n");
@@ -287,5 +293,5 @@ void vgPatchParse() {
     g_main.patch_state = vgIoParse(PATCH_PATH, vgPatchParseLine);
     vgLogPrintF("[PATCH] %u total patches found in patchlist.txt\n", g_patch_count);
 
-    vgConfigSetSupported(g_patch_support[0], g_patch_support[1], g_patch_support[2]);
+    vgConfigSetSupported(g_patch_support[0], g_patch_support[1], g_patch_support[2], g_patch_support[3]);
 }

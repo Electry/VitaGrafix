@@ -50,11 +50,14 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
 
     osdUpdateFrameBuf(pParam);
     osdSetBgColor(0, 0, 0, 200);
-    if (g_main.config.ib_count > 1) {
-        osdFastDrawRectangle(20, 20, 340, 70);
-    } else {
-        osdFastDrawRectangle(20, 20, 260, 70);
-    }
+
+    // Background
+    int w = 260;
+    if (g_main.config.ib_count > 1)
+        w += 80;
+    if (g_main.config.msaa_enabled == FT_ENABLED)
+        w += 30;
+    osdFastDrawRectangle(20, 20, w, 70);
 
     osdDrawLogo(30, 30);
 
@@ -88,11 +91,15 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
         }
         // Internal buffer resolution patched
         else if (vgConfigIsIbEnabled()) {
-            char buf[16] = "";
+            char buf[32] = "";
             if (g_main.config.ib_count > 1) {
-                snprintf(buf, 16, " >> %dx%d",
+                snprintf(buf, 32, " >> %dx%d",
                             g_main.config.ib[g_main.config.ib_count - 1].width,
                             g_main.config.ib[g_main.config.ib_count - 1].height);
+            }
+            if (g_main.config.msaa_enabled == FT_ENABLED) {
+                snprintf(buf, 32, " (%s)", g_main.config.msaa == MSAA_4X ? "4x" :
+                                            (g_main.config.msaa == MSAA_2X ? "2x" : "1x"));
             }
             osdDrawStringF(120, y, "%dx%d%s", g_main.config.ib[0].width, g_main.config.ib[0].height, buf);
         }

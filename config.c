@@ -83,6 +83,27 @@ static VG_IoParseState vgConfigParseFramerate(
     return IO_BAD;
 }
 
+static VG_IoParseState vgConfigParseMsaa(
+            const char chunk[], int pos, int end,
+            const char option[], VG_FeatureState *ft,
+            VG_Msaa *msaa) {
+
+    if (!strncmp(&chunk[pos], option, strlen(option))) {
+        pos += strlen(option) + 1;
+        if (pos >= end)
+            return IO_BAD;
+
+        *ft = !strncmp(&chunk[pos], "OFF", 3) ? FT_DISABLED : FT_ENABLED;
+        if (!*ft)
+            return IO_OK;
+
+        *msaa = chunk[pos] == '4' ? MSAA_4X : (chunk[pos] == '2' ? MSAA_2X : MSAA_NONE);
+        return IO_OK;
+    }
+
+    return IO_BAD;
+}
+
 static VG_IoParseState vgConfigParseMain(const char chunk[], int pos, int end) {
 
     if (!vgConfigParseFeatureState(chunk, pos, end, "ENABLED", &g_main.config.enabled) ||
@@ -101,7 +122,8 @@ static VG_IoParseState vgConfigParseGame(const char chunk[], int pos, int end) {
         !vgConfigParseFeatureState(chunk, pos, end, "OSD", &g_main.config.game_osd_enabled) ||
         !vgConfigParseResolution(chunk, pos, end, "FB", &g_main.config.fb_enabled, &g_main.config.fb, NULL) ||
         !vgConfigParseResolution(chunk, pos, end, "IB", &g_main.config.ib_enabled, g_main.config.ib, &g_main.config.ib_count) ||
-        !vgConfigParseFramerate(chunk, pos, end, "FPS", &g_main.config.fps_enabled, &g_main.config.fps)) {
+        !vgConfigParseFramerate(chunk, pos, end, "FPS", &g_main.config.fps_enabled, &g_main.config.fps) ||
+        !vgConfigParseMsaa(chunk, pos, end, "MSAA", &g_main.config.msaa_enabled, &g_main.config.msaa)) {
             return IO_OK;
     }
     vgLogPrintF("[CONFIG] ERROR: Failed parsing option in [%s] section, pos=%d, end=%d, string='%.*s'\n",
@@ -158,6 +180,7 @@ void vgConfigParse() {
     g_main.config.ib_enabled = FT_DISABLED;
     g_main.config.ib_count = 0;
     g_main.config.fps_enabled = FT_DISABLED;
+    g_main.config.msaa_enabled = FT_DISABLED;
 
     vgLogPrintF("[CONFIG] Parsing config.txt\n");
     g_main.config_state = vgIoParse(CONFIG_PATH, vgConfigParseLine);
@@ -166,13 +189,16 @@ void vgConfigParse() {
 void vgConfigSetSupported(
         VG_FeatureState fb,
         VG_FeatureState ib,
-        VG_FeatureState fps) {
+        VG_FeatureState fps,
+        VG_FeatureState msaa) {
     if (fb == FT_UNSUPPORTED)
         g_main.config.fb_enabled = fb;
     if (ib == FT_UNSUPPORTED)
         g_main.config.ib_enabled = ib;
     if (fps == FT_UNSUPPORTED)
         g_main.config.fps_enabled = fps;
+    if (msaa == FT_UNSUPPORTED)
+        g_main.config.msaa_enabled = msaa;
 }
 void vgConfigSetSupportedIbCount(uint8_t count) {
     if (g_main.config.ib_count > 0 && count > g_main.config.ib_count) {
@@ -198,6 +224,11 @@ uint8_t vgConfigIsFpsEnabled() {
     return g_main.config.enabled == FT_ENABLED &&
             g_main.config.game_enabled == FT_ENABLED &&
             g_main.config.fps_enabled == FT_ENABLED;
+}
+uint8_t vgConfigIsMsaaEnabled() {
+    return g_main.config.enabled == FT_ENABLED &&
+            g_main.config.game_enabled == FT_ENABLED &&
+            g_main.config.msaa_enabled == FT_ENABLED;
 }
 uint8_t vgConfigIsOsdEnabled() {
     return g_main.config.enabled == FT_ENABLED &&

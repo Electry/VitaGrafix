@@ -76,6 +76,15 @@ VG_IoParseState vgPatchParseGenValue(
             *value = g_main.config.fps == FPS_60 ? 1 : 2;
             return IO_OK;
         }
+        if (!strncmp(&chunk[pos], "<msaa>", 6)) {
+            *value = g_main.config.msaa == MSAA_4X ? 2 :
+                    (g_main.config.msaa == MSAA_2X ? 1 : 0);
+            return IO_OK;
+        }
+        if (!strncmp(&chunk[pos], "<msaa_enabled>", 14)) {
+            *value = g_main.config.msaa_enabled == FT_ENABLED;
+            return IO_OK;
+        }
         if (!strncmp(&chunk[pos], "<+,", 3) ||
                 !strncmp(&chunk[pos], "<-,", 3) ||
                 !strncmp(&chunk[pos], "<*,", 3) ||
