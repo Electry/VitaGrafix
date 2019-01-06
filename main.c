@@ -63,7 +63,7 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
 
     osdSetBgColor(0, 0, 0, 0);
     osdSetTextScale(1);
-    osdDrawStringF(120, 30, "v4.0 ALPHA [%s]", g_main.titleid);
+    osdDrawStringF(120, 30, "v4.0 [%s]", g_main.titleid);
     osdSetTextScale(2);
 
     int y = 62;
