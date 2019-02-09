@@ -140,3 +140,25 @@ void vgMakeArm_A1_MOV(uint8_t reg, uint8_t setflags, uint32_t value, uint8_t out
     out[1] |= (imm12 & 0b111100000000) >> 8;
     out[0] |= (imm12 & 0b000011111111);
 }
+
+/*
+ * A2 MOVW<c> <Rd>,#<imm16>
+ *
+ * 1110      00110000 xxxx xxxx xxxxxxxxxxxx
+ * Condition OPcode   imm4 Rd   imm12
+ *
+ * byte 3   byte 2   byte 1   byte 0
+ * 11100011 0000xxxx xxxxxxxx xxxxxxxx
+ */
+void vgMakeArm_A2_MOV(uint8_t reg, uint16_t value, uint8_t out[4]) {
+    memset(out, 0, 4);
+
+    out[3] |= 0b11100000;       // Condition
+    out[3] |= 0b00000010;       // Immediate value
+    out[3] |= 0b00000001;       // OPcode
+    out[1] |= reg << 4;         // Rd
+
+    out[2] |= (value & 0b1111000000000000) >> 12; // imm4
+    out[1] |= (value & 0b0000111100000000) >> 8;  // imm12
+    out[0] |= (value & 0b0000000011111111);
+}

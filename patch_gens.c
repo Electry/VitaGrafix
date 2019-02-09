@@ -202,6 +202,7 @@ VG_IoParseState vgPatchParseGen(
             !vgPatchParseGen_nop(chunk, pos, end, patch_data, patch_data_len) ||
             !vgPatchParseGen_bkpt(chunk, pos, end, patch_data, patch_data_len) ||
             !vgPatchParseGen_a1_mov(chunk, pos, end, patch_data, patch_data_len) ||
+            !vgPatchParseGen_a2_mov(chunk, pos, end, patch_data, patch_data_len) ||
             !vgPatchParseGen_t1_mov(chunk, pos, end, patch_data, patch_data_len) ||
             !vgPatchParseGen_t2_mov(chunk, pos, end, patch_data, patch_data_len) ||
             !vgPatchParseGen_t3_mov(chunk, pos, end, patch_data, patch_data_len) ||
@@ -402,6 +403,37 @@ VG_IoParseState vgPatchParseGen_a1_mov(
             return IO_BAD;
 
         vgMakeArm_A1_MOV(reg, setflags, value, patch_data);
+        return IO_OK;
+    }
+
+    return IO_BAD;
+}
+
+/**
+ * a2_mov()
+ */
+VG_IoParseState vgPatchParseGen_a2_mov(
+        const char chunk[], int pos, int end,
+        uint8_t patch_data[], uint8_t *patch_data_len) {
+
+    if (!strncasecmp(&chunk[pos], "a2_mov(", 7)) {
+        int token_end = pos;
+        uint32_t value;
+
+        *patch_data_len = 4;
+        uint32_t reg = 0;
+
+        while (chunk[token_end] != ',') { token_end++; }
+        if (vgPatchParseGenValue(chunk, pos + 7, token_end, &reg))
+            return IO_BAD;
+
+        token_end++;
+        pos = token_end;
+        while (chunk[token_end] != ')') { token_end++; }
+        if (vgPatchParseGenValue(chunk, pos, token_end, &value))
+            return IO_BAD;
+
+        vgMakeArm_A2_MOV(reg, value, patch_data);
         return IO_OK;
     }
 
