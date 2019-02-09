@@ -32,6 +32,7 @@ int snprintf(char * s, size_t n, const char * format, ...);
 long int strtol(const char *str, char **endptr, int base);
 unsigned long int strtoul(const char* str, char** endptr, int base);
 int isspace(int c);
+int tolower(int c);
 
 
 typedef enum {
