@@ -26,19 +26,19 @@ VG_IoParseState vgPatchParseHook(
             const char chunk[], int pos, int end,
             uint32_t *importNid, void **hookPtr, uint8_t *shallHook) {
 
-    if (!strncmp(&chunk[pos + 1], "sceDisplaySetFrameBuf_withWait", 30)) {
+    if (!strncasecmp(&chunk[pos + 1], "sceDisplaySetFrameBuf_withWait", 30)) {
         *importNid = 0x7A410B64;
         *hookPtr = &vgHook_sceDisplaySetFrameBuf_withWait;
         *shallHook = g_main.config.fps_enabled == FT_ENABLED && g_main.config.fps == FPS_30;
         return IO_OK;
     }
-    if (!strncmp(&chunk[pos + 1], "sceCtrlReadBufferPositive_peekPatched", 37)) {
+    if (!strncasecmp(&chunk[pos + 1], "sceCtrlReadBufferPositive_peekPatched", 37)) {
         *importNid = 0x67E7AB83;
         *hookPtr = &vgHook_sceCtrlReadBufferPositive_peekPatched;
         *shallHook = g_main.config.fps_enabled == FT_ENABLED && g_main.config.fps == FPS_60;
         return IO_OK;
     }
-    if (!strncmp(&chunk[pos + 1], "sceCtrlReadBufferPositive2_peekPatched", 38)) {
+    if (!strncasecmp(&chunk[pos + 1], "sceCtrlReadBufferPositive2_peekPatched", 38)) {
         *importNid = 0xC4226A3E;
         *hookPtr = &vgHook_sceCtrlReadBufferPositive2_peekPatched;
         *shallHook = g_main.config.fps_enabled == FT_ENABLED && g_main.config.fps == FPS_60;

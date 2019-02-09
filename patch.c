@@ -19,8 +19,8 @@ static VG_FeatureState g_patch_support[] = // FB, IB, FPS, MSAA
 static uint8_t vgPatchIsGame(const char titleid[], const char self[], uint32_t nid) {
     VG_GameSupport supp = GAME_UNSUPPORTED;
 
-    if (!strncmp(titleid, TITLEID_ANY, TITLEID_LEN) ||
-            !strncmp(titleid, g_main.titleid, TITLEID_LEN)) {
+    if (!strncasecmp(titleid, TITLEID_ANY, TITLEID_LEN) ||
+            !strncasecmp(titleid, g_main.titleid, TITLEID_LEN)) {
         if (self[0] == '\0' || strstr(g_main.sceInfo.path, self)) {
             if (nid == NID_ANY || nid == g_main.info.module_nid) {
                 supp = GAME_SUPPORTED;
@@ -234,22 +234,22 @@ static VG_IoParseState vgPatchParseSection(const char chunk[], int pos, int end)
 static VG_IoParseState vgPatchParsePatchType(const char chunk[], int pos, int end) {
     g_patch_type = PATCH_TYPE_OFF;
 
-    if (!strncmp(&chunk[pos], "@FB", 3)) {
+    if (!strncasecmp(&chunk[pos], "@FB", 3)) {
         g_patch_support[0] = FT_ENABLED;
         if (vgConfigIsFbEnabled()) {
             g_patch_type = PATCH_TYPE_FB;
         }
-    } else if (!strncmp(&chunk[pos], "@IB", 3)) {
+    } else if (!strncasecmp(&chunk[pos], "@IB", 3)) {
         g_patch_support[1] = FT_ENABLED;
         if (vgConfigIsIbEnabled()) {
             g_patch_type = PATCH_TYPE_IB;
         }
-    } else if (!strncmp(&chunk[pos], "@FPS", 4)) {
+    } else if (!strncasecmp(&chunk[pos], "@FPS", 4)) {
         g_patch_support[2] = FT_ENABLED;
         if (vgConfigIsFpsEnabled()) {
             g_patch_type = PATCH_TYPE_FPS;
         }
-    } else if (!strncmp(&chunk[pos], "@MSAA", 5)) {
+    } else if (!strncasecmp(&chunk[pos], "@MSAA", 5)) {
         g_patch_support[3] = FT_ENABLED;
         if (vgConfigIsMsaaEnabled()) {
             g_patch_type = PATCH_TYPE_MSAA;

@@ -13,12 +13,12 @@ static VG_IoParseState vgConfigParseFeatureState(
             const char chunk[], int pos, int end,
             const char option[], VG_FeatureState *out) {
 
-    if (!strncmp(&chunk[pos], option, strlen(option))) {
+    if (!strncasecmp(&chunk[pos], option, strlen(option))) {
         pos += strlen(option) + 1;
         if (pos >= end)
             return IO_BAD;
 
-        *out = (chunk[pos] == '0' || !strncmp(&chunk[pos], "OFF", 3)) ? FT_DISABLED : FT_ENABLED;
+        *out = (chunk[pos] == '0' || !strncasecmp(&chunk[pos], "OFF", 3)) ? FT_DISABLED : FT_ENABLED;
         return IO_OK;
     }
 
@@ -30,12 +30,12 @@ static VG_IoParseState vgConfigParseResolution(
             const char option[], VG_FeatureState *ft,
             VG_Resolution *res, uint8_t *count) {
 
-    if (!strncmp(&chunk[pos], option, strlen(option))) {
+    if (!strncasecmp(&chunk[pos], option, strlen(option))) {
         pos += strlen(option) + 1;
         if (pos >= end)
             return IO_BAD;
 
-        *ft = (chunk[pos] == '0' || !strncmp(&chunk[pos], "OFF", 3)) ? FT_DISABLED : FT_ENABLED;
+        *ft = (chunk[pos] == '0' || !strncasecmp(&chunk[pos], "OFF", 3)) ? FT_DISABLED : FT_ENABLED;
         if (!*ft)
             return IO_OK;
 
@@ -67,16 +67,16 @@ static VG_IoParseState vgConfigParseFramerate(
             const char option[], VG_FeatureState *ft,
             VG_Fps *fps) {
 
-    if (!strncmp(&chunk[pos], option, strlen(option))) {
+    if (!strncasecmp(&chunk[pos], option, strlen(option))) {
         pos += strlen(option) + 1;
         if (pos >= end)
             return IO_BAD;
 
-        *ft = (chunk[pos] == '0' || !strncmp(&chunk[pos], "OFF", 3)) ? FT_DISABLED : FT_ENABLED;
+        *ft = (chunk[pos] == '0' || !strncasecmp(&chunk[pos], "OFF", 3)) ? FT_DISABLED : FT_ENABLED;
         if (!*ft)
             return IO_OK;
 
-        *fps = !strncmp(&chunk[pos], "30", 2) ? FPS_30 : FPS_60;
+        *fps = !strncasecmp(&chunk[pos], "30", 2) ? FPS_30 : FPS_60;
         return IO_OK;
     }
 
@@ -88,12 +88,12 @@ static VG_IoParseState vgConfigParseMsaa(
             const char option[], VG_FeatureState *ft,
             VG_Msaa *msaa) {
 
-    if (!strncmp(&chunk[pos], option, strlen(option))) {
+    if (!strncasecmp(&chunk[pos], option, strlen(option))) {
         pos += strlen(option) + 1;
         if (pos >= end)
             return IO_BAD;
 
-        *ft = !strncmp(&chunk[pos], "OFF", 3) ? FT_DISABLED : FT_ENABLED;
+        *ft = !strncasecmp(&chunk[pos], "OFF", 3) ? FT_DISABLED : FT_ENABLED;
         if (!*ft)
             return IO_OK;
 
@@ -135,7 +135,7 @@ static VG_IoParseState vgConfigParseGame(const char chunk[], int pos, int end) {
 static VG_IoParseState vgConfigParseLine(const char chunk[], int pos, int end) {
 
     // Check for [MAIN] section
-    if (!strncmp(&chunk[pos], "[MAIN]", 6)) {
+    if (!strncasecmp(&chunk[pos], "[MAIN]", 6)) {
         vgLogPrintF("[CONFIG] Found [MAIN] section, pos=%d\n", pos);
         g_config_section = CONFIG_MAIN;
         return IO_OK;
@@ -144,7 +144,7 @@ static VG_IoParseState vgConfigParseLine(const char chunk[], int pos, int end) {
     // Check for [TITLEID] section
     if (chunk[pos] == '[') {
         if ((pos + TITLEID_LEN + 1) < end && // does titleid even fit?
-                !strncmp(&chunk[pos + 1], g_main.titleid, TITLEID_LEN) &&
+                !strncasecmp(&chunk[pos + 1], g_main.titleid, TITLEID_LEN) &&
                 chunk[pos + TITLEID_LEN + 1] == ']') {
             vgLogPrintF("[CONFIG] Found [%s] section, pos=%d\n", g_main.titleid, pos, end);
             g_config_section = CONFIG_GAME;
