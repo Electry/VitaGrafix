@@ -34,23 +34,27 @@ ur0:tai/VitaGrafix.suprx
 You can configure every game separately using unified configuration file.
 
 ### [MAIN] section
-- This section applies to all games and overrides their individual options.
+- This section applies to all games, unless specific entry for a game exists. Available options are listed below.
 ```
 [MAIN]
-ENABLED=1      <- Setting this to 0 disables all game modifications.
-                  (default = 1)
-OSD=1          <- Setting this to 0 disables in game on-screen display (shown during few seconds at the beginning).
-                  (default = 1)
+# Same options as in GAME section are permitted here. To save space, they are listed only once, below.
 ```
 
 ### GAME section
-- This section applies to a single game. Each game supports different options! Refer to the compatibility table below.
+- This section applies to a single game. These options override the [MAIN] section (for that game). Each game supports different options! Refer to the compatibility table of your patchlist.txt
 ```
-[PCSB00245]    <- TITLE ID of your game
+[PCSB00245]    <- TITLE ID of your game (if you're not sure, run your game and check log.txt using VitaShell)
 ENABLED=1      <- Setting this to 0 disables all game modifications.
                   (default = 1)
-OSD=1          <- Setting this to 0 disables in game on-screen display (shown during few seconds at the beginning).
+                  Valid options:
+                    1
+                    0
+OSD=1          <- Setting this to 0 disables in game on-screen display
+                  (shown during few seconds at the beginning).
                   (default = 1)
+                  Valid options:
+                    1
+                    0
 FB=960x544     <- Framebuffer resolution. Setting this to OFF disables this feature.
                   (default = OFF)
                   Valid options:
@@ -71,36 +75,54 @@ FPS=60         <- FPS cap. Setting this to OFF disables this feature.
                     60
                     30
                     OFF
+MSAA=4x        <- Multisample anti-aliasing. Setting this to OFF disables this feature.
+                  (default = OFF)
+                  Valid options:
+                    4x
+                    2x
+                    1x
+                    OFF
 ```
 
 ### Example config.txt
 ```
-[MAIN]
-ENABLED=1
-
 # This is a comment, comments have to be on a separate line and start with # char
+
+[MAIN]
+# Set default options for all games
+FB=960x544
+IB=960x544
+FPS=60
+MSAA=4x
+
+# Persona 4 Golden [EU], disable osd
+# Notice that IB=960x544 is redundant here as it is
+#  the same resolution as the default one in [MAIN] section above.
+#  This of course doesn't cause any harm.
 [PCSB00245]
 OSD=0
 IB=960x544
 
-# Ninja Gaiden Sigma 2 Plus uses dynamic resolution scaling,
-# and switches between two specified IB resolutions when patched
-# (based on framerate)
+# Ninja Gaiden Sigma 2 Plus, uses dynamic resolution scaling
+#  and switches between two specified IB resolutions when patched
+#  (based on framerate)
+# Override the [MAIN] IB resolution(s) for this game.
 [PCSB00294]
 IB=960x544,720x408
 
-[PCSE00411]
-IB=864x492
+# LittleBigPlanet res. patch introduces some glitches,
+#  let's disable it here.
+[PCSA00017]
+ENABLED=0
 
+# GoW won't reach 60 FPS @ 960x544 very often, so let's
+#  keep it locked to 30 (default FPS cap).
+[PCSF00438]
+FPS=OFF
+
+# I think you get what this does by now.
 [PCSB00204]
 IB=OFF
-
-[PCSF00438]
-FB=720x408
-FPS=30
-
-[PCSB00204]
-ENABLED=0
 ```
 NOTE: If some options are left out, the plugin will use their default values.
 
@@ -115,8 +137,8 @@ NOTE: If some options are left out, the plugin will use their default values.
 #
 #  [titleid,self_path,self_nid]
 #    titleid    = Game's TITLEID, e.g. "PCSF00001"
-#    self_path  = Part of SELF path, e.g. "eboot.bin" or "GOW1.self" (optional)
-#    self_nid   = NID of SELF written as hex integer, e.g. 0x12345678 (optional)
+#    self_path  = Part of SELF path, e.g. "eboot.bin" or "GOW1.self" (optional, but recommended)
+#    self_nid   = NID of SELF written as hex integer, e.g. 0x12345678 (optional, but recommended)
 #
 #
 # Patch type section:
@@ -145,7 +167,7 @@ NOTE: If some options are left out, the plugin will use their default values.
 #  bytes(x)     x = 1 or more 8-bit hex values without the 0x prefix (e.g. "01 02" or "DEADBEEF")
 #
 #
-# Instruction generators:
+# Instruction encoders:
 #
 #  t1_mov(register,value)            - MOV{S} <Rd>,#<imm8>     (Thumb instr. set)
 #    register   = destination, decimal integer (0 <= r <= 14), 0 denotes R0 or A1
@@ -168,6 +190,10 @@ NOTE: If some options are left out, the plugin will use their default values.
 #    setflags   = 1 for MOVS, 0 for MOV
 #    register   = destination, decimal integer (0 <= r <= 14), 0 denotes R0 or A1
 #    value      = macro or decimal/hex integer (0 <= v < 2^32)
+#
+#  a2_mov(register,value)            - MOVW <Rd>,#<imm16>      (Arm instr. set)
+#    register   = destination, decimal integer (0 <= r <= 14), 0 denotes R0 or A1
+#    value      = macro or decimal/hex integer (0 <= v < 2^16)
 #
 #  nop()                             - NOP     (00 BF)
 #  bkpt()                            - BKPT    (00 BE)
@@ -209,7 +235,7 @@ NOTE: If some options are left out, the plugin will use their default values.
 #
 #
 #
-# Valid examples:
+# Valid examples (syntactically, in reality they don't make any logical sense):
 #
 [PCSF00001,eboot.bin,0x12345678]
 @FB
