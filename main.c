@@ -67,7 +67,7 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
     osdSetTextScale(2);
 
     int y = 62;
-    if (g_main.config.game_enabled != FT_ENABLED ||
+    if (g_main.config.enabled != FT_ENABLED ||
             g_main.support == GAME_WRONG_VERSION ||
             g_main.config_state != IO_OK ||
             g_main.patch_state != IO_OK) {
@@ -79,8 +79,7 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
             y -= 20;
         }
         // FPS cap unpatched
-        else if (g_main.config.game_enabled == FT_ENABLED &&
-                    g_main.config.fps_enabled != FT_UNSUPPORTED) {
+        else if (g_main.config.fps_enabled != FT_UNSUPPORTED) {
             osdDrawStringF(120, y, "FPS: default");
             y -= 20;
         }
@@ -104,9 +103,8 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
             osdDrawStringF(120, y, "%dx%d%s", g_main.config.ib[0].width, g_main.config.ib[0].height, buf);
         }
         // Resolution unpatched
-        else if (g_main.config.game_enabled == FT_ENABLED &&
-                    (g_main.config.fb_enabled != FT_UNSUPPORTED ||
-                    g_main.config.ib_enabled != FT_UNSUPPORTED)) {
+        else if (g_main.config.fb_enabled != FT_UNSUPPORTED ||
+                    g_main.config.ib_enabled != FT_UNSUPPORTED) {
             osdDrawStringF(120, y, "Res: default");
         }
     }

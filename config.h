@@ -35,13 +35,9 @@ typedef struct {
 } VG_Resolution;
 
 typedef struct {
-    // [MAIN] options
+    // Basic options
     VG_FeatureState enabled;
     VG_FeatureState osd_enabled;
-
-    // [TITLEID] options
-    VG_FeatureState game_enabled;
-    VG_FeatureState game_osd_enabled;
 
     // Framebuffer
     VG_FeatureState fb_enabled;
