@@ -63,7 +63,7 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
 
     osdSetBgColor(0, 0, 0, 0);
     osdSetTextScale(1);
-    osdDrawStringF(120, 30, "v4.1 [%s]", g_main.titleid);
+    osdDrawStringF(120, 30, "v4.1.1 [%s]", g_main.titleid);
     osdSetTextScale(2);
 
     int y = 62;
@@ -84,29 +84,46 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
             y -= 20;
         }
 
+        char res_buf[32] = "";
         // Framebuffer resolution patched
         if (vgConfigIsFbEnabled()) {
-            osdDrawStringF(120, y, "%dx%d", g_main.config.fb.width, g_main.config.fb.height);
+            snprintf(res_buf, 32, "%dx%d", g_main.config.fb.width, g_main.config.fb.height);
         }
         // Internal buffer resolution patched
         else if (vgConfigIsIbEnabled()) {
-            char buf[32] = "";
+            snprintf(res_buf, 32, "%dx%d", g_main.config.ib[0].width, g_main.config.ib[0].height);
+
             if (g_main.config.ib_count > 1) {
-                snprintf(buf, 32, " >> %dx%d",
+                snprintf(res_buf, 32, "%s >> %dx%d",
+                            res_buf,
                             g_main.config.ib[g_main.config.ib_count - 1].width,
                             g_main.config.ib[g_main.config.ib_count - 1].height);
             }
-            if (g_main.config.msaa_enabled == FT_ENABLED) {
-                snprintf(buf, 32, " (%s)", g_main.config.msaa == MSAA_4X ? "4x" :
-                                            (g_main.config.msaa == MSAA_2X ? "2x" : "1x"));
-            }
-            osdDrawStringF(120, y, "%dx%d%s", g_main.config.ib[0].width, g_main.config.ib[0].height, buf);
         }
         // Resolution unpatched
         else if (g_main.config.fb_enabled != FT_UNSUPPORTED ||
                     g_main.config.ib_enabled != FT_UNSUPPORTED) {
-            osdDrawStringF(120, y, "Res: default");
+            snprintf(res_buf, 32, "Res: default");
         }
+        // MSAA patched
+        if (vgConfigIsMsaaEnabled()) {
+            if (strlen(res_buf)) {
+                snprintf(res_buf, 32, "%s (%s)", res_buf, g_main.config.msaa == MSAA_4X ? "4x" :
+                                        (g_main.config.msaa == MSAA_2X ? "2x" : "1x"));
+            } else {
+                snprintf(res_buf, 32, "MSAA: %s", g_main.config.msaa == MSAA_4X ? "4x" :
+                                        (g_main.config.msaa == MSAA_2X ? "2x" : "1x"));
+            }
+        }
+        // Res & MSAA unpatched
+        else {
+            if (!strlen(res_buf)) {
+                snprintf(res_buf, 32, "MSAA: default");
+            }
+        }
+
+        if (strlen(res_buf))
+            osdDrawStringF(120, y, "%s", res_buf);
     }
 
     osdSetBgColor(0, 0, 0, 200);
