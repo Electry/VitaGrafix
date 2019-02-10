@@ -13,10 +13,10 @@ static VG_IoParseState vgConfigParseFeatureState(
             const char chunk[], int pos, int end, int is_main,
             const char option[], VG_FeatureState *out) {
 
-    if (is_main && *out != FT_UNSPECIFIED)
-        return IO_OK; // Ignore [MAIN] if game-specific option is already set
-
     if (!strncasecmp(&chunk[pos], option, strlen(option))) {
+        if (is_main && *out != FT_UNSPECIFIED)
+            return IO_OK; // Ignore [MAIN] if game-specific option is already set
+
         pos += strlen(option) + 1;
         if (pos >= end)
             return IO_BAD;
@@ -33,10 +33,10 @@ static VG_IoParseState vgConfigParseResolution(
             const char option[], VG_FeatureState *ft,
             VG_Resolution *res, uint8_t *count) {
 
-    if (is_main && *ft != FT_UNSPECIFIED)
-        return IO_OK; // Ignore [MAIN] if game-specific option is already set
-
     if (!strncasecmp(&chunk[pos], option, strlen(option))) {
+        if (is_main && *ft != FT_UNSPECIFIED)
+            return IO_OK; // Ignore [MAIN] if game-specific option is already set
+
         pos += strlen(option) + 1;
         if (pos >= end)
             return IO_BAD;
@@ -73,10 +73,10 @@ static VG_IoParseState vgConfigParseFramerate(
             const char option[], VG_FeatureState *ft,
             VG_Fps *fps) {
 
-    if (is_main && *ft != FT_UNSPECIFIED)
-        return IO_OK; // Ignore [MAIN] if game-specific option is already set
-
     if (!strncasecmp(&chunk[pos], option, strlen(option))) {
+        if (is_main && *ft != FT_UNSPECIFIED)
+            return IO_OK; // Ignore [MAIN] if game-specific option is already set
+
         pos += strlen(option) + 1;
         if (pos >= end)
             return IO_BAD;
@@ -97,10 +97,10 @@ static VG_IoParseState vgConfigParseMsaa(
             const char option[], VG_FeatureState *ft,
             VG_Msaa *msaa) {
 
-    if (is_main && *ft != FT_UNSPECIFIED)
-        return IO_OK; // Ignore [MAIN] if game-specific option is already set
-
     if (!strncasecmp(&chunk[pos], option, strlen(option))) {
+        if (is_main && *ft != FT_UNSPECIFIED)
+            return IO_OK; // Ignore [MAIN] if game-specific option is already set
+
         pos += strlen(option) + 1;
         if (pos >= end)
             return IO_BAD;
