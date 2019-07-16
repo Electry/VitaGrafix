@@ -6,9 +6,10 @@
 #include "config.h"
 #include "main.h"
 
-int vg_io_find_eol(const char chunk[], int pos, int end, bool allow_hash) {
+int vg_io_find_eol(const char chunk[], int pos, int end, bool allow_nonlf_eol) {
     for (int i = pos; i < end; i++) {
-        if (chunk[i] == '\n' || (allow_hash && chunk[i] == '#')) {
+        if (chunk[i] == '\n'
+                || (allow_nonlf_eol && (chunk[i] == '#' || chunk[i] == '\r'))) {
             return i;
         }
     }
