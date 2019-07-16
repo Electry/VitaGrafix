@@ -84,6 +84,7 @@ bool op_vg_config_vblank(value_t *out) {
     switch (g_main.config.fps) {
         case FPS_60: default: out->data.uint32 = 1; break;
         case FPS_30: out->data.uint32 = 2; break;
+        case FPS_20: out->data.uint32 = 3; break;
     }
 #else
     out->data.uint32 = 1;

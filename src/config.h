@@ -29,7 +29,8 @@ typedef enum {
 
 typedef enum {
     FPS_60,
-    FPS_30
+    FPS_30,
+    FPS_20
 } vg_fps_t;
 
 typedef enum {

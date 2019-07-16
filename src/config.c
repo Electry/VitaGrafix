@@ -129,6 +129,10 @@ static vg_io_status_t vg_config_parse_framerate(
         *fps = FPS_30;
         __ret_status(IO_OK, 0, 0);
     }
+    if (!strncasecmp(&line[pos], "20", 2)) {
+        *fps = FPS_20;
+        __ret_status(IO_OK, 0, 0);
+    }
 
     __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos);
 }

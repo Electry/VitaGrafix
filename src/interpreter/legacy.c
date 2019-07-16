@@ -112,7 +112,8 @@ intp_status_t legacy_parse_gen_value(
             }
         }
         if (!strncasecmp(&chunk[pos], "<vblank>", 8)) {
-            *value = g_main.config.fps == FPS_60 ? 1 : 2;
+            *value = g_main.config.fps == FPS_60 ? 1 :
+                    (g_main.config.fps == FPS_30 ? 2 : 3);
             return ret;
         }
         if (!strncasecmp(&chunk[pos], "<msaa>", 6)) {

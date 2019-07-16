@@ -74,6 +74,7 @@ FPS=60         <- FPS cap. Setting this to OFF disables this feature.
                   Valid options:
                     60
                     30
+                    20
                     OFF
 MSAA=4x        <- Multisample anti-aliasing. Setting this to OFF disables this feature.
                   (default = OFF)
