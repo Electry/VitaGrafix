@@ -90,8 +90,10 @@ vg_io_status_t vg_io_parse(const char *path, vg_io_status_t (*parse_line_fn)(con
                 if (chunk[pos] == '#')
                     goto NEXT_LINE;
 
-                // Find end of readable part (aka. pos of # or \n)
+                // Search for '#'
                 end_readable = vg_io_find_eol(chunk, pos, end, true);
+                if (end_readable == -1) // No '#' found on this line
+                    end_readable = end; // Set eol to '\n'
 
                 // Swap \n or # with \0
                 chunk[end_readable] = '\0';
