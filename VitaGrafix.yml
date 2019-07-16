@@ -1,7 +1,7 @@
 VitaGrafix:
   attributes: 0
   version:
-    major: 1
+    major: 5
     minor: 0
   main:
     start: module_start
