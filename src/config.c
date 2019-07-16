@@ -8,9 +8,6 @@
 #include "main.h"
 #include "log.h"
 
-// TODO:
-//  allow # comments on same linez
-
 static vg_config_section_t g_config_section = CONFIG_SECTION_NONE;
 
 #define OPTIONS_TOTAL 7

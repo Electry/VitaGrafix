@@ -6,9 +6,9 @@
 #include "config.h"
 #include "main.h"
 
-int vg_io_find_eol(const char chunk[], int pos, int end) {
+int vg_io_find_eol(const char chunk[], int pos, int end, bool allow_hash) {
     for (int i = pos; i < end; i++) {
-        if (chunk[i] == '\n') {
+        if (chunk[i] == '\n' || (allow_hash && chunk[i] == '#')) {
             return i;
         }
     }
@@ -37,7 +37,7 @@ vg_io_status_t vg_io_parse(const char *path, vg_io_status_t (*parse_line_fn)(con
 
     int chunk_size = 0;
     char chunk[IO_CHUNK_SIZE] = "";
-    int pos = 0, end = 0;
+    int pos = 0, end = 0, end_readable = 0;
     int line_counter = 0;
 
     while ((chunk_size = sceIoRead(fd, chunk, IO_CHUNK_SIZE)) > 1) {
@@ -48,8 +48,8 @@ vg_io_status_t vg_io_parse(const char *path, vg_io_status_t (*parse_line_fn)(con
 
         // Read all lines in chunk
         while (pos < chunk_size) {
-            // Get next EOL
-            end = vg_io_find_eol(chunk, pos, chunk_size);
+            // Get next real EOL
+            end = vg_io_find_eol(chunk, pos, chunk_size, false);
 
             // Did not find EOL in current chunk & there is more to read?
             // Proceed by reading next sub-chunk
@@ -90,8 +90,11 @@ vg_io_status_t vg_io_parse(const char *path, vg_io_status_t (*parse_line_fn)(con
                 if (chunk[pos] == '#')
                     goto NEXT_LINE;
 
-                // Swap \n with \0
-                chunk[end] = '\0';
+                // Find end of readable part (aka. pos of # or \n)
+                end_readable = vg_io_find_eol(chunk, pos, end, true);
+
+                // Swap \n or # with \0
+                chunk[end_readable] = '\0';
 
                 // Parse valid line
                 ret = parse_line_fn(&chunk[pos]);
@@ -101,7 +104,7 @@ vg_io_status_t vg_io_parse(const char *path, vg_io_status_t (*parse_line_fn)(con
                 }
 
                 // Swap back \n
-                chunk[end] = '\n';
+                chunk[end_readable] = '\n';
 
 NEXT_LINE:
                 pos = end + 1;
