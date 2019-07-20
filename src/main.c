@@ -244,6 +244,7 @@ EXIT_HOOK_OSD:
     }
 
 EXIT:
+    vg_log_flush();
     return SCE_KERNEL_START_SUCCESS;
 }
 
