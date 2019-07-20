@@ -57,6 +57,7 @@ bool op_encode_t1_mov(value_t *out, value_t *value);
 bool op_encode_t2_mov(value_t *out, value_t *setflags, value_t *value);
 bool op_encode_t3_mov(value_t *out, value_t *value);
 bool op_encode_t1_movt(value_t *out, value_t *value);
+bool op_encode_t2_vmov_f32(value_t *out, value_t *value);
 bool op_encode_a1_mov(value_t *out, value_t *setflags, value_t *value);
 bool op_encode_a2_mov(value_t *out, value_t *value);
 bool op_encode_bkpt(value_t *out);

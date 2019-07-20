@@ -118,6 +118,42 @@ bool op_encode_t1_movt(value_t *out, value_t *value) {
 }
 
 /*
+ * T2 VMOV<c>.F32 <Sd>, #<imm>
+ *
+ * 1110      11101  x 11 xxxx  xxxx 101 0  0000 xxxx
+ * Condition OPcode D    imm4H Vd       sz      imm4L
+ *
+ * byte 1   byte 0   byte 3   byte 2
+ * 11101110 1x11xxxx xxxx1010 0000xxxx
+ */
+bool op_encode_t2_vmov_f32(value_t *out, value_t *value) {
+    uint8_t reg = (uint8_t)out->data.uint32;
+    memset(out->data.raw, 0, 4);
+    value_raw(out, 4);
+
+    out->data.raw[1] |= 0b11101110; // Condition + OP
+    out->data.raw[0] |= 0b10110000; // OP
+    out->data.raw[3] |= 0b00001010; // OP
+
+    // Vd:D
+    if (reg & 0b1)
+        out->data.raw[0] |= 0b01000000;       // D
+    out->data.raw[3] |= (reg & 0b11110) << 3; // Vd
+
+    // imm4H:imm4L
+    uint8_t imm8 = 0;
+    if (value->data.uint32 & (1 << 31))
+        imm8 |= 1 << 7; // sign bit
+    if (((value->data.uint32 >> 25) & 0b111111) < 0b100000)
+        imm8 |= 1 << 6; // < 2.0
+    imm8 |= (value->data.uint32 >> 19) & 0b111111;
+
+    out->data.raw[0] |= (imm8 & 0b11110000) >> 4; // imm4H
+    out->data.raw[2] |= (imm8 & 0b00001111);      // imm4L
+    return true;
+}
+
+/*
  * A1 MOV{S}<c> <Rd>,#<const>
  *
  * 1110      00 1         1101   x 0000 xxxx xxxxxxxxxxxx

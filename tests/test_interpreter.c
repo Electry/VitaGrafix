@@ -195,6 +195,9 @@ const intp_testcase_t _TESTS[] = {
     {"t1_movt( 3 , 42 )",   {0xC0, 0xF2, 0x2A, 0x03},  4, DATA_TYPE_RAW},
     {"a1_mov(1,5,255)",     {0xFF, 0x50, 0xB0, 0xE3},  4, DATA_TYPE_RAW},
     {"a2_mov(1,736)",       {0xE0, 0x12, 0x00, 0xE3},  4, DATA_TYPE_RAW},
+    {"t2_vmov(1, 1.0)",     {0xF7, 0xEE, 0x00, 0x0A},  4, DATA_TYPE_RAW},
+    {"t2_vmov(8, -1.5)",    {0xBF, 0xEE, 0x08, 0x4A},  4, DATA_TYPE_RAW},
+    {"t2_vmov(16, 31.0)",   {0xB3, 0xEE, 0x0F, 0x8A},  4, DATA_TYPE_RAW},
 
     // Mixed real world cases
     {"t1_movt(4, 725.0f >> 16)",                  {0xC4, 0xF2, 0x35, 0x44}, 4, DATA_TYPE_RAW},
