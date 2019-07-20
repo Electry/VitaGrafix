@@ -81,6 +81,7 @@ const token_t _TOKENS[TOKEN_INVALID + 1] = {
     {90, "vblank",  TOKEN_VG_CONFIG_VBLANK,    TOKEN_CONSTANT, (bool *)op_vg_config_vblank},
     {90, "msaa",    TOKEN_VG_CONFIG_MSAA,      TOKEN_CONSTANT, (bool *)op_vg_config_msaa},
 
+    {52, "mov32",   TOKEN_ENCODE_MOV32,   TOKEN_ARITY_3,  (bool *)op_encode_mov32},
     {52, "t2_vmov", TOKEN_ENCODE_T2_VMOV_F32,  TOKEN_ARITY_2,  (bool *)op_encode_t2_vmov_f32},
     {52, "t1_movt", TOKEN_ENCODE_T1_MOVT, TOKEN_ARITY_2,  (bool *)op_encode_t1_movt},
     {52, "t1_mov",  TOKEN_ENCODE_T1_MOV,  TOKEN_ARITY_2,  (bool *)op_encode_t1_mov},

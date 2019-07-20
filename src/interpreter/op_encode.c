@@ -246,3 +246,32 @@ bool op_encode_unk(value_t *out) {
     memset(out->unk, 1, size * sizeof(bool));
     return true;
 }
+
+bool op_encode_mov32(value_t *out, value_t *value, value_t *gap) {
+    value_t reg, top;
+    memcpy(&reg, out, sizeof(value_t));
+    memcpy(&top, value, sizeof(value_t));
+    bool ret;
+
+    // Encode MOVW
+    value->size = 2; // trim to 16B
+    ret = op_encode_t3_mov(out, value);
+    if (!ret) return ret;
+
+    // Encode MOVT
+    top.size = 2;
+    top.data.uint32 >>= 16; // shift
+    ret = op_encode_t1_movt(&reg, &top);
+    if (!ret) return ret;
+
+    // Encode byte gap
+    if (gap->data.uint32 > 0) {
+        ret = op_encode_unk(gap);
+        if (!ret) return ret;
+
+        ret = op_datatype_raw_concat(out, gap);
+        if (!ret) return ret;
+    }
+
+    return op_datatype_raw_concat(out, &reg);
+}

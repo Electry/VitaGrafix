@@ -335,6 +335,7 @@ const intp_unk_testcase_t _TESTS_UNK[] = {
     {"DEr . ??(1) . ADr",            {0xDE, 0x00, 0xAD},                         3, DATA_TYPE_RAW, {0, 1, 0}},
     {"DEr.ADr.??(5)",                {0xDE, 0xAD, 0x00, 0x00, 0x00, 0x00, 0x00}, 7, DATA_TYPE_RAW, {0, 0, 1, 1, 1, 1, 1}},
     {"t1_mov(1, 255) . ??(2) . nop", {0xFF, 0x21, 0x00, 0x00, 0x00, 0xBF},       6, DATA_TYPE_RAW, {0, 0, 1, 1, 0, 0}},
+    {"mov32(2, 725.0, 2)",           {0x44, 0xF2, 0x00, 0x02, 0x00, 0x00, 0xC4, 0xF2, 0x35, 0x42},  10, DATA_TYPE_RAW, {0, 0, 0, 0, 1, 1, 0, 0, 0, 0}},
 };
 
 uint32_t g_success_cnt = 0;
