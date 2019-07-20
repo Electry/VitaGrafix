@@ -51,7 +51,12 @@ void vg_log_read(char *dest, int size) {
         return;
     }
 
-    sceIoRead(fd, dest, size);
+    long long fsize = sceIoLseek(fd, 0, SCE_SEEK_END);
+    if (fsize > size)
+        sceIoLseek(fd, -size, SCE_SEEK_CUR);
+    else
+        sceIoLseek(fd, 0, SCE_SEEK_SET);
 
+    sceIoRead(fd, dest, size);
     sceIoClose(fd);
 }
