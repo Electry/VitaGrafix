@@ -233,3 +233,16 @@ bool op_encode_nop(value_t *out) {
     out->data.raw[1] = 0xBF;
     return true;
 }
+
+bool op_encode_unk(value_t *out) {
+    uint32_t size = out->data.uint32;
+    if ((out->type != DATA_TYPE_SIGNED && out->type != DATA_TYPE_UNSIGNED)
+            || size == 0
+            || size > MAX_VALUE_SIZE)
+        return false;
+
+    value_raw(out, size);
+    memset(out->data.raw, 0, size * sizeof(byte_t));
+    memset(out->unk, 1, size * sizeof(bool));
+    return true;
+}

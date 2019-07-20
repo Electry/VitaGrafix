@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -DBUILD_LEGACY_SUPPORT
+CFLAGS=-Wall -Wno-trigraphs -DBUILD_LEGACY_SUPPORT
 
 all: tests
 default: tests

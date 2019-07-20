@@ -69,6 +69,10 @@ static bool vg_patch_is_game(const char titleid[], const char self[], uint32_t n
     return supp == GAME_SUPPORTED;
 }
 
+static byte_t *vg_patch_get_vaddr(uint8_t segment, uint32_t offset) {
+    return (byte_t *)((uint32_t)g_main.sce_info.segments[segment].vaddr + offset);
+}
+
 /**
  * Parses segment & offset (e.g. 0:0x12345)
  */
@@ -98,7 +102,7 @@ static vg_io_status_t vg_patch_parse_address(
 static vg_io_status_t vg_patch_parse_patch(const char line[]) {
     uint8_t segment = 0;
     uint32_t offset = 0;
-    intp_value_t patch_data;
+    intp_value_t patch_data = {0};
 
     vg_io_status_t ret;
     int pos = 0;
@@ -119,6 +123,14 @@ static vg_io_status_t vg_patch_parse_patch(const char line[]) {
         vg_log_printf("%s\n", buf);
 
         __ret_status(IO_ERROR_INTERPRETER_ERROR, 0, intp_ret.pos);
+    }
+
+    // Readmem for unknown bytes
+    byte_t *vaddr = vg_patch_get_vaddr(segment, offset);
+    for (byte_t i = 0; i < patch_data.size; i++) {
+        if (patch_data.unk[i]) {
+            patch_data.data.raw[i] = *(vaddr + i);
+        }
     }
 
     // Apply patch

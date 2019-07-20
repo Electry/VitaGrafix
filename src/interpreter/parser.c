@@ -90,6 +90,7 @@ const token_t _TOKENS[TOKEN_INVALID + 1] = {
     {52, "a2_mov",  TOKEN_ENCODE_A2_MOV,  TOKEN_ARITY_2,  (bool *)op_encode_a2_mov},
     {52, "bkpt",    TOKEN_ENCODE_BKPT,    TOKEN_CONSTANT, (bool *)op_encode_bkpt},
     {52, "nop",     TOKEN_ENCODE_NOP,     TOKEN_CONSTANT, (bool *)op_encode_nop},
+    {52, "??",      TOKEN_ENCODE_UNK,     TOKEN_ARITY_1,  (bool *)op_encode_unk},
 
 #ifdef BUILD_LEGACY_SUPPORT
     {0,  "<",       TOKEN_LEGACY,         0,              NULL},
@@ -125,6 +126,7 @@ void value_cast(value_t *lhs, value_data_type_t data_type) {
     // bytes -> *
     if (lhs->type == DATA_TYPE_RAW) {
         lhs->type = data_type;
+        memset(lhs->unk, 0, MAX_VALUE_SIZE * sizeof(bool));
         goto ALIGN_SIZE;
     }
 
@@ -496,7 +498,8 @@ intp_status_t parse_call(const char *expr, uint32_t *pos, value_t *value, bool a
             || (token->flags & TOKEN_ARITY_3)
             || (token->flags & TOKEN_ARITY_4)) && token->op != NULL) {
         const token_t *op = token;
-        value_t arg[TOKEN_GET_ARGN(token) - 1];
+        value_t arg[TOKEN_ARITY_4 - 1];
+        memset(arg, 0, (TOKEN_ARITY_4 - 1) * sizeof(value_t));
 
         // Check for opening bracket
         pos_error = *pos;
@@ -603,6 +606,7 @@ intp_status_t parse_value(const char *expr, uint32_t *pos, value_t *value, bool 
     const token_t *token;
     intp_status_t ret;
     uint32_t pos_error;
+    memset(value, 0, sizeof(value_t));
 
     // Peek first, check if token is function call
     ret = peek_token(expr, *pos, value, &token, true, force_raw);
@@ -695,7 +699,7 @@ intp_status_t parse_subtree(const char *expr, uint32_t *pos, value_t *value, int
 
     uint32_t pos_infix_op = *pos;
     intp_status_t ret;
-    value_t rhs;
+    value_t rhs = {0};
     const token_t *token;
 
     // Peek next token (operator)

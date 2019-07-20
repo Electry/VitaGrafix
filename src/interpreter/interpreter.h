@@ -1,6 +1,7 @@
 #ifndef INTERPRETER_H
 #define INTERPRETER_H
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef uint8_t byte_t;
 
@@ -36,6 +37,8 @@ typedef struct {
 
     // data size in bytes (primitives = 4B)
     byte_t size;
+
+    bool unk[MAX_VALUE_SIZE];
 } intp_value_t;
 
 typedef enum {

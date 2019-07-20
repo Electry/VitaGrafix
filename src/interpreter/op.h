@@ -62,6 +62,7 @@ bool op_encode_a1_mov(value_t *out, value_t *setflags, value_t *value);
 bool op_encode_a2_mov(value_t *out, value_t *value);
 bool op_encode_bkpt(value_t *out);
 bool op_encode_nop(value_t *out);
+bool op_encode_unk(value_t *out);
 
 bool op_vg_config_fb_width(value_t *out);
 bool op_vg_config_fb_height(value_t *out);

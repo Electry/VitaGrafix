@@ -16,6 +16,14 @@ typedef struct {
 
 typedef struct {
     const char *expr;
+    byte_t expected_raw[MAX_VALUE_SIZE];
+    uint32_t expected_size;
+    intp_value_data_type_t expected_type;
+    bool expected_unk[MAX_VALUE_SIZE];
+} intp_unk_testcase_t;
+
+typedef struct {
+    const char *expr;
     intp_status_code_t expected_status;
     uint32_t expected_pos;
 } intp_error_testcase_t;
@@ -322,6 +330,13 @@ const intp_error_testcase_t _TESTS_ERROR[] = {
     {"bytes(DE AD$BE EF)", INTP_STATUS_ERROR_MISSING_CLOSE_BRACKET, 11},
 };
 
+const intp_unk_testcase_t _TESTS_UNK[] = {
+    {"??(4)",                        {0x00, 0x00, 0x00, 0x00},                   4, DATA_TYPE_RAW, {1, 1, 1, 1}},
+    {"DEr . ??(1) . ADr",            {0xDE, 0x00, 0xAD},                         3, DATA_TYPE_RAW, {0, 1, 0}},
+    {"DEr.ADr.??(5)",                {0xDE, 0xAD, 0x00, 0x00, 0x00, 0x00, 0x00}, 7, DATA_TYPE_RAW, {0, 0, 1, 1, 1, 1, 1}},
+    {"t1_mov(1, 255) . ??(2) . nop", {0xFF, 0x21, 0x00, 0x00, 0x00, 0xBF},       6, DATA_TYPE_RAW, {0, 0, 1, 1, 0, 0}},
+};
+
 uint32_t g_success_cnt = 0;
 
 void pr_bytes(byte_t *bytes, int size) {
@@ -398,6 +413,67 @@ ERROR_ETEST:
     return;
 }
 
+void test_unk_assert(intp_unk_testcase_t test, uint32_t pos, intp_value_t *value, intp_status_t status) {
+    byte_t expected_full[test.expected_size];
+    memset(expected_full, 0, test.expected_size);
+    memcpy(expected_full, test.expected_raw, test.expected_size);
+
+    if (status.code != INTP_STATUS_OK) {
+        printf("FAIL: '%s'\n", test.expr);
+        printf("-  Expected status %d, got %d\n", 0, status.code);
+        goto ERROR_UNKTEST;
+    }
+
+    // Value size
+    if (value->size != test.expected_size) {
+        printf("FAIL: '%s'\n", test.expr);
+        printf("-  Expected size %d, got %d\n", test.expected_size, value->size);
+        goto ERROR_UNKTEST;
+    }
+
+    // Value type
+    if (value->type != test.expected_type) {
+        printf("FAIL: '%s'\n", test.expr);
+        printf("-  Expected type '%s', got '%s'\n",
+                intp_data_type_to_string(test.expected_type),
+                intp_data_type_to_string(value->type));
+        goto ERROR_UNKTEST;
+    }
+
+    // Value data
+    for (int i = 0; i < test.expected_size; i++) {
+        if (expected_full[i] != value->data.raw[i]) {
+            printf("FAIL: '%s'\n", test.expr);
+            printf("-  Expected: ");
+            pr_bytes(expected_full, test.expected_size);
+            printf("\n");
+            printf("-  Got: ");
+            pr_bytes(value->data.raw, value->size);
+            printf("\n");
+            goto ERROR_UNKTEST;
+        }
+    }
+
+    // Value data
+    for (int i = 0; i < test.expected_size; i++) {
+        if (test.expected_unk[i] != value->unk[i]) {
+            printf("FAIL: '%s'\n", test.expr);
+            printf("-  Expected ?? bytes: ");
+            pr_bytes((byte_t *)test.expected_unk, test.expected_size);
+            printf("\n");
+            printf("-  Got: ");
+            pr_bytes((byte_t *)value->unk, value->size);
+            printf("\n");
+            goto ERROR_UNKTEST;
+        }
+    }
+
+    g_success_cnt++;
+
+ERROR_UNKTEST:
+    return;
+}
+
 extern const token_t _TOKENS[];
 
 int main() {
@@ -410,6 +486,7 @@ int main() {
     uint32_t pos;
     uint32_t tests_cnt = sizeof(_TESTS) / sizeof(intp_testcase_t);
     uint32_t tests_error_cnt = sizeof(_TESTS_ERROR) / sizeof(intp_error_testcase_t);
+    uint32_t tests_unk_cnt = sizeof(_TESTS_UNK) / sizeof(intp_unk_testcase_t);
 
     intp_status_t ret;
 
@@ -442,8 +519,16 @@ int main() {
         test_error_assert(_TESTS_ERROR[i], ret);
     }
 
+    for (int i = 0; i < tests_unk_cnt; i++) {
+        memset(&value, 0, sizeof(intp_value_t));
+        pos = 0;
+
+        ret = intp_evaluate(_TESTS_UNK[i].expr, &pos, &value);
+        test_unk_assert(_TESTS_UNK[i], pos, &value, ret);
+    }
+
     printf("\n");
-    printf("%d out of %d tests succeeded!\n", g_success_cnt, tests_cnt + tests_error_cnt);
+    printf("%d out of %d tests succeeded!\n", g_success_cnt, tests_cnt + tests_error_cnt + tests_unk_cnt);
     printf("\n");
 
     return 0;

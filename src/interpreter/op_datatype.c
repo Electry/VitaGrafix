@@ -26,8 +26,10 @@ bool op_datatype_raw_concat(value_t *lhs, value_t *rhs) {
 
     value_raw(lhs, lhs->size);
     value_raw(rhs, rhs->size);
-    
+
     memcpy(&lhs->data.raw[lhs->size], rhs->data.raw, rhs->size);
+    memcpy(&lhs->unk[lhs->size], rhs->unk, rhs->size * sizeof(bool));
+
     lhs->size += rhs->size;
     return true;
 }
