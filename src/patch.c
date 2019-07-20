@@ -116,7 +116,7 @@ static vg_io_status_t vg_patch_parse_patch(const char line[]) {
         // Log error info
         char buf[256];
         intp_format_error(line, intp_ret, buf, 256);
-        vg_log_printf("%s", buf);
+        vg_log_printf("%s\n", buf);
 
         __ret_status(IO_ERROR_INTERPRETER_ERROR, 0, intp_ret.pos);
     }

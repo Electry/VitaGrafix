@@ -21,7 +21,9 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
         g_main.osd_timer = sceKernelGetProcessTimeLow();
     }
     // OSD timer finished? Release the hook
-    else if (sceKernelGetProcessTimeLow() - g_main.osd_timer > OSD_SHOW_DURATION) {
+    else if (sceKernelGetProcessTimeLow() - g_main.osd_timer > OSD_SHOW_DURATION
+            && g_main.config_status.code == IO_OK // Show indefinitely on i/o error
+            && g_main.patch_status.code == IO_OK) {
         int ret = TAI_CONTINUE(int, g_main.osd_hook_ref, pParam, sync);
 
         taiHookRelease(g_main.osd_hook, g_main.osd_hook_ref);
@@ -35,14 +37,17 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
     // Background
     int w = 180;
     if (g_main.config.ib_count > 1)
-        w += 80;
-    if ((g_main.config.fb_enabled == FT_ENABLED
-            || g_main.config.ib_enabled == FT_ENABLED)
+        w += 100; // Fit "960x544 >> 720x408"
+    if ((g_main.config.fb_enabled != FT_UNSUPPORTED
+            || g_main.config.ib_enabled != FT_UNSUPPORTED)
             && g_main.config.msaa_enabled == FT_ENABLED)
-        w += 30;
+        w += 45; // Fit "960x544 (4x)"
+    if (g_main.config.fb_enabled == FT_DISABLED || g_main.config.fb_enabled == FT_UNSPECIFIED
+            || g_main.config.ib_enabled == FT_DISABLED || g_main.config.ib_enabled == FT_UNSPECIFIED)
+        w += 45; // Fit "Res: default"
     if ((g_main.config.fb_enabled == FT_ENABLED && g_main.config.fb.width > 999)
             || (g_main.config.ib_enabled == FT_ENABLED && g_main.config.ib[0].width > 999))
-        w += 10;
+        w += 10; // Fit "1280x720"
     osd_draw_rectangle_fast(20, 20, w, 70);
 
     // Logo
@@ -63,12 +68,16 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
         osd_set_back_color(0, 0, 0, 255);
 
         // Draw short message
-        if (g_main.config_status.code != IO_OK) {
+        if (g_main.config_status.code == IO_ERROR_OPEN_FAILED) {
             osd_draw_string(20, 110, OSD_MSG_CONFIG_OPEN_FAILED);
             osd_draw_string(20, 130, OSD_MSG_IOPLUS_HINT);
-        } else if (g_main.patch_status.code != IO_OK) {
+        } else if (g_main.patch_status.code == IO_ERROR_OPEN_FAILED) {
             osd_draw_string(20, 110, OSD_MSG_PATCH_OPEN_FAILED);
             osd_draw_string(20, 130, OSD_MSG_IOPLUS_HINT);
+        } else if (g_main.config_status.code != IO_OK) {
+            osd_draw_string(20, 110, OSD_MSG_CONFIG_ERROR);
+        } else if (g_main.patch_status.code != IO_OK) {
+            osd_draw_string(20, 110, OSD_MSG_PATCH_ERROR);
         }
 
         // Draw first x characters from log
@@ -210,10 +219,12 @@ int module_start(SceSize argc, const void *args) {
                     g_main.patch_status.line,
                     g_main.patch_status.pos_line,
                     vg_io_status_code_to_string(g_main.patch_status.code));
+        goto EXIT_HOOK_OSD;
     }
 
-    // Game shell?
-    if (g_main.support == GAME_SELF_SHELL)
+    // Exit if game is not supported / is self shell
+    if (g_main.support == GAME_SELF_SHELL
+                || g_main.support == GAME_UNSUPPORTED)
         goto EXIT;
 
 EXIT_HOOK_OSD:

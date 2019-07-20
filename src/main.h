@@ -2,10 +2,12 @@
 #define _MAIN_H_
 
 #define SECOND             1000000
-#define OSD_SHOW_DURATION  30 * SECOND
+#define OSD_SHOW_DURATION  5 * SECOND
 
 #define OSD_MSG_CONFIG_OPEN_FAILED   "Failed to open config file."
+#define OSD_MSG_CONFIG_ERROR         "An error occured while reading config file."
 #define OSD_MSG_PATCH_OPEN_FAILED    "Failed to open patch file."
+#define OSD_MSG_PATCH_ERROR          "An error occured while reading patch file."
 #define OSD_MSG_IOPLUS_HINT          "Do you have ioPlus installed?"
 #define OSD_MSG_GAME_WRONG_VERSION   "Your game version is not supported :("
 
@@ -32,8 +34,8 @@ int tolower(int c);
 
 typedef enum {
     GAME_UNSUPPORTED,
-    GAME_WRONG_VERSION,
     GAME_SELF_SHELL,
+    GAME_WRONG_VERSION,
     GAME_SUPPORTED
 } vg_game_support_t;
 
