@@ -14,9 +14,10 @@
 
 #include "interpreter/interpreter.h"
 
-static vg_patch_section_t g_patch_section = PATCH_SECTION_NONE;
-static vg_feature_t       g_patch_feature = FEATURE_INVALID;
-static uint32_t           g_patch_count   = 0;
+static vg_patch_section_t g_patch_section       = PATCH_SECTION_NONE;
+static vg_feature_t       g_patch_feature       = FEATURE_INVALID;
+static uint32_t           g_patch_total_count   = 0;
+static uint32_t           g_patch_applied_size  = 0;
 
 // Feature support, updated according to patchlist.txt entry for current game.
 // Used to update global feature support after patchlist.txt is parsed.
@@ -43,6 +44,7 @@ static bool vg_inject_data(int segidx, uint32_t offset, const void *data, size_t
 
     g_main.inject[g_main.inject_num] = taiInjectData(g_main.tai_info.modid, segidx, offset, data, size);
     g_main.inject_num++;
+    g_patch_applied_size += size;
     return true;
 }
 
@@ -200,7 +202,7 @@ static vg_io_status_t vg_patch_parse_section(const char line[]) {
     if (line[pos] != ']')
         __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos);
 
-    g_patch_count++;
+    g_patch_total_count++;
 
     if (vg_patch_is_game(titleid, self, nid)) {
         g_patch_section = PATCH_SECTION_GAME;
@@ -285,9 +287,13 @@ void vg_patch_parse_and_apply() {
 
     vg_log_printf("[PATCH] Parsing patchlist.txt\n");
 
+    SceUInt32 start = sceKernelGetProcessTimeLow();
     g_main.patch_status = vg_io_parse(PATCH_PATH, vg_patch_parse_line);
+    SceUInt32 end = sceKernelGetProcessTimeLow();
 
-    vg_log_printf("[PATCH] %u total patches found in patchlist.txt\n", g_patch_count);
+    vg_log_printf("[PATCH] Patched %u bytes in %d patches and it took %ums\n",
+                    g_patch_applied_size, g_main.inject_num, (end - start) / 1000);
+    vg_log_printf("[PATCH] %u total patches found in patchlist.txt\n", g_patch_total_count);
 
     // Mark features as unsupported (those for which patches haven't been found)
     vg_config_set_unsupported_features(g_patch_support);
