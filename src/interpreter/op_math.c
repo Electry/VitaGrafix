@@ -118,8 +118,13 @@ bool op_math_fn_abs(value_t *lhs)                    { __math_do_fn_op_unary(lhs
 bool op_math_fn_acos(value_t *lhs)                   { __math_do_fn_op_unary(lhs, acos); return ret; }
 bool op_math_fn_align(value_t *lhs, value_t *rhs)    {
     common_cast(lhs, rhs);
+    __math_do_fn_op_unary(rhs, fabs); // make rhs absolute
+    if (!ret) return ret;
     switch (lhs->type) {
-        case DATA_TYPE_SIGNED:   lhs->data.int32  = (int32_t)(lhs->data.int32 + rhs->data.int32 - 1) / rhs->data.int32 * rhs->data.int32; break;
+        case DATA_TYPE_SIGNED:
+            lhs->data.int32 = lhs->data.int32 + rhs->data.int32 - 1;
+            lhs->data.int32 -= (rhs->data.int32 + (lhs->data.int32 % rhs->data.int32)) % rhs->data.int32;
+            break;
         case DATA_TYPE_UNSIGNED: lhs->data.uint32 = (uint32_t)(lhs->data.uint32 + rhs->data.uint32 - 1) / rhs->data.uint32 * rhs->data.uint32; break;
         case DATA_TYPE_FLOAT:    lhs->data.fl32   = (float)(ceil(lhs->data.fl32 / rhs->data.fl32) * rhs->data.fl32); break;
         default:                 return false;

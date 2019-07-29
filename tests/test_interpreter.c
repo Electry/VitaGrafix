@@ -142,6 +142,13 @@ const intp_testcase_t _TESTS[] = {
     {"align(-16,32)", {0x00},                 INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
     {"align(0.5,1.0)", {0x00, 0x00, 0x80, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
     {"align(-0.5,1.0)", {0x00, 0x00, 0x00, 0x80}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"align(720, -32)",    {0xE0, 0x02},             INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
+    {"align(720, 32.0)",   {0x00, 0x00, 0x38, 0x44}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"align(720, -32.0)",  {0x00, 0x00, 0x38, 0x44}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"align(-720, 32)",    {0x40, 0xFD, 0xFF, 0xFF}, INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
+    {"align(-720, -32)",   {0x40, 0xFD, 0xFF, 0xFF}, INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
+    {"align(-720, 32.0)",  {0x00, 0x00, 0x30, 0xC4}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"align(-720, -32.0)", {0x00, 0x00, 0x30, 0xC4}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
 
     // Fns limits
     {"sin(4294967296.0)", {0x81, 0x89, 0xEC, 0xBE},  INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
