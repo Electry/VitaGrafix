@@ -263,7 +263,7 @@ void vg_config_parse() {
     g_main.config.msaa_enabled = FT_UNSPECIFIED;
 
     // Parse config.txt
-    g_main.config_status = vg_io_parse(CONFIG_PATH, vg_config_parse_line);
+    g_main.config_status = vg_io_parse(CONFIG_PATH, vg_config_parse_line, true);
 
     // Set unset options to their default values
     vg_config_set_defaults();

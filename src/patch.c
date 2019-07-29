@@ -1,6 +1,7 @@
 #include <vitasdk.h>
 #include <taihen.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "io.h"
 #include "log.h"
@@ -298,11 +299,19 @@ void vg_patch_parse_and_apply() {
     }
 
     vg_log_printf("[PATCH] Parsing patchlist.txt\n");
-
     SceUInt32 start = sceKernelGetProcessTimeLow();
-    g_main.patch_status = vg_io_parse(PATCH_PATH, vg_patch_parse_line);
-    SceUInt32 end = sceKernelGetProcessTimeLow();
 
+    char path[128];
+    snprintf(path, 128, "%s/%s.txt", PATCH_FOLDER, g_main.titleid);
+
+    // Try game-specific patch file
+    g_main.patch_status = vg_io_parse(path, vg_patch_parse_line, false);
+    if (g_main.patch_status.code == IO_ERROR_OPEN_FAILED) {
+        // Doesn't exist? Read patchlist.txt
+        g_main.patch_status = vg_io_parse(PATCH_LIST_PATH, vg_patch_parse_line, true);
+    }
+
+    SceUInt32 end = sceKernelGetProcessTimeLow();
     vg_log_printf("[PATCH] Patched %u bytes in %d patches and it took %ums\n",
                     g_patch_applied_size, g_main.inject_num, (end - start) / 1000);
     vg_log_printf("[PATCH] %u total patches found in patchlist.txt\n", g_patch_total_count);

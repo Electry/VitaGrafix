@@ -1,5 +1,6 @@
 #ifndef _IO_H_
 #define _IO_H_
+#include <stdbool.h>
 
 #define IO_MAX_LINE_SIZE 128
 #define IO_CHUNK_SIZE    1024
@@ -28,6 +29,6 @@ typedef struct {
 } vg_io_status_t;
 
 const char *vg_io_status_code_to_string(vg_io_status_code_t code);
-vg_io_status_t vg_io_parse(const char *path, vg_io_status_t (*parse_line_fn)(const char line[]));
+vg_io_status_t vg_io_parse(const char *path, vg_io_status_t (*parse_line_fn)(const char line[]), bool create);
 
 #endif

@@ -27,10 +27,10 @@ const char *vg_io_status_code_to_string(vg_io_status_code_t code) {
     }
 }
 
-vg_io_status_t vg_io_parse(const char *path, vg_io_status_t (*parse_line_fn)(const char line[])) {
+vg_io_status_t vg_io_parse(const char *path, vg_io_status_t (*parse_line_fn)(const char line[]), bool create) {
     vg_io_status_t ret = {IO_OK, 0, 0};
 
-    SceUID fd = sceIoOpen(path, SCE_O_RDONLY | SCE_O_CREAT, 0777);
+    SceUID fd = sceIoOpen(path, SCE_O_RDONLY | (create ? SCE_O_CREAT : 0), 0777);
     if (fd < 0) {
         ret.code = IO_ERROR_OPEN_FAILED;
         goto EXIT;
