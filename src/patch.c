@@ -127,18 +127,30 @@ static vg_io_status_t vg_patch_parse_patch(const char line[]) {
         __ret_status(IO_ERROR_INTERPRETER_ERROR, 0, intp_ret.pos);
     }
 
-    // Readmem for unknown bytes
-    byte_t *vaddr = vg_patch_get_vaddr(segment, offset);
     for (byte_t i = 0; i < patch_data.size; i++) {
-        if (patch_data.unk[i]) {
-            patch_data.data.raw[i] = *(vaddr + i);
-        }
-    }
+        byte_t patch_end_i = patch_data.size;
 
-    // Apply patch
-    bool injected = vg_inject_data(segment, offset, patch_data.data.raw, patch_data.size);
-    if (!injected)
-        __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos);
+        // Skip gap
+        while (i < patch_data.size && patch_data.unk[i]) { i++; }
+        if (i >= patch_data.size)
+            break;
+
+        // Find next gap
+        for (byte_t j = i; j < patch_data.size; j++) {
+            if (patch_data.unk[j]) {
+                patch_end_i = j;
+                break;
+            }
+        }
+
+        // Apply patch
+        bool injected = vg_inject_data(segment, offset + i, &patch_data.data.raw[i], patch_end_i - i);
+        if (!injected)
+            __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos);
+
+        // Skip patch
+        i = patch_end_i;
+    }
 
     __ret_status(IO_OK, 0, 0);
 }
