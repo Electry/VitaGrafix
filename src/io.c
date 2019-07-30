@@ -1,5 +1,6 @@
 #include <vitasdk.h>
 #include <taihen.h>
+#include <stdlib.h>
 
 #include "io.h"
 #include "log.h"
@@ -25,6 +26,68 @@ const char *vg_io_status_code_to_string(vg_io_status_code_t code) {
         case IO_ERROR_INTERPRETER_ERROR: return "Interpreter error.";
         default: return "?";
     }
+}
+
+vg_io_status_t vg_io_parse_section_header(const char line[], char titleid[], char self[], uint32_t *nid) {
+    size_t len = strlen(line);
+    int pos = 0;
+
+    if (TITLEID_LEN + 1 >= len) // Line too short?
+        __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, len);
+
+    // Set defaults
+    strncpy(titleid, TITLEID_ANY, TITLEID_LEN);
+    self[0] = '\0'; // SELF_ANY
+    *nid = NID_ANY;
+
+    // Match opening bracket '['
+    while (isspace(line[pos])) { pos++; }
+    if (line[pos] != '[')
+        __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos);
+    pos++;
+
+    // TITLEID (required)
+    while (isspace(line[pos])) { pos++; }
+    strncpy(titleid, &line[pos], TITLEID_LEN);
+    pos += TITLEID_LEN;
+
+    // SELF & NID (optional)
+    while (isspace(line[pos])) { pos++; }
+    if (line[pos] == ',') {
+        pos++;
+
+        // Peek next separator ',' or ']'
+        int pos_sep = pos;
+        while (line[pos_sep] != '\0'
+                && line[pos_sep] != ','
+                && line[pos_sep] != ']') { pos_sep++; }
+        if (line[pos_sep] == '\0')
+            __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos_sep);
+
+        // SELF
+        while (isspace(line[pos])) { pos++; }
+        strncpy(self, &line[pos], pos_sep - pos);
+        pos = pos_sep;
+
+        // NID
+        if (line[pos] == ',') {
+            pos++;
+            while (isspace(line[pos])) { pos++; }
+            char *end = NULL;
+            *nid = strtoul(&line[pos], &end, 0);
+            if (end == &line[pos])
+                __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos);
+
+            pos += (end - &line[pos]);
+        }
+    }
+
+    // Match closing bracket ']'
+    while (isspace(line[pos])) { pos++; }
+    if (line[pos] != ']')
+        __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos);
+
+    __ret_status(IO_OK, 0, pos);
 }
 
 vg_io_status_t vg_io_parse(const char *path, vg_io_status_t (*parse_line_fn)(const char line[]), bool create) {

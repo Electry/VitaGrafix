@@ -49,29 +49,6 @@ static bool vg_inject_data(int segidx, uint32_t offset, const void *data, size_t
     return true;
 }
 
-static bool vg_patch_is_game(const char titleid[], const char self[], uint32_t nid) {
-    vg_game_support_t supp = GAME_UNSUPPORTED;
-
-    if (!strncasecmp(titleid, TITLEID_ANY, TITLEID_LEN) ||
-            !strncasecmp(titleid, g_main.titleid, TITLEID_LEN)) {
-        if (self[0] == '\0' || strstr(g_main.sce_info.path, self)) {
-            if (nid == NID_ANY || nid == g_main.tai_info.module_nid) {
-                supp = GAME_SUPPORTED;
-            } else {
-                supp = GAME_WRONG_VERSION;
-            }
-        } else {
-            supp = GAME_SELF_SHELL;
-        }
-    }
-
-    // Update global support
-    if (supp > g_main.support)
-        g_main.support = supp;
-
-    return supp == GAME_SUPPORTED;
-}
-
 static byte_t *vg_patch_get_vaddr(uint8_t segment, uint32_t offset) {
     return (byte_t *)((uint32_t)g_main.sce_info.segments[segment].vaddr + offset);
 }
@@ -157,67 +134,18 @@ static vg_io_status_t vg_patch_parse_patch(const char line[]) {
 }
 
 static vg_io_status_t vg_patch_parse_section(const char line[]) {
-    size_t len = strlen(line);
-    int pos = 0;
-
-    if (TITLEID_LEN + 1 >= len) // Line too short?
-        __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, len);
-
     // Parsed values
     char titleid[TITLEID_LEN + 1] = TITLEID_ANY;
     char self[SELF_LEN_MAX + 1] = SELF_ANY;
     uint32_t nid = NID_ANY;
 
-    // Match opening bracket '['
-    while (isspace(line[pos])) { pos++; }
-    if (line[pos] != '[')
-        __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos);
-    pos++;
-
-    // TITLEID (required)
-    while (isspace(line[pos])) { pos++; }
-    strncpy(titleid, &line[pos], TITLEID_LEN);
-    pos += TITLEID_LEN;
-
-    // SELF & NID (optional)
-    while (isspace(line[pos])) { pos++; }
-    if (line[pos] == ',') {
-        pos++;
-
-        // Peek next separator ',' or ']'
-        int pos_sep = pos;
-        while (line[pos_sep] != '\0'
-                && line[pos_sep] != ','
-                && line[pos_sep] != ']') { pos_sep++; }
-        if (line[pos_sep] == '\0')
-            __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos_sep);
-
-        // SELF
-        while (isspace(line[pos])) { pos++; }
-        strncpy(self, &line[pos], pos_sep - pos);
-        pos = pos_sep;
-
-        // NID
-        if (line[pos] == ',') {
-            pos++;
-            while (isspace(line[pos])) { pos++; }
-            char *end = NULL;
-            nid = strtoul(&line[pos], &end, 0);
-            if (end == &line[pos])
-                __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos);
-
-            pos += (end - &line[pos]);
-        }
-    }
-
-    // Match closing bracket ']'
-    while (isspace(line[pos])) { pos++; }
-    if (line[pos] != ']')
-        __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos);
+    vg_io_status_t ret = vg_io_parse_section_header(line, titleid, self, &nid);
+    if (ret.code != IO_OK)
+        return ret;
 
     g_patch_total_count++;
 
-    if (vg_patch_is_game(titleid, self, nid)) {
+    if (vg_main_is_game(titleid, self, nid)) {
         g_patch_section = PATCH_SECTION_GAME;
     } else {
         // If previous patch section didn't have any patches ->

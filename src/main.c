@@ -151,6 +151,29 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
     return TAI_CONTINUE(int, g_main.osd_hook_ref, pParam, sync);
 }
 
+bool vg_main_is_game(const char titleid[], const char self[], uint32_t nid) {
+    vg_game_support_t supp = GAME_UNSUPPORTED;
+
+    if (!strncasecmp(titleid, TITLEID_ANY, TITLEID_LEN) ||
+            !strncasecmp(titleid, g_main.titleid, TITLEID_LEN)) {
+        if (self[0] == '\0' || strstr(g_main.sce_info.path, self)) {
+            if (nid == NID_ANY || nid == g_main.tai_info.module_nid) {
+                supp = GAME_SUPPORTED;
+            } else {
+                supp = GAME_WRONG_VERSION;
+            }
+        } else {
+            supp = GAME_SELF_SHELL;
+        }
+    }
+
+    // Update global support
+    if (supp > g_main.support)
+        g_main.support = supp;
+
+    return supp == GAME_SUPPORTED;
+}
+
 void vg_main_log_header() {
 #ifndef ENABLE_VERBOSE_LOGGING
     // Don't overwrite log

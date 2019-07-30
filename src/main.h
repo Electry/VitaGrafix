@@ -72,4 +72,6 @@ typedef struct {
 
 extern vg_main_t g_main;
 
+bool vg_main_is_game(const char titleid[], const char self[], uint32_t nid);
+
 #endif

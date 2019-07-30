@@ -214,11 +214,16 @@ static vg_io_status_t vg_config_parse_line(const char line[]) {
             return ret;
         }
 
-        // [TITLEID]
-        if (strlen(line) >= TITLEID_LEN + 1
-                && line[0] == '['
-                && !strncasecmp(&line[1], g_main.titleid, TITLEID_LEN)
-                && line[TITLEID_LEN + 1] == ']') {
+        // [TITLEID,SELF,NID]
+        char titleid[TITLEID_LEN + 1] = TITLEID_ANY;
+        char self[SELF_LEN_MAX + 1] = SELF_ANY;
+        uint32_t nid = NID_ANY;
+
+        ret = vg_io_parse_section_header(line, titleid, self, &nid);
+        if (ret.code != IO_OK)
+            return ret;
+
+        if (vg_main_is_game(titleid, self, nid)) {
             g_config_section = CONFIG_SECTION_GAME;
             return ret;
         }

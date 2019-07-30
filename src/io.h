@@ -29,6 +29,7 @@ typedef struct {
 } vg_io_status_t;
 
 const char *vg_io_status_code_to_string(vg_io_status_code_t code);
+vg_io_status_t vg_io_parse_section_header(const char line[], char titleid[], char self[], uint32_t *nid);
 vg_io_status_t vg_io_parse(const char *path, vg_io_status_t (*parse_line_fn)(const char line[]), bool create);
 
 #endif
