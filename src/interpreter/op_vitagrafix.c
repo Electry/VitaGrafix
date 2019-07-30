@@ -36,6 +36,28 @@ bool op_vg_config_fb_height(value_t *out) {
 }
 
 bool op_vg_config_ib_width(value_t *out) {
+    out->type = DATA_TYPE_UNSIGNED;
+    out->size = 4;
+#ifdef BUILD_VITAGRAFIX
+    out->data.uint32 = g_main.config.ib[0].width;
+#else
+    out->data.uint32 = 960;
+#endif
+    return true;
+}
+
+bool op_vg_config_ib_height(value_t *out) {
+    out->type = DATA_TYPE_UNSIGNED;
+    out->size = 4;
+#ifdef BUILD_VITAGRAFIX
+    out->data.uint32 = g_main.config.ib[0].height;
+#else
+    out->data.uint32 = 544;
+#endif
+    return true;
+}
+
+bool op_vg_config_ib_width_i(value_t *out) {
     if ((out->type != DATA_TYPE_UNSIGNED
             && out->type != DATA_TYPE_SIGNED)
             || (out->type == DATA_TYPE_SIGNED && out->data.int32 < 0))
@@ -56,7 +78,7 @@ bool op_vg_config_ib_width(value_t *out) {
     return true;
 }
 
-bool op_vg_config_ib_height(value_t *out) {
+bool op_vg_config_ib_height_i(value_t *out) {
     if ((out->type != DATA_TYPE_UNSIGNED
             && out->type != DATA_TYPE_SIGNED)
             || (out->type == DATA_TYPE_SIGNED && out->data.int32 < 0))

@@ -260,12 +260,14 @@ const intp_testcase_t _TESTS[] = {
     {"2 * nop",         {0x00, 0xBF, 0x00, 0xBF}, 4, DATA_TYPE_RAW},
 
     // VG
-    {"fb_w",    {0xC0, 0x03}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"fb_h",    {0x20, 0x02}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"ib_w(0)", {0xC0, 0x03}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"ib_h(0)", {0x20, 0x02}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"vblank",  {0x01},       INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"msaa",    {0x02},       INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"fb_w",     {0xC0, 0x03}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"fb_h",     {0x20, 0x02}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"ib_w",     {0xC0, 0x03}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"ib_h",     {0x20, 0x02}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"ib_wi(1)", {0xC0, 0x03}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"ib_hi(1)", {0x20, 0x02}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"vblank",   {0x01},       INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"msaa",     {0x02},       INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
 
 #ifdef BUILD_LEGACY_SUPPORT
     // Legacy
@@ -331,7 +333,12 @@ const intp_error_testcase_t _TESTS_ERROR[] = {
     {"1.0 % 5",      INTP_STATUS_ERROR_INVALID_DATATYPE, 4},
 
     // VG
-    {"ib_w(-1)",     INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+#ifdef BUILD_LEGACY_SUPPORT
+    {"ib_w(0)",      INTP_STATUS_ERROR_TOO_MANY_ARGS, 5},
+#else
+    {"ib_w(0)",      INTP_STATUS_ERROR_INVALID_TOKEN, 4},
+#endif
+    {"ib_wi(-1)",    INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
 
     // Terminator
     {"sin(pi$",      INTP_STATUS_ERROR_MISSING_CLOSE_BRACKET, 6},
