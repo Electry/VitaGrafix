@@ -119,7 +119,10 @@ void osd_draw_rectangle(int x, int y, int width, int height) {
     }
 }
 
-void osd_draw_char(const char character, int x, int y) {
+void osd_draw_char(char character, int x, int y) {
+    if (character < FONT_ASCII_BEGIN || character > FONT_ASCII_END)
+        character = '?'; // invalid char
+
     for (int yy = 0; yy < FONT_HEIGHT * g_font_scale; yy++) {
         int yy_font = yy / g_font_scale;
         uint32_t displacement = x + (y + yy) * g_framebuf.pitch;
@@ -134,7 +137,7 @@ void osd_draw_char(const char character, int x, int y) {
 
             // Get px 0/1 from osd_font.h
             int xx_font = xx / g_font_scale;
-            uint32_t char_pos = character * (FONT_HEIGHT * (((FONT_WIDTH - 1) / 8) + 1));
+            uint32_t char_pos = (character - FONT_ASCII_BEGIN) * (FONT_HEIGHT * (((FONT_WIDTH - 1) / 8) + 1));
             uint32_t char_pos_h = char_pos + (yy_font * (((FONT_WIDTH - 1) / 8) + 1));
             uint8_t char_byte = g_font[char_pos_h + (xx_font / 8)];
 
