@@ -31,10 +31,9 @@ static const vg_patch_feature_token_t _FEATURE_TOKENS[FEATURE_INVALID] = {
     {"@MSAA", FEATURE_MSAA}
 };
 
-static bool vg_inject_data(int segidx, uint32_t offset, const void *data, size_t size) {
+static vg_io_status_t vg_inject_data(int segidx, uint32_t offset, const void *data, size_t size) {
     if (g_main.inject_num >= MAX_INJECT_NUM) {
-        vg_log_printf("[PATCH] ERROR: Number of patches exceed maximum allowed!\n");
-        return false;
+        __ret_status(IO_ERROR_TOO_MANY_PATCHES, 0, 0);
     }
 
     vg_log_printf("[PATCH] Patching seg%03d : %08X to", segidx, offset);
@@ -44,9 +43,15 @@ static bool vg_inject_data(int segidx, uint32_t offset, const void *data, size_t
     vg_log_printf(", size=%d\n", size);
 
     g_main.inject[g_main.inject_num] = taiInjectData(g_main.tai_info.modid, segidx, offset, data, size);
+    if (g_main.inject[g_main.inject_num] == 0x90010005) { // TAI_ERROR_PATCH_EXISTS
+        __ret_status(IO_ERROR_TAI_PATCH_EXISTS, 0, 0);
+    } else if (g_main.inject[g_main.inject_num] < 0) {
+        __ret_status(IO_ERROR_TAI_GENERIC, 0, 0);
+    }
+
     g_main.inject_num++;
     g_patch_applied_size += size;
-    return true;
+    __ret_status(IO_OK, 0, 0);
 }
 
 static byte_t *vg_patch_get_vaddr(uint8_t segment, uint32_t offset) {
@@ -122,9 +127,11 @@ static vg_io_status_t vg_patch_parse_patch(const char line[]) {
         }
 
         // Apply patch
-        bool injected = vg_inject_data(segment, offset + i, &patch_data.data.raw[i], patch_end_i - i);
-        if (!injected)
-            __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos);
+        ret = vg_inject_data(segment, offset + i, &patch_data.data.raw[i], patch_end_i - i);
+        if (ret.code != IO_OK) {
+            ret.pos_line = pos; // Update pos
+            return ret;
+        }
 
         // Skip patch
         i = patch_end_i;

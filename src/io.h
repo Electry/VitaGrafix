@@ -19,7 +19,13 @@ typedef enum {
 
     // Syntax error
     IO_ERROR_PARSE_INVALID_TOKEN,
-    IO_ERROR_INTERPRETER_ERROR
+    IO_ERROR_INTERPRETER_ERROR,
+
+    // Patcher error
+    IO_ERROR_TOO_MANY_PATCHES,
+    IO_ERROR_TOO_MANY_HOOKS,
+    IO_ERROR_TAI_PATCH_EXISTS,
+    IO_ERROR_TAI_GENERIC
 } vg_io_status_code_t;
 
 typedef struct {

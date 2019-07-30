@@ -32,6 +32,9 @@ int isspace(int c);
 int isdigit(int c);
 int tolower(int c);
 
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+
 typedef enum {
     GAME_UNSUPPORTED,
     GAME_SELF_SHELL,

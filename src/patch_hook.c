@@ -21,17 +21,20 @@ int vg_hook_sceCtrlReadBufferPositive2_peekPatched(int port, SceCtrlData *pad_da
     return sceCtrlPeekBufferPositive2(port, pad_data, count);
 }
 
-bool vg_hook_function_import(uint32_t nid, const void *func) {
+static vg_io_status_t vg_hook_function_import(uint32_t nid, const void *func) {
     if (g_main.hook_num >= MAX_HOOK_NUM) {
-        vg_log_printf("[HOOK] ERROR: Number of hooks exceed maximum allowed!\n");
-        return false;
+        __ret_status(IO_ERROR_TOO_MANY_HOOKS, 0, 0);
     }
 
     vg_log_printf("[HOOK] Hooking function import nid=0x%X to 0x%X\n", nid, func);
 
     g_main.hook[g_main.hook_num] = taiHookFunctionImport(&g_main.hook_ref[g_main.hook_num], TAI_MAIN_MODULE, TAI_ANY_LIBRARY, nid, func);
+    if (g_main.hook[g_main.hook_num] < 0) {
+        __ret_status(IO_ERROR_TAI_GENERIC, 0, 0);
+    }
+
     g_main.hook_num++;
-    return true;
+    __ret_status(IO_OK, 0, 0);
 }
 
 static vg_io_status_t vg_hook_parse_common(
@@ -76,10 +79,7 @@ vg_io_status_t vg_hook_parse_patch(const char line[]) {
 
     // Apply
     if (shallHook) {
-        if (vg_hook_function_import(importNid, hookPtr))
-            return ret;
-        else
-            __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, 0); // FIXME
+        return vg_hook_function_import(importNid, hookPtr);
     }
 
     return ret;
