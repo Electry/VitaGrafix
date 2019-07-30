@@ -6,6 +6,7 @@ bool op_math_add(value_t *lhs, value_t *rhs);
 bool op_math_subtract(value_t *lhs, value_t *rhs);
 bool op_math_multiply(value_t *lhs, value_t *rhs);
 bool op_math_divide(value_t *lhs, value_t *rhs);
+bool op_math_modulo(value_t *lhs, value_t *rhs);
 
 bool op_math_bitwise_or(value_t *lhs, value_t *rhs);
 bool op_math_bitwise_xor(value_t *lhs, value_t *rhs);

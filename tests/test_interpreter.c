@@ -100,6 +100,11 @@ const intp_testcase_t _TESTS[] = {
     {"6 / -2",      {0xFD, 0xFF, 0xFF, 0xFF}, INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
     {"3 * 4 / 2",   {0x06},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
     {"4 / 2 * 3",   {0x06},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"4 \% 2",      {0x00},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"4 \% 3",      {0x01},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"123 \% 23",   {0x08},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"123 \% -23",  {0x08},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
+    {"-123 \% -23", {0xF8, 0xFF, 0xFF, 0xFF}, INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
 
     // Floats
     {"4f + 3f",     {0x00, 0x00, 0xE0, 0x40}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
@@ -323,6 +328,7 @@ const intp_error_testcase_t _TESTS_ERROR[] = {
     {"DEr + ADr",    INTP_STATUS_ERROR_INVALID_DATATYPE, 4},
     {"abs(DEADr)",   INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
     {"bytes(DE AD) * bytes(DE AD)", INTP_STATUS_ERROR_INVALID_DATATYPE, 13},
+    {"1.0 % 5",      INTP_STATUS_ERROR_INVALID_DATATYPE, 4},
 
     // VG
     {"ib_w(-1)",     INTP_STATUS_ERROR_INVALID_DATATYPE, 0},

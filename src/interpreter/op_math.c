@@ -107,6 +107,16 @@ bool op_math_multiply(value_t *lhs, value_t *rhs)    {
     }
 }
 bool op_math_divide(value_t *lhs, value_t *rhs)      { __math_do_infix_op(lhs, rhs, /); return ret; }
+bool op_math_modulo(value_t *lhs, value_t *rhs) {
+    common_cast(lhs, rhs);
+    switch (lhs->type) {
+        case DATA_TYPE_SIGNED:   lhs->data.int32 %= rhs->data.int32; break;
+        case DATA_TYPE_UNSIGNED: lhs->data.uint32 %= rhs->data.uint32; break;
+        case DATA_TYPE_FLOAT:
+        default:                 return false;
+    }
+    return true;
+}
 
 bool op_math_bitwise_or(value_t *lhs, value_t *rhs)  { __math_do_infix_op_bw(lhs, rhs, |); return ret; }
 bool op_math_bitwise_xor(value_t *lhs, value_t *rhs) { __math_do_infix_op_bw(lhs, rhs, ^); return ret; }

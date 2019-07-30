@@ -23,6 +23,7 @@ const token_t _TOKENS[TOKEN_INVALID + 1] = {
     {10, "-",       TOKEN_SUBTRACT,       TOKEN_INFIX,    (bool *)op_math_subtract},
     {11, "*",       TOKEN_MULTIPLY,       TOKEN_INFIX,    (bool *)op_math_multiply},
     {11, "/",       TOKEN_DIVIDE,         TOKEN_INFIX,    (bool *)op_math_divide},
+    {11, "\%",      TOKEN_MODULO,         TOKEN_INFIX,    (bool *)op_math_modulo},
 
     {6,  "|",       TOKEN_BITWISE_OR,     TOKEN_INFIX,    (bool *)op_math_bitwise_or},
     {7,  "^",       TOKEN_BITWISE_XOR,    TOKEN_INFIX,    (bool *)op_math_bitwise_xor},
