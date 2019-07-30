@@ -53,16 +53,19 @@ uint32_t osd_get_text_width(const char *str) {
 }
 
 void osd_draw_logo(int x, int y) {
+    rgba_t logo_rgba = {.rgba = {255, 255, 255, 255}};
+
     for (int yy = y; yy < y + LOGO_HEIGHT; yy++) {
         for (int xx = x; xx < x + LOGO_WIDTH; xx++) {
             rgba_t *pixel_rgb = (rgba_t *)g_framebuf.base + yy * g_framebuf.pitch + xx;
-            rgba_t *logo_rgba = (rgba_t *)g_logo + (yy - y) * LOGO_WIDTH + (xx - x);
+            const unsigned char *logo_alpha = g_logo + (yy - y) * LOGO_WIDTH + (xx - x);
+            logo_rgba.rgba.a = *logo_alpha;
 
-            if (logo_rgba->rgba.a) { // alpha != 0
-                if (logo_rgba->rgba.a != 0xFF) { // alpha < 255
-                    *pixel_rgb = osd_blend_color(*logo_rgba, *pixel_rgb);
+            if (logo_rgba.rgba.a) { // alpha != 0
+                if (logo_rgba.rgba.a != 0xFF) { // alpha < 255
+                    *pixel_rgb = osd_blend_color(logo_rgba, *pixel_rgb);
                 } else {
-                    *pixel_rgb = *logo_rgba;
+                    *pixel_rgb = logo_rgba;
                 }
             }
         }
