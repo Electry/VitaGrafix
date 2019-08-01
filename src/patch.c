@@ -233,11 +233,10 @@ void vg_patch_parse_and_apply() {
         g_patch_support[i] = FT_UNSUPPORTED;
     }
 
-    vg_log_printf("[PATCH] Parsing patchlist.txt\n");
     SceUInt32 start = sceKernelGetProcessTimeLow();
 
     char path[128];
-    snprintf(path, 128, "%s/%s.txt", PATCH_FOLDER, g_main.titleid);
+    snprintf(path, 128, "%s%s.txt", PATCH_FOLDER, g_main.titleid);
 
     // Try game-specific patch file
     g_main.patch_status = vg_io_parse(path, vg_patch_parse_line, false);
@@ -249,7 +248,7 @@ void vg_patch_parse_and_apply() {
     SceUInt32 end = sceKernelGetProcessTimeLow();
     vg_log_printf("[PATCH] Patched %u bytes in %d patches and it took %ums\n",
                     g_patch_applied_size, g_main.inject_num, (end - start) / 1000);
-    vg_log_printf("[PATCH] %u total patches found in patchlist.txt\n", g_patch_total_count);
+    vg_log_printf("[PATCH] %u total game patches found in patch list\n", g_patch_total_count);
 
     // Mark features as unsupported (those for which patches haven't been found)
     vg_config_set_unsupported_features(g_patch_support);

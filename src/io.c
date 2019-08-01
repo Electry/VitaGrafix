@@ -103,6 +103,8 @@ vg_io_status_t vg_io_parse(const char *path, vg_io_status_t (*parse_line_fn)(con
         goto EXIT;
     }
 
+    vg_log_printf("[IO] Parsing %s\n", path);
+
     int chunk_size = 0;
     char chunk[IO_CHUNK_SIZE] = "";
     int pos = 0, end = 0, end_readable = 0;
