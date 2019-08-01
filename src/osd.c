@@ -160,7 +160,8 @@ void osd_draw_char(char character, int x, int y) {
 void osd_draw_string(int x, int y, const char *str) {
     size_t i_cur_line = 0;
 
-    for (size_t i = 0; i < strlen(str); i++) {
+    size_t slen = strlen(str);
+    for (size_t i = 0; i < slen; i++) {
         if (str[i] == '\n') {
             i_cur_line = 0;
             y += FONT_HEIGHT;

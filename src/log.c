@@ -80,6 +80,8 @@ void vg_log_read(char *dest, int size) {
     else
         sceIoLseek(fd, 0, SCE_SEEK_SET);
 
-    sceIoRead(fd, dest, size);
+    int read = sceIoRead(fd, dest, size - 1);
+    dest[read] = '\0';
+
     sceIoClose(fd);
 }
