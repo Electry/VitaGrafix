@@ -232,8 +232,13 @@ intp_status_t parse_token_raw(const char *expr, uint32_t *pos, value_t *value, c
 
     //printf("DEBUG: Parsing raw data at %d\n", *pos);
 
+    int count = 0;
     while (isxdigit(expr[*pos])) {
-        char byte[3];
+        if (count >= MAX_VALUE_SIZE) {
+            __intp_ret_status(INTP_STATUS_ERROR_INVALID_DATATYPE, *pos);
+        }
+
+        char byte[3] = {0};
         memcpy(&byte, &expr[*pos], 2);
 
         unsigned long tmp = strtoul(byte, &endptr, 16);
@@ -242,6 +247,7 @@ intp_status_t parse_token_raw(const char *expr, uint32_t *pos, value_t *value, c
             __intp_ret_status(INTP_STATUS_ERROR_INVALID_TOKEN, *pos);
         }
 
+        count++;
         (*pos) += endptr - byte;
         if (value != NULL) {
             value->data.raw[value->size] = tmp & 0xFF;

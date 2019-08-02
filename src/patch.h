@@ -3,7 +3,6 @@
 
 #define PATCH_FOLDER      "ux0:data/VitaGrafix/patch/"
 #define PATCH_LIST_PATH   "ux0:data/VitaGrafix/patchlist.txt"
-#define PATCH_MAX_LENGTH  32
 
 typedef enum {
     PATCH_SECTION_NONE,
