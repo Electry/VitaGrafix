@@ -15,7 +15,39 @@ vg_main_t g_main = {0};
 // string buffer
 char g_osd_buffer[STRING_BUFFER_SIZE] = "";
 
-int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
+static int vg_main_get_osd_width() {
+    // TODO: Maybe just snprintf both lines to buf, and then osd_get_text_width(buf) ¯\_(ツ)_/¯
+    int w = 180;      // Fit "960x544" or "60 FPS"
+
+    if (g_main.config.fb_enabled == FT_UNSUPPORTED && g_main.config.ib_enabled == FT_UNSUPPORTED
+            && (g_main.config.msaa_enabled == FT_DISABLED || g_main.config.msaa_enabled == FT_UNSPECIFIED)) {
+        w += 60;      // Fit "MSAA: default"
+    } else if (g_main.config.fb_enabled == FT_DISABLED || g_main.config.fb_enabled == FT_UNSPECIFIED
+            || g_main.config.ib_enabled == FT_DISABLED || g_main.config.ib_enabled == FT_UNSPECIFIED
+            || g_main.config.fps_enabled == FT_DISABLED || g_main.config.fps_enabled == FT_UNSPECIFIED) {
+        w += 50;      // Fit "Res: default" or "FPS: default"
+    } else if (g_main.config.fb_enabled == FT_UNSUPPORTED && g_main.config.ib_enabled == FT_UNSUPPORTED
+            && g_main.config.msaa_enabled == FT_ENABLED) {
+        w += 10;      // Fit "MSAA: 4x"
+    }
+
+    if (g_main.config.ib_enabled == FT_ENABLED) {
+        if (g_main.config.ib[0].width > 999)
+            w += 10;  // Fit "1280x720"
+        if (g_main.config.ib_count > 1)
+            w += 110; // Fit "960x544 >> 720x408"
+    }
+    if ((g_main.config.fb_enabled != FT_UNSUPPORTED || g_main.config.ib_enabled != FT_UNSUPPORTED)
+            && !((g_main.config.fb_enabled == FT_ENABLED || g_main.config.ib_enabled == FT_ENABLED)           // "960x544 (4x)"
+                && (g_main.config.fps_enabled == FT_DISABLED || g_main.config.fps_enabled == FT_UNSPECIFIED)) // "FPS: default"
+            && g_main.config.msaa_enabled == FT_ENABLED) {
+        w += 50;      // Fit "960x544 (4x)" or "Res: default (4x)"
+    }
+
+    return w;
+}
+
+static int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
     // OSD not shown yet? Start the timer
     if (!g_main.osd_timer) {
         g_main.osd_timer = sceKernelGetProcessTimeLow();
@@ -35,20 +67,7 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
     osd_set_back_color(0, 0, 0, 200);
 
     // Background
-    int w = 180;
-    if (g_main.config.ib_count > 1)
-        w += 100; // Fit "960x544 >> 720x408"
-    if ((g_main.config.fb_enabled != FT_UNSUPPORTED
-            || g_main.config.ib_enabled != FT_UNSUPPORTED)
-            && g_main.config.msaa_enabled == FT_ENABLED)
-        w += 45; // Fit "960x544 (4x)"
-    if (g_main.config.fb_enabled == FT_DISABLED || g_main.config.fb_enabled == FT_UNSPECIFIED
-            || g_main.config.ib_enabled == FT_DISABLED || g_main.config.ib_enabled == FT_UNSPECIFIED)
-        w += 45; // Fit "Res: default"
-    if ((g_main.config.fb_enabled == FT_ENABLED && g_main.config.fb.width > 999)
-            || (g_main.config.ib_enabled == FT_ENABLED && g_main.config.ib[0].width > 999))
-        w += 10; // Fit "1280x720"
-    osd_draw_rectangle_fast(20, 20, w, 70);
+    osd_draw_rectangle_fast(20, 20, vg_main_get_osd_width(), 70);
 
     // Logo
     osd_draw_logo(30 + 5, 30); // 60x38
@@ -87,6 +106,7 @@ int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
     }
     // Wrong version
     else if (g_main.support == GAME_WRONG_VERSION) {
+        osd_draw_string(110, y, "Error");
         osd_set_back_color(0, 0, 0, 255);
         osd_draw_string(pParam->width / 2 - osd_get_text_width(OSD_MSG_GAME_WRONG_VERSION) / 2,
                         pParam->height / 2 - 20,
