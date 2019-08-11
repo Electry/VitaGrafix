@@ -16,7 +16,7 @@
 
 #define STRING_BUFFER_SIZE 1024
 
-#define MAX_INJECT_NUM 256
+#define MAX_INJECT_NUM 1024
 #define MAX_HOOK_NUM   4
 
 #define TITLEID_LEN  9
@@ -57,7 +57,7 @@ typedef struct {
     vg_game_support_t support;
 
     // eboot patches
-    uint8_t inject_num;
+    uint32_t inject_num;
     SceUID inject[MAX_INJECT_NUM];
 
     // eboot hooks
