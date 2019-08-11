@@ -195,10 +195,12 @@ const intp_testcase_t _TESTS[] = {
     {"fl32(1)",            {0x00, 0x00, 0x80, 0x3F},  4, DATA_TYPE_RAW},
     {"fl32(1.0)",          {0x00, 0x00, 0x80, 0x3F},  4, DATA_TYPE_RAW},
     {"fl32(pi)",           {0xDB, 0x0F, 0x49, 0x40},  4, DATA_TYPE_RAW},
+#ifdef BUILD_LEGACY_SUPPORT
     {"bytes(pi)",          {0xDB, 0x0F, 0x49, 0x40},  4, DATA_TYPE_RAW},
     {"bytes(DEADBEEFr)",   {0xDE, 0xAD, 0xBE, 0xEF},  4, DATA_TYPE_RAW},
     {"bytes(DEADBEEF)",    {0xDE, 0xAD, 0xBE, 0xEF},  4, DATA_TYPE_RAW},
     {"bytes(DE AD BE EF)", {0xDE, 0xAD, 0xBE, 0xEF},  4, DATA_TYPE_RAW},
+#endif
 
     // Overflow?
     {"int8(4294967295)",   {0xFF},                    1, DATA_TYPE_RAW},
@@ -234,7 +236,9 @@ const intp_testcase_t _TESTS[] = {
     {"NOP",                 {0x00, 0xBF},              2, DATA_TYPE_RAW},
     {"t1_MOV(1, 255)",      {0xFF, 0x21},              2, DATA_TYPE_RAW},
     {"T1_MOV(1, 255)",      {0xFF, 0x21},              2, DATA_TYPE_RAW},
+#ifdef BUILD_LEGACY_SUPPORT
     {"BYTES(deadbeefR)",    {0xDE, 0xAD, 0xBE, 0xEF},  4, DATA_TYPE_RAW},
+#endif
     {"INT16(-32768)",       {0x00, 0x80},              2, DATA_TYPE_RAW},
     {"4F + 3F",             {0x00, 0x00, 0xE0, 0x40},  INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
 
@@ -249,12 +253,16 @@ const intp_testcase_t _TESTS[] = {
     {"float(1) . float(1)", {0x00, 0x00, 0x80, 0x3F, 0x00, 0x00, 0x80, 0x3F}, 8, DATA_TYPE_RAW},
     {"DEr . ADr",             {0xDE, 0xAD}, 2, DATA_TYPE_RAW},
     {"DEr.ADr",               {0xDE, 0xAD}, 2, DATA_TYPE_RAW},
+#ifdef BUILD_LEGACY_SUPPORT
     {"bytes(DE) . bytes(AD)", {0xDE, 0xAD}, 2, DATA_TYPE_RAW},
+#endif
     {"t1_mov(1, 255) . nop",  {0xFF, 0x21, 0x00, 0xBF}, 4, DATA_TYPE_RAW},
 
     // Repeat
+#ifdef BUILD_LEGACY_SUPPORT
     {"bytes(DEAD) *2",  {0xDE, 0xAD, 0xDE, 0xAD}, 4, DATA_TYPE_RAW},
     {"bytes(DEAD) * 2", {0xDE, 0xAD, 0xDE, 0xAD}, 4, DATA_TYPE_RAW},
+#endif
     {"uint8(255) *3",   {0xFF, 0xFF, 0xFF}, 3, DATA_TYPE_RAW},
     {"nop *2",          {0x00, 0xBF, 0x00, 0xBF}, 4, DATA_TYPE_RAW},
     {"2 * nop",         {0x00, 0xBF, 0x00, 0xBF}, 4, DATA_TYPE_RAW},
@@ -286,7 +294,9 @@ const intp_testcase_t _TESTS[] = {
     {"2 . 3 $",      {0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00}, 8, DATA_TYPE_RAW},
     {"2 $. 3",       {0x02, 0x00, 0x00, 0x00}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
     {"t1_mov(1, 255) . nop $",  {0xFF, 0x21, 0x00, 0xBF}, 4, DATA_TYPE_RAW},
+#ifdef BUILD_LEGACY_SUPPORT
     {"bytes(DE AD BE EF)$",     {0xDE, 0xAD, 0xBE, 0xEF}, 4, DATA_TYPE_RAW},
+#endif
 };
 
 const intp_error_testcase_t _TESTS_ERROR[] = {
@@ -300,7 +310,9 @@ const intp_error_testcase_t _TESTS_ERROR[] = {
     {".",         INTP_STATUS_ERROR_INVALID_TOKEN, 0},
     {"f",         INTP_STATUS_ERROR_INVALID_TOKEN, 0},
     {"0 x 123",   INTP_STATUS_ERROR_INVALID_TOKEN, 2},
+#ifdef BUILD_LEGACY_SUPPORT
     {"bytes(0x123)", INTP_STATUS_ERROR_INVALID_TOKEN, 7},
+#endif
     {"1)",        INTP_STATUS_ERROR_INVALID_TOKEN, 1},
     {"1 + ()",    INTP_STATUS_ERROR_INVALID_TOKEN, 5},
     {"()",        INTP_STATUS_ERROR_INVALID_TOKEN, 1},
@@ -329,7 +341,9 @@ const intp_error_testcase_t _TESTS_ERROR[] = {
     // Invalid data type
     {"DEr + ADr",    INTP_STATUS_ERROR_INVALID_DATATYPE, 4},
     {"abs(DEADr)",   INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+#ifdef BUILD_LEGACY_SUPPORT
     {"bytes(DE AD) * bytes(DE AD)", INTP_STATUS_ERROR_INVALID_DATATYPE, 13},
+#endif
     {"1.0 % 5",      INTP_STATUS_ERROR_INVALID_DATATYPE, 4},
     {"FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF r",
                     INTP_STATUS_ERROR_INVALID_DATATYPE, 96},
@@ -351,7 +365,9 @@ const intp_error_testcase_t _TESTS_ERROR[] = {
     {"1 + $",        INTP_STATUS_ERROR_INVALID_TOKEN, 4},
     {"t2_mov(1,$",   INTP_STATUS_ERROR_INVALID_TOKEN, 9},
     {"t2_mov(1, $, 3)", INTP_STATUS_ERROR_INVALID_TOKEN, 10},
+#ifdef BUILD_LEGACY_SUPPORT
     {"bytes(DE AD$BE EF)", INTP_STATUS_ERROR_MISSING_CLOSE_BRACKET, 11},
+#endif
 };
 
 const intp_unk_testcase_t _TESTS_UNK[] = {
