@@ -17,6 +17,15 @@ bool op_datatype_raw_uint16(value_t *lhs) { __datatype_raw_cast_op(lhs, DATA_TYP
 bool op_datatype_raw_uint32(value_t *lhs) { __datatype_raw_cast_op(lhs, DATA_TYPE_UNSIGNED, 4); return true; }
 bool op_datatype_raw_fl32(value_t *lhs)   { __datatype_raw_cast_op(lhs, DATA_TYPE_FLOAT, 4); return true; }
 bool op_datatype_raw_bytes(value_t *lhs)  { __datatype_raw_cast_op(lhs, DATA_TYPE_RAW, lhs->size); return true; }
+bool op_datatype_raw_bytes_n(value_t *lhs, value_t *rhs) {
+    if ((rhs->type != DATA_TYPE_UNSIGNED && rhs->type != DATA_TYPE_SIGNED)
+            || (rhs->type == DATA_TYPE_SIGNED && rhs->data.int32 <= 0)
+            || rhs->data.uint32 == 0)
+        return false;
+
+    __datatype_raw_cast_op(lhs, DATA_TYPE_RAW, rhs->data.uint32);
+    return true;
+}
 
 bool op_datatype_raw_concat(value_t *lhs, value_t *rhs) {
     if (lhs->size + rhs->size > MAX_VALUE_SIZE) {

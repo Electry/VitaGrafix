@@ -64,6 +64,8 @@ const token_t _TOKENS[TOKEN_INVALID + 1] = {
     {52, "uint16",  TOKEN_RAW_UINT16,     TOKEN_ARITY_1,  (bool *)op_datatype_raw_uint16},
     {52, "uint32",  TOKEN_RAW_UINT32,     TOKEN_ARITY_1,  (bool *)op_datatype_raw_uint32},
     {52, "fl32",    TOKEN_RAW_FL32,       TOKEN_ARITY_1,  (bool *)op_datatype_raw_fl32},
+    {52, "rawn",    TOKEN_RAW_RAWN,       TOKEN_ARITY_2,  (bool *)op_datatype_raw_bytes_n},
+    {52, "raw",     TOKEN_RAW_RAW,        TOKEN_ARITY_1,  (bool *)op_datatype_raw_bytes},
 #ifdef BUILD_LEGACY_SUPPORT
     {52, "bytes",   TOKEN_RAW_BYTES,      TOKEN_ARITY_1 | TOKEN_FORCE_RAW,  (bool *)op_datatype_raw_bytes},
 #endif

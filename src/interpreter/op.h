@@ -47,6 +47,7 @@ bool op_datatype_raw_uint16(value_t *lhs);
 bool op_datatype_raw_uint32(value_t *lhs);
 bool op_datatype_raw_fl32(value_t *lhs);
 bool op_datatype_raw_bytes(value_t *lhs);
+bool op_datatype_raw_bytes_n(value_t *lhs, value_t *rhs);
 
 bool op_datatype_raw_concat(value_t *lhs, value_t *rhs);
 

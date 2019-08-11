@@ -70,6 +70,8 @@ typedef enum {
     TOKEN_RAW_UINT16,
     TOKEN_RAW_UINT32,
     TOKEN_RAW_FL32,
+    TOKEN_RAW_RAWN,
+    TOKEN_RAW_RAW,
 #ifdef BUILD_LEGACY_SUPPORT
     TOKEN_RAW_BYTES,
 #endif

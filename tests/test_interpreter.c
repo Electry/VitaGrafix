@@ -201,6 +201,11 @@ const intp_testcase_t _TESTS[] = {
     {"bytes(DEADBEEF)",    {0xDE, 0xAD, 0xBE, 0xEF},  4, DATA_TYPE_RAW},
     {"bytes(DE AD BE EF)", {0xDE, 0xAD, 0xBE, 0xEF},  4, DATA_TYPE_RAW},
 #endif
+    {"raw(pi)",            {0xDB, 0x0F, 0x49, 0x40},  4, DATA_TYPE_RAW},
+    {"raw(DEADBEEFr)",     {0xDE, 0xAD, 0xBE, 0xEF},  4, DATA_TYPE_RAW},
+    {"raw(0xEFBEADDE)",    {0xDE, 0xAD, 0xBE, 0xEF},  4, DATA_TYPE_RAW},
+    {"rawn(DEADBEEFr, 2)", {0xDE, 0xAD},              2, DATA_TYPE_RAW},
+    {"rawn(1.0 >> 16, 2)", {0x80, 0x3F},              2, DATA_TYPE_RAW},
 
     // Overflow?
     {"int8(4294967295)",   {0xFF},                    1, DATA_TYPE_RAW},
