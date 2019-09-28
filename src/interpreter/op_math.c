@@ -172,6 +172,7 @@ bool op_math_fn_max(value_t *lhs, value_t *rhs)      {
     return true;
 }
 bool op_math_fn_pow(value_t *lhs, value_t *rhs)      { __math_do_fn_op_binary(lhs, rhs, pow); return ret; }
+bool op_math_fn_round(value_t *lhs)                  { __math_do_fn_op_unary(lhs, round); return ret; }
 bool op_math_fn_sinh(value_t *lhs)                   { __math_do_fn_op_unary(lhs, sinh); return ret; }
 bool op_math_fn_sin(value_t *lhs)                    { __math_do_fn_op_unary(lhs, sin); return ret; }
 bool op_math_fn_sqrt(value_t *lhs)                   { __math_do_fn_op_unary(lhs, sqrt); return ret; }

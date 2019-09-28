@@ -57,6 +57,7 @@ typedef enum {
     TOKEN_FN_MIN,
     TOKEN_FN_MAX,
     TOKEN_FN_POW,
+    TOKEN_FN_ROUND,
     TOKEN_FN_SINH,
     TOKEN_FN_SIN,
     TOKEN_FN_SQRT,

@@ -51,6 +51,7 @@ const token_t _TOKENS[TOKEN_INVALID + 1] = {
     {50, "min",     TOKEN_FN_MIN,         TOKEN_ARITY_2,  (bool *)op_math_fn_min},
     {50, "max",     TOKEN_FN_MAX,         TOKEN_ARITY_2,  (bool *)op_math_fn_max},
     {50, "pow",     TOKEN_FN_POW,         TOKEN_ARITY_2,  (bool *)op_math_fn_pow},
+    {50, "round",   TOKEN_FN_ROUND,       TOKEN_ARITY_1,  (bool *)op_math_fn_round},
     {50, "sinh",    TOKEN_FN_SINH,        TOKEN_ARITY_1,  (bool *)op_math_fn_sinh},
     {50, "sin",     TOKEN_FN_SIN,         TOKEN_ARITY_1,  (bool *)op_math_fn_sin},
     {50, "sqrt",    TOKEN_FN_SQRT,        TOKEN_ARITY_1,  (bool *)op_math_fn_sqrt},

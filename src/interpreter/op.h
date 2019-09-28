@@ -30,6 +30,7 @@ bool op_math_fn_log10(value_t *lhs);
 bool op_math_fn_min(value_t *lhs, value_t *rhs);
 bool op_math_fn_max(value_t *lhs, value_t *rhs);
 bool op_math_fn_pow(value_t *lhs, value_t *rhs);
+bool op_math_fn_round(value_t *lhs);
 bool op_math_fn_sinh(value_t *lhs);
 bool op_math_fn_sin(value_t *lhs);
 bool op_math_fn_sqrt(value_t *lhs);
