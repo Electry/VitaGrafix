@@ -40,7 +40,7 @@ vg_io_status_t vg_io_parse_section_header(const char line[], char titleid[], cha
         __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, len);
 
     // Set defaults
-    strncpy(titleid, TITLEID_ANY, TITLEID_LEN);
+    strncpy(titleid, TITLEID_ANY, TITLEID_LEN + 1);
     self[0] = '\0'; // SELF_ANY
     *nid = NID_ANY;
 

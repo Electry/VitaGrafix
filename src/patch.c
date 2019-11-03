@@ -54,10 +54,6 @@ static vg_io_status_t vg_inject_data(int segidx, uint32_t offset, const void *da
     __ret_status(IO_OK, 0, 0);
 }
 
-static byte_t *vg_patch_get_vaddr(uint8_t segment, uint32_t offset) {
-    return (byte_t *)((uint32_t)g_main.sce_info.segments[segment].vaddr + offset);
-}
-
 /**
  * Parses segment & offset (e.g. 0:0x12345)
  */

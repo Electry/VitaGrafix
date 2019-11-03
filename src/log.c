@@ -56,7 +56,7 @@ void vg_log_printf(const char *format, ...) {
     if (g_log_buffer_size + print_len >= LOG_BUFFER_SIZE)
         vg_log_flush(); // Flush buffer
 
-    strncpy(&g_log_buffer[g_log_buffer_size], buffer, print_len);
+    strncpy(&g_log_buffer[g_log_buffer_size], buffer, print_len + 1);
     g_log_buffer_size += print_len;
 
     va_end(args);
