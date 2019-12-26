@@ -183,3 +183,25 @@ void osd_draw_stringf(int x, int y, const char *format, ...) {
 
     osd_draw_string(x, y, buffer);
 }
+
+void osd_draw_log(int x, int y, int maxy, const char *str) {
+    size_t slen = strlen(str);
+    if (slen <= 3)
+        return;
+
+    size_t line_end = slen - 1;
+
+    for (int i = slen - 2; i >= 0; i--) {
+        if (i == 0 || str[i - 1] == '\n') {
+            maxy -= FONT_HEIGHT;
+            if (maxy < y)
+                break;
+
+            for (size_t i_cur = 0; i_cur < line_end - i; i_cur++) {
+                osd_draw_char(str[i + i_cur], x + (i_cur * FONT_WIDTH * g_font_scale), (maxy - FONT_HEIGHT));
+            }
+
+            line_end = i - 1;
+        }
+    }
+}

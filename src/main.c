@@ -101,7 +101,7 @@ static int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int s
 
         // Draw first x characters from log
         if (g_main.config.log_enabled) {
-            osd_draw_string(20, 150, g_osd_buffer);
+            osd_draw_log(20, 150, pParam->height, g_osd_buffer);
         }
     }
     // Wrong version

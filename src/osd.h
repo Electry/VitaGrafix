@@ -29,4 +29,6 @@ void osd_draw_char(const char character, int x, int y);
 void osd_draw_string(int x, int y, const char *str);
 void osd_draw_stringf(int x, int y, const char *format, ...);
 
+void osd_draw_log(int x, int y, int maxy, const char *str);
+
 #endif
