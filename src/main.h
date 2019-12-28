@@ -11,7 +11,7 @@
 #define OSD_MSG_IOPLUS_HINT          "Do you have ioPlus installed?"
 #define OSD_MSG_GAME_WRONG_VERSION   "Your game version is not supported :("
 
-#define VG_VERSION         "v5.0.0"
+#define VG_VERSION         "v5.0.1"
 #define VG_FOLDER          "ux0:data/VitaGrafix/"
 
 #define STRING_BUFFER_SIZE 1024
