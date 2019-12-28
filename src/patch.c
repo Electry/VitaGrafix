@@ -20,6 +20,9 @@ static vg_feature_t       g_patch_feature       = FEATURE_INVALID;
 static uint32_t           g_patch_total_count   = 0;
 static uint32_t           g_patch_applied_size  = 0;
 
+// Alternative patchlist path
+static char g_patch_alte_path[PATCH_ALTE_PATH_LEN] = "";
+
 // Feature support, updated according to patchlist.txt entry for current game.
 // Used to update global feature support after patchlist.txt is parsed.
 static vg_feature_state_t g_patch_support[FEATURE_INVALID];
@@ -183,6 +186,31 @@ static vg_io_status_t vg_patch_parse_patch_type(const char line[]) {
     __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, 0);
 }
 
+static vg_io_status_t vg_patch_parse_patch_directive(const char line[]) {
+    int pos, epos;
+    int llen = strlen(line);
+
+    if (!strncasecmp(line, "!USE", 4)) {
+        pos = 4;
+        while (isspace(line[pos])) { pos++; }
+        if (line[pos] != '(')
+            __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos);
+
+        epos = pos++;
+        while (epos < llen - 1 && line[epos] != ')') { epos++; }
+        if (line[epos] != ')')
+            __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, epos);
+
+        // Copy alternative path
+        strncpy(g_patch_alte_path, &line[pos], epos - pos);
+        g_patch_alte_path[epos - pos] = '\0';
+
+        __ret_status(IO_DIRECTIVE_ALTE_FILE, 0, 0);
+    }
+
+    __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, 0);
+}
+
 static vg_io_status_t vg_patch_parse_line(const char line[]) {
     // Check for new section
     if (line[0] == '[') {
@@ -194,6 +222,11 @@ static vg_io_status_t vg_patch_parse_line(const char line[]) {
         // Check for new feature type
         if (line[0] == '@') {
             return vg_patch_parse_patch_type(line);
+        }
+
+        // Check for patcher directive
+        if (line[0] == '!') {
+            return vg_patch_parse_patch_directive(line);
         }
 
         // Parse & apply ENABLED patches/hooks
@@ -236,15 +269,29 @@ void vg_patch_parse_and_apply() {
 
     // Try game-specific patch file
     g_main.patch_status = vg_io_parse(path, vg_patch_parse_line, false);
+
+    // Doesn't exist? Read patchlist.txt
     if (g_main.patch_status.code == IO_ERROR_OPEN_FAILED) {
-        // Doesn't exist? Read patchlist.txt
         g_main.patch_status = vg_io_parse(PATCH_LIST_PATH, vg_patch_parse_line, true);
     }
 
+    // Read alternative patch file if directed to
+    if (g_main.patch_status.code == IO_DIRECTIVE_ALTE_FILE) {
+        g_patch_total_count = 0;
+        snprintf(path, 128, "%s%s.txt", PATCH_FOLDER, g_patch_alte_path);
+        vg_log_printf("[PATCH] Redirecting to %s\n", path);
+        g_main.patch_status = vg_io_parse(path, vg_patch_parse_line, false);
+    }
+
     SceUInt32 end = sceKernelGetProcessTimeLow();
-    vg_log_printf("[PATCH] Patched %u bytes in %d patches and it took %ums\n",
-                    g_patch_applied_size, g_main.inject_num, (end - start) / 1000);
-    vg_log_printf("[PATCH] %u total game patches found in patch list\n", g_patch_total_count);
+
+    if (g_main.inject_num > 0) {
+        vg_log_printf("[PATCH] Patched %u bytes in %d patches and it took %ums\n",
+                        g_patch_applied_size, g_main.inject_num, (end - start) / 1000);
+    }
+    if (g_patch_total_count > 0) {
+        vg_log_printf("[PATCH] %u total game patches found in patch list\n", g_patch_total_count);
+    }
 
     // Mark features as unsupported (those for which patches haven't been found)
     vg_config_set_unsupported_features(g_patch_support);

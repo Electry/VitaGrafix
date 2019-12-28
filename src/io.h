@@ -25,7 +25,10 @@ typedef enum {
     IO_ERROR_TOO_MANY_PATCHES,
     IO_ERROR_TOO_MANY_HOOKS,
     IO_ERROR_TAI_PATCH_EXISTS,
-    IO_ERROR_TAI_GENERIC
+    IO_ERROR_TAI_GENERIC,
+
+    // Patcher directive
+    IO_DIRECTIVE_ALTE_FILE
 } vg_io_status_code_t;
 
 typedef struct {
