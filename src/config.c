@@ -223,7 +223,7 @@ static vg_io_status_t vg_config_parse_line(const char line[]) {
         if (ret.code != IO_OK)
             return ret;
 
-        if (vg_main_is_game(titleid, self, nid)) {
+        if (vg_main_is_game(titleid, self, nid, false)) {
             g_config_section = CONFIG_SECTION_GAME;
             return ret;
         }

@@ -151,7 +151,7 @@ static vg_io_status_t vg_patch_parse_section(const char line[]) {
 
     g_patch_total_count++;
 
-    if (vg_main_is_game(titleid, self, nid)) {
+    if (vg_main_is_game(titleid, self, nid, true)) {
         g_patch_section = PATCH_SECTION_GAME;
     } else {
         // If previous patch section didn't have any patches ->

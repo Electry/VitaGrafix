@@ -171,7 +171,7 @@ static int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int s
     return TAI_CONTINUE(int, g_main.osd_hook_ref, pParam, sync);
 }
 
-bool vg_main_is_game(const char titleid[], const char self[], uint32_t nid) {
+bool vg_main_is_game(const char titleid[], const char self[], uint32_t nid, bool update_support) {
     vg_game_support_t supp = GAME_UNSUPPORTED;
 
     if (!strncasecmp(titleid, TITLEID_ANY, TITLEID_LEN) ||
@@ -188,7 +188,7 @@ bool vg_main_is_game(const char titleid[], const char self[], uint32_t nid) {
     }
 
     // Update global support
-    if (supp > g_main.support)
+    if (update_support && supp > g_main.support)
         g_main.support = supp;
 
     return supp == GAME_SUPPORTED;
