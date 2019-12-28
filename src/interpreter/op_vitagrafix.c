@@ -64,7 +64,7 @@ bool op_vg_config_ib_width_i(value_t *out) {
         return false;
 
 #ifdef BUILD_VITAGRAFIX
-    if (out->data.uint32 > MAX_RES_COUNT)
+    if (out->data.uint32 >= MAX_RES_COUNT)
         return false;
 #endif
 
@@ -85,7 +85,7 @@ bool op_vg_config_ib_height_i(value_t *out) {
         return false;
 
 #ifdef BUILD_VITAGRAFIX
-    if (out->data.uint32 > MAX_RES_COUNT)
+    if (out->data.uint32 >= MAX_RES_COUNT)
         return false;
 #endif
 

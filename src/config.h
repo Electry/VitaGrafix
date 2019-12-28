@@ -92,14 +92,5 @@ typedef struct {
 void vg_config_parse();
 bool vg_config_is_feature_enabled(vg_feature_t feature);
 void vg_config_set_unsupported_features(vg_feature_state_t states[]);
-void vg_config_set_supported_ib_count(uint8_t count);
-
-//void vgConfigSetSupported(VG_FeatureState fb, VG_FeatureState ib, VG_FeatureState fps, VG_FeatureState msaa);
-//void vgConfigSetSupportedIbCount(uint8_t count);
-//uint8_t vgConfigIsFbEnabled();
-//uint8_t vgConfigIsIbEnabled();
-//uint8_t vgConfigIsFpsEnabled();
-//uint8_t vgConfigIsMsaaEnabled();
-//uint8_t vgConfigIsOsdEnabled();
 
 #endif

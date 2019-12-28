@@ -89,7 +89,6 @@ intp_status_t legacy_parse_gen_value(
                     __intp_ret_status(INTP_STATUS_ERROR_VG_IB_OOB, pos + 6);
                 }
 
-                vg_config_set_supported_ib_count(ib_n + 1); // Raise supp. IB count
                 *value = g_main.config.ib[ib_n].width;
                 return ret;
             }
@@ -106,7 +105,6 @@ intp_status_t legacy_parse_gen_value(
                     __intp_ret_status(INTP_STATUS_ERROR_VG_IB_OOB, pos + 6);
                 }
 
-                vg_config_set_supported_ib_count(ib_n + 1); // Raise supp. IB count
                 *value = g_main.config.ib[ib_n].height;
                 return ret;
             }

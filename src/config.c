@@ -256,6 +256,13 @@ void vg_config_set_defaults() {
         g_main.config.msaa_enabled  = FT_DISABLED;
 }
 
+void vg_config_propagate_ib() {
+    for (uint8_t i = g_main.config.ib_count; i < MAX_RES_COUNT; i++) {
+        g_main.config.ib[i].width = g_main.config.ib[i - 1].width;
+        g_main.config.ib[i].height = g_main.config.ib[i - 1].height;
+    }
+}
+
 void vg_config_parse() {
     // Reset
     g_main.config.enabled      = FT_UNSPECIFIED;
@@ -272,6 +279,9 @@ void vg_config_parse() {
 
     // Set unset options to their default values
     vg_config_set_defaults();
+
+    // Propagate last specified IB res. (for multires patches)
+    vg_config_propagate_ib();
 
 #ifdef ENABLE_VERBOSE_LOGGING
     vg_log_printf("[CONFIG] Config:\n");
@@ -305,14 +315,4 @@ void vg_config_set_unsupported_features(vg_feature_state_t states[]) {
     if (states[FEATURE_IB] == FT_UNSUPPORTED)   g_main.config.ib_enabled = FT_UNSUPPORTED;
     if (states[FEATURE_FPS] == FT_UNSUPPORTED)  g_main.config.fps_enabled = FT_UNSUPPORTED;
     if (states[FEATURE_MSAA] == FT_UNSUPPORTED) g_main.config.msaa_enabled = FT_UNSUPPORTED;
-}
-
-void vg_config_set_supported_ib_count(uint8_t count) {
-    if (g_main.config.ib_count > 0 && count > g_main.config.ib_count) {
-        // User did not specify enough res.?
-        for (uint8_t i = g_main.config.ib_count; i < count; i++) {
-            g_main.config.ib[i].width = g_main.config.ib[i - 1].width;
-            g_main.config.ib[i].height = g_main.config.ib[i - 1].height;
-        }
-    }
 }
