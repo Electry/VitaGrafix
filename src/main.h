@@ -5,9 +5,9 @@
 #define OSD_SHOW_DURATION  5 * SECOND
 
 #define OSD_MSG_CONFIG_OPEN_FAILED   "Failed to open config file."
-#define OSD_MSG_CONFIG_ERROR         "An error occured while reading config file."
+#define OSD_MSG_CONFIG_ERROR         "An error occurred while reading config file."
 #define OSD_MSG_PATCH_OPEN_FAILED    "Failed to open patch file."
-#define OSD_MSG_PATCH_ERROR          "An error occured while reading patch file."
+#define OSD_MSG_PATCH_ERROR          "An error occurred while reading patch file."
 #define OSD_MSG_IOPLUS_HINT          "Do you have ioPlus installed?"
 #define OSD_MSG_GAME_WRONG_VERSION   "Your game version is not supported :("
 
