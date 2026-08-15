@@ -2,6 +2,7 @@
 #include <taihen.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "io.h"
 #include "config.h"

@@ -2,6 +2,8 @@
 #include <taihen.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
+#include <strings.h>
 
 #include "io.h"
 #include "log.h"
