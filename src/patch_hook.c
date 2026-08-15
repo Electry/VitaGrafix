@@ -1,6 +1,7 @@
 #include <vitasdk.h>
 #include <taihen.h>
 #include <stdbool.h>
+#include <strings.h>
 
 #include "io.h"
 #include "log.h"

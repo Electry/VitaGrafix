@@ -1,5 +1,6 @@
 #include <vitasdk.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "osd.h"
 #include "osd_font.h"

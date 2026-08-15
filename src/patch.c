@@ -2,6 +2,7 @@
 #include <taihen.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "io.h"
 #include "log.h"
