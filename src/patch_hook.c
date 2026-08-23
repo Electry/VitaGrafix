@@ -11,53 +11,54 @@
 #include "main.h"
 
 int vg_hook_sceDisplaySetFrameBuf_withWait(const SceDisplayFrameBuf *pParam, int sync) {
-    int ret = TAI_CONTINUE(int, g_main.hook_ref[0], pParam, sync);
+    int ret = TAI_CONTINUE(int, g_main.hook_ref[HOOK_DISPLAY_SET_FRAMEBUF_WITH_WAIT], pParam, sync);
     sceDisplayWaitVblankStartMulti(2);
     return ret;
 }
+
 int vg_hook_sceCtrlReadBufferPositive_peekPatched(int port, SceCtrlData *pad_data, int count) {
     return sceCtrlPeekBufferPositive(port, pad_data, count);
 }
+
 int vg_hook_sceCtrlReadBufferPositive2_peekPatched(int port, SceCtrlData *pad_data, int count) {
     return sceCtrlPeekBufferPositive2(port, pad_data, count);
 }
 
-static vg_io_status_t vg_hook_function_import(uint32_t nid, const void *func) {
-    if (g_main.hook_num >= MAX_HOOK_NUM) {
-        __ret_status(IO_ERROR_TOO_MANY_HOOKS, 0, 0);
-    }
-
+static vg_io_status_t vg_hook_function_import(vg_hook_id_t hook_id, uint32_t nid, const void *func) {
     vg_log_printf("[HOOK] Hooking function import nid=0x%X to 0x%X\n", nid, func);
 
-    g_main.hook[g_main.hook_num] = taiHookFunctionImport(&g_main.hook_ref[g_main.hook_num], TAI_MAIN_MODULE, TAI_ANY_LIBRARY, nid, func);
-    if (g_main.hook[g_main.hook_num] < 0) {
+    g_main.hook[hook_id] = taiHookFunctionImport(&g_main.hook_ref[hook_id], TAI_MAIN_MODULE, TAI_ANY_LIBRARY, nid, func);
+    if (g_main.hook[hook_id] < 0) {
         __ret_status(IO_ERROR_TAI_GENERIC, 0, 0);
     }
 
-    g_main.hook_num++;
     __ret_status(IO_OK, 0, 0);
 }
 
-static vg_io_status_t vg_hook_parse_common(
-            const char line[], uint32_t *importNid, void **hookPtr, uint8_t *shallHook) {
+static vg_io_status_t vg_hook_parse_common(const char line[], vg_hook_id_t *hook_id,
+        uint32_t *import_nid, void **hook_ptr, uint8_t *shall_hook) {
     vg_io_status_t ret = {IO_OK, 0, 0};
+    const vg_config_t *config = vg_config_get();
 
     if (!strncasecmp(&line[1], "sceDisplaySetFrameBuf_withWait", 30)) {
-        *importNid = 0x7A410B64;
-        *hookPtr = &vg_hook_sceDisplaySetFrameBuf_withWait;
-        *shallHook = g_main.config.fps_enabled == FT_ENABLED && g_main.config.fps == FPS_30;
+        *hook_id = HOOK_DISPLAY_SET_FRAMEBUF_WITH_WAIT;
+        *import_nid = 0x7A410B64;
+        *hook_ptr = &vg_hook_sceDisplaySetFrameBuf_withWait;
+        *shall_hook = config->fps_enabled == FT_ENABLED && config->fps == FPS_30;
         return ret;
     }
     if (!strncasecmp(&line[1], "sceCtrlReadBufferPositive_peekPatched", 37)) {
-        *importNid = 0x67E7AB83;
-        *hookPtr = &vg_hook_sceCtrlReadBufferPositive_peekPatched;
-        *shallHook = g_main.config.fps_enabled == FT_ENABLED && g_main.config.fps == FPS_60;
+        *hook_id = HOOK_CTRL_READ_BUFFER_POSITIVE;
+        *import_nid = 0x67E7AB83;
+        *hook_ptr = &vg_hook_sceCtrlReadBufferPositive_peekPatched;
+        *shall_hook = config->fps_enabled == FT_ENABLED && config->fps == FPS_60;
         return ret;
     }
     if (!strncasecmp(&line[1], "sceCtrlReadBufferPositive2_peekPatched", 38)) {
-        *importNid = 0xC4226A3E;
-        *hookPtr = &vg_hook_sceCtrlReadBufferPositive2_peekPatched;
-        *shallHook = g_main.config.fps_enabled == FT_ENABLED && g_main.config.fps == FPS_60;
+        *hook_id = HOOK_CTRL_READ_BUFFER_POSITIVE2;
+        *import_nid = 0xC4226A3E;
+        *hook_ptr = &vg_hook_sceCtrlReadBufferPositive2_peekPatched;
+        *shall_hook = config->fps_enabled == FT_ENABLED && config->fps == FPS_60;
         return ret;
     }
 
@@ -68,20 +69,20 @@ static vg_io_status_t vg_hook_parse_common(
  * Parses and applies a common hook
  */
 vg_io_status_t vg_hook_parse_patch(const char line[]) {
-    void *hookPtr;
-    uint32_t importNid;
-    uint8_t shallHook = 0;
+    vg_hook_id_t hook_id;
+    void *hook_ptr;
+    uint32_t import_nid;
+    uint8_t shall_hook = 0;
     vg_io_status_t ret = {IO_OK, 0, 0};
 
     // Check for common hook
-    ret = vg_hook_parse_common(line, &importNid, &hookPtr, &shallHook);
+    ret = vg_hook_parse_common(line, &hook_id, &import_nid, &hook_ptr, &shall_hook);
     if (ret.code != IO_OK)
         return ret;
 
     // Apply
-    if (shallHook) {
-        return vg_hook_function_import(importNid, hookPtr);
-    }
+    if (shall_hook)
+        return vg_hook_function_import(hook_id, import_nid, hook_ptr);
 
     return ret;
 }
