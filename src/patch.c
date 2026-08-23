@@ -35,6 +35,40 @@ static const vg_patch_feature_token_t _FEATURE_TOKENS[FEATURE_INVALID] = {
     {"@MSAA", FEATURE_MSAA}
 };
 
+static void vg_patch_set_interpreter_context() {
+    intp_vg_context_t context = {0};
+
+    context.fb_width = g_main.config.fb.width;
+    context.fb_height = g_main.config.fb.height;
+
+    for (uint8_t i = 0; i < INTP_VG_MAX_RES_COUNT; i++) {
+        context.ib_width[i] = g_main.config.ib[i].width;
+        context.ib_height[i] = g_main.config.ib[i].height;
+    }
+
+    switch (g_main.config.fps) {
+        case FPS_30:
+            context.vblank = 2;
+            context.fps_limit = 30;
+            break;
+        case FPS_20:
+            context.vblank = 3;
+            context.fps_limit = 20;
+            break;
+        case FPS_60:
+        default:
+            context.vblank = 1;
+            context.fps_limit = 60;
+            break;
+    }
+
+    // SCE_GXM_MULTISAMPLE_*
+    context.msaa = g_main.config.msaa == MSAA_4X ? 2 : g_main.config.msaa == MSAA_2X ? 1 : 0;
+    context.msaa_enabled = context.msaa > 0;
+
+    intp_set_vg_context(&context);
+}
+
 static vg_io_status_t vg_inject_data(int segidx, uint32_t offset, const void *data, size_t size) {
     if (g_main.inject_num >= MAX_INJECT_NUM) {
         __ret_status(IO_ERROR_TOO_MANY_PATCHES, 0, 0);
@@ -257,6 +291,8 @@ static vg_io_status_t vg_patch_parse_line(const char line[]) {
 void vg_patch_parse_and_apply() {
     g_patch_section = PATCH_SECTION_NONE;
     g_patch_feature = FEATURE_INVALID;
+
+    vg_patch_set_interpreter_context();
 
     // Reset supported features list
     for (int i = 0; i < FEATURE_INVALID; i++) {
