@@ -2,18 +2,21 @@
 #include <taihen.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
-#include "config.h"
-#include "io.h"
-#include "main.h"
 #include "log.h"
 
 static uint32_t g_log_buffer_size = 0;
 static char     g_log_buffer[LOG_BUFFER_SIZE];
+static bool     g_log_enabled = false;
+
+void vg_log_set_enabled(bool enabled) {
+    g_log_enabled = enabled;
+}
 
 void vg_log_prepare() {
 #ifndef ENABLE_VERBOSE_LOGGING
-    if (g_main.config.log_enabled != FT_ENABLED)
+    if (!g_log_enabled)
         return;
 #endif
 
@@ -24,7 +27,7 @@ void vg_log_prepare() {
 
 void vg_log_flush() {
 #ifndef ENABLE_VERBOSE_LOGGING
-    if (g_main.config.log_enabled != FT_ENABLED)
+    if (!g_log_enabled)
         return;
 #endif
     if (!g_log_buffer_size)
@@ -43,7 +46,7 @@ void vg_log_flush() {
 
 void vg_log_printf(const char *format, ...) {
 #ifndef ENABLE_VERBOSE_LOGGING
-    if (g_main.config.log_enabled != FT_ENABLED)
+    if (!g_log_enabled)
         return;
 #endif
 
@@ -65,9 +68,12 @@ void vg_log_printf(const char *format, ...) {
 
 void vg_log_read(char *dest, int size) {
 #ifndef ENABLE_VERBOSE_LOGGING
-    if (g_main.config.log_enabled != FT_ENABLED)
+    if (!g_log_enabled)
         return;
 #endif
+    if (size <= 0)
+        return;
+
     vg_log_flush();
 
     SceUID fd = sceIoOpen(LOG_PATH, SCE_O_RDONLY | SCE_O_CREAT, 0777);
@@ -82,7 +88,8 @@ void vg_log_read(char *dest, int size) {
         sceIoLseek(fd, 0, SCE_SEEK_SET);
 
     int read = sceIoRead(fd, dest, size - 1);
-    dest[read] = '\0';
+    if (read >= 0)
+        dest[read] = '\0';
 
     sceIoClose(fd);
 }

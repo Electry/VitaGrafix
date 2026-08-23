@@ -16,10 +16,12 @@
 
 #include "interpreter/interpreter.h"
 
+typedef char vg_patch_resolution_limits_must_match[MAX_RES_COUNT == INTP_VG_MAX_RES_COUNT ? 1 : -1];
+
 static vg_patch_section_t g_patch_section       = PATCH_SECTION_NONE;
 static vg_feature_t       g_patch_feature       = FEATURE_INVALID;
-static uint32_t           g_patch_total_count   = 0;
 static uint32_t           g_patch_applied_size  = 0;
+static vg_io_status_t     g_patch_status        = {0};
 
 // Alternative patchlist path
 static char g_patch_alte_path[PATCH_ALTE_PATH_LEN] = "";
@@ -36,17 +38,18 @@ static const vg_patch_feature_token_t _FEATURE_TOKENS[FEATURE_INVALID] = {
 };
 
 static void vg_patch_set_interpreter_context() {
+    const vg_config_t *config = vg_config_get();
     intp_vg_context_t context = {0};
 
-    context.fb_width = g_main.config.fb.width;
-    context.fb_height = g_main.config.fb.height;
+    context.fb_width = config->fb.width;
+    context.fb_height = config->fb.height;
 
-    for (uint8_t i = 0; i < INTP_VG_MAX_RES_COUNT; i++) {
-        context.ib_width[i] = g_main.config.ib[i].width;
-        context.ib_height[i] = g_main.config.ib[i].height;
+    for (int i = 0; i < INTP_VG_MAX_RES_COUNT; i++) {
+        context.ib_width[i] = config->ib[i].width;
+        context.ib_height[i] = config->ib[i].height;
     }
 
-    switch (g_main.config.fps) {
+    switch (config->fps) {
         case FPS_30:
             context.vblank = 2;
             context.fps_limit = 30;
@@ -63,7 +66,7 @@ static void vg_patch_set_interpreter_context() {
     }
 
     // SCE_GXM_MULTISAMPLE_*
-    context.msaa = g_main.config.msaa == MSAA_4X ? 2 : g_main.config.msaa == MSAA_2X ? 1 : 0;
+    context.msaa = config->msaa == MSAA_4X ? 2 : config->msaa == MSAA_2X ? 1 : 0;
     context.msaa_enabled = context.msaa > 0;
 
     intp_set_vg_context(&context);
@@ -95,23 +98,32 @@ static vg_io_status_t vg_inject_data(int segidx, uint32_t offset, const void *da
 /**
  * Parses segment & offset (e.g. 0:0x12345)
  */
-static vg_io_status_t vg_patch_parse_address(
-        const char line[], int *pos, uint8_t *segment, uint32_t *offset) {
+static vg_io_status_t vg_patch_parse_address(const char line[], int *pos, uint8_t *segment, uint32_t *offset) {
 
     char *next = NULL;
 
     // Parse segment
-    *segment = strtoul(&line[*pos], &next, 10); // always base 10
-    (*pos) += (next - &line[*pos]) + 1;
+    if (!isdigit(line[*pos]))
+        __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, *pos);
+    unsigned long segment_value = strtoul(&line[*pos], &next, 10); // always base 10
+    if (next == &line[*pos] || segment_value > UINT8_MAX)
+        __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, *pos);
     if (*next != ':') {
-        __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, (*pos - 1));
+        __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, next - line);
     }
+    *segment = segment_value;
+    *pos = next - line + 1;
 
     // Parse offset
-    *offset = strtoul(&line[*pos], &next, 0);
-    (*pos) += (next - &line[*pos]) + 1;
+    if (!isdigit(line[*pos]))
+        __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, *pos);
+    unsigned long long offset_value = strtoull(&line[*pos], &next, 0);
+    if (next == &line[*pos] || offset_value > UINT32_MAX)
+        __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, *pos);
     if (!isspace(*next))
-        __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, (*pos - 1));
+        __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, next - line);
+    *offset = offset_value;
+    *pos = next - line;
 
     //vg_log_printf("Address: %d:0x%X\n", *segment, *offset);
 
@@ -176,17 +188,18 @@ static vg_io_status_t vg_patch_parse_patch(const char line[]) {
 
 static vg_io_status_t vg_patch_parse_section(const char line[]) {
     // Parsed values
-    char titleid[TITLEID_LEN + 1] = TITLEID_ANY;
-    char self[SELF_LEN_MAX + 1] = SELF_ANY;
-    uint32_t nid = NID_ANY;
+    vg_io_section_header_t header;
 
-    vg_io_status_t ret = vg_io_parse_section_header(line, titleid, self, &nid);
+    vg_io_status_t ret = vg_io_parse_section_header(line, &header);
     if (ret.code != IO_OK)
         return ret;
 
-    g_patch_total_count++;
+    vg_module_match_t match = vg_main_match_current_module(header.titleid, header.self, header.nid, false);
+    if (match > g_main.patch_match) {
+        g_main.patch_match = match;
+    }
 
-    if (vg_main_is_game(titleid, self, nid, true)) {
+    if (match == MODULE_MATCH) {
         g_patch_section = PATCH_SECTION_GAME;
     } else {
         // If previous patch section didn't have any patches ->
@@ -201,7 +214,7 @@ static vg_io_status_t vg_patch_parse_section(const char line[]) {
     g_patch_feature = FEATURE_INVALID;
 
 #ifdef ENABLE_VERBOSE_LOGGING
-    vg_log_printf("[PATCH] Found section [%s] [%s] [0x%X]\n", titleid, self, nid);
+    vg_log_printf("[PATCH] Found section [%s] [%s] [0x%X]\n", header.titleid, header.self, header.nid);
 #endif
     __ret_status(IO_OK, 0, 0);
 }
@@ -209,7 +222,8 @@ static vg_io_status_t vg_patch_parse_section(const char line[]) {
 static vg_io_status_t vg_patch_parse_patch_type(const char line[]) {
     // Check for valid feature type
     for (int i = 0; i < FEATURE_INVALID; i++) {
-        if (!strncasecmp(line, _FEATURE_TOKENS[i].name, strlen(_FEATURE_TOKENS[i].name))) {
+        size_t token_length = strlen(_FEATURE_TOKENS[i].name);
+        if (!strncasecmp(line, _FEATURE_TOKENS[i].name, token_length) && vg_io_is_line_end(line, token_length)) {
             g_patch_support[i] = FT_ENABLED; // mark feature as supported
             g_patch_feature = i;
 
@@ -236,9 +250,15 @@ static vg_io_status_t vg_patch_parse_patch_directive(const char line[]) {
         if (line[epos] != ')')
             __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, epos);
 
+        int path_length = epos - pos;
+        if (path_length >= PATCH_ALTE_PATH_LEN)
+            __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos);
+        if (!vg_io_is_line_end(line, epos + 1))
+            __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, epos + 1);
+
         // Copy alternative path
-        strncpy(g_patch_alte_path, &line[pos], epos - pos);
-        g_patch_alte_path[epos - pos] = '\0';
+        memcpy(g_patch_alte_path, &line[pos], path_length);
+        g_patch_alte_path[path_length] = '\0';
 
         __ret_status(IO_DIRECTIVE_ALTE_FILE, 0, 0);
     }
@@ -288,36 +308,41 @@ static vg_io_status_t vg_patch_parse_line(const char line[]) {
     __ret_status(IO_OK, 0, 0);
 }
 
-void vg_patch_parse_and_apply() {
+vg_io_status_t vg_patch_parse_and_apply() {
     g_patch_section = PATCH_SECTION_NONE;
     g_patch_feature = FEATURE_INVALID;
-
-    vg_patch_set_interpreter_context();
 
     // Reset supported features list
     for (int i = 0; i < FEATURE_INVALID; i++) {
         g_patch_support[i] = FT_UNSUPPORTED;
     }
 
+    vg_patch_set_interpreter_context();
+
     SceUInt32 start = sceKernelGetProcessTimeLow();
-
     char path[128];
-    snprintf(path, 128, "%s%s.txt", PATCH_FOLDER, g_main.titleid);
 
-    // Try game-specific patch file
-    g_main.patch_status = vg_io_parse(path, vg_patch_parse_line, false);
+    // Try title-specific patch file in a title-prefixed patch subdirectory first
+    snprintf(path, 128, "%s%.4s/%s.txt", PATCH_DIR, g_main.titleid, g_main.titleid);
+    g_patch_status = vg_io_parse(path, vg_patch_parse_line, false);
+
+    // Not found? Try title-specific patch in the patch subdirectory
+    if (g_patch_status.code == IO_ERROR_OPEN_FAILED) {
+        snprintf(path, 128, "%s%s.txt", PATCH_DIR, g_main.titleid);
+        g_patch_status = vg_io_parse(path, vg_patch_parse_line, false);
+    }
 
     // Doesn't exist? Read patchlist.txt
-    if (g_main.patch_status.code == IO_ERROR_OPEN_FAILED) {
-        g_main.patch_status = vg_io_parse(PATCH_LIST_PATH, vg_patch_parse_line, true);
+    if (g_patch_status.code == IO_ERROR_OPEN_FAILED) {
+        snprintf(path, 128, "%s", PATCH_LIST_PATH);
+        g_patch_status = vg_io_parse(path, vg_patch_parse_line, false);
     }
 
     // Read alternative patch file if directed to
-    if (g_main.patch_status.code == IO_DIRECTIVE_ALTE_FILE) {
-        g_patch_total_count = 0;
-        snprintf(path, 128, "%s%s.txt", PATCH_FOLDER, g_patch_alte_path);
+    if (g_patch_status.code == IO_DIRECTIVE_ALTE_FILE) {
+        snprintf(path, 128, "%s%s.txt", PATCH_DIR, g_patch_alte_path);
         vg_log_printf("[PATCH] Redirecting to %s\n", path);
-        g_main.patch_status = vg_io_parse(path, vg_patch_parse_line, false);
+        g_patch_status = vg_io_parse(path, vg_patch_parse_line, false);
     }
 
     SceUInt32 end = sceKernelGetProcessTimeLow();
@@ -326,10 +351,14 @@ void vg_patch_parse_and_apply() {
         vg_log_printf("[PATCH] Patched %u bytes in %d patches and it took %ums\n",
                         g_patch_applied_size, g_main.inject_num, (end - start) / 1000);
     }
-    if (g_patch_total_count > 0) {
-        vg_log_printf("[PATCH] %u total game patches found in patch list\n", g_patch_total_count);
-    }
 
     // Mark features as unsupported (those for which patches haven't been found)
-    vg_config_set_unsupported_features(g_patch_support);
+    vg_config_apply_patch_capabilities(g_patch_support);
+
+    // NOTE: Patches injected before a parse failure remain active
+    return g_patch_status;
+}
+
+const vg_io_status_t *vg_patch_get_status() {
+    return &g_patch_status;
 }

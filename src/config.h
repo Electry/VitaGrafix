@@ -1,10 +1,13 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 #include <stdbool.h>
+#include "io.h"
 
-#define MAX_RES_COUNT      16
+#define MAX_RES_COUNT 16
+#define FRAMEBUFFER_RESOLUTION_COUNT 4
 
-#define CONFIG_PATH        "ux0:data/VitaGrafix/config.txt"
+#define CONFIG_PATH "ux0:data/VitaGrafix/config.txt"
+#define CONFIG_DIR  "ux0:data/VitaGrafix/config/"
 
 typedef enum {
     CONFIG_SECTION_NONE,
@@ -70,7 +73,8 @@ typedef struct {
 
 typedef enum {
     CONFIG_OPTION_FEATURE_STATE,
-    CONFIG_OPTION_RESOLUTION,
+    CONFIG_OPTION_FRAMEBUFFER_RESOLUTION,
+    CONFIG_OPTION_INTERNAL_BUFFER_RESOLUTION,
     CONFIG_OPTION_FRAMERATE,
     CONFIG_OPTION_MSAA
 } vg_config_parse_option_type_t;
@@ -88,9 +92,15 @@ typedef struct {
     uint8_t *count;
 } vg_config_parse_option_t;
 
+extern const vg_res_t vg_config_framebuffer_resolutions[FRAMEBUFFER_RESOLUTION_COUNT];
 
-void vg_config_parse();
+void vg_config_propagate_ib();
+vg_io_status_t vg_config_parse();
+vg_config_t *vg_config_get();
+const vg_io_status_t *vg_config_get_status();
 bool vg_config_is_feature_enabled(vg_feature_t feature);
-void vg_config_set_unsupported_features(vg_feature_state_t states[]);
+bool vg_config_is_feature_supported(vg_feature_t feature);
+
+void vg_config_apply_patch_capabilities(vg_feature_state_t states[]);
 
 #endif

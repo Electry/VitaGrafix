@@ -23,27 +23,27 @@ const char *vg_io_status_code_to_string(vg_io_status_code_t code) {
         case IO_OK: return "All OK!";
         case IO_ERROR_LINE_TOO_LONG: return "Line too long.";
         case IO_ERROR_OPEN_FAILED: return "Failed to open the file.";
+        case IO_ERROR_READ_FAILED: return "Failed to read the file.";
         case IO_ERROR_PARSE_INVALID_TOKEN: return "Invalid token.";
         case IO_ERROR_INTERPRETER_ERROR: return "Interpreter error.";
         case IO_ERROR_TOO_MANY_PATCHES: return "Too many patches, limit: " TOSTRING(MAX_INJECT_NUM);
-        case IO_ERROR_TOO_MANY_HOOKS: return "Too many hooks, limit: " TOSTRING(MAX_HOOK_NUM);
         case IO_ERROR_TAI_PATCH_EXISTS: return "Memory already patched.";
         case IO_ERROR_TAI_GENERIC: return "Unknown TAI error.";
         default: return "?";
     }
 }
 
-vg_io_status_t vg_io_parse_section_header(const char line[], char titleid[], char self[], uint32_t *nid) {
-    size_t len = strlen(line);
+bool vg_io_is_line_end(const char line[], int pos) {
+    while (isspace(line[pos])) { pos++; }
+    return line[pos] == '\0' || line[pos] == '#';
+}
+
+vg_io_status_t vg_io_parse_section_header(const char line[], vg_io_section_header_t *header) {
     int pos = 0;
 
-    if (TITLEID_LEN + 1 >= len) // Line too short?
-        __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, len);
-
     // Set defaults
-    strncpy(titleid, TITLEID_ANY, TITLEID_LEN + 1);
-    self[0] = '\0'; // SELF_ANY
-    *nid = NID_ANY;
+    memset(header, 0, sizeof(*header));
+    header->nid = NID_ANY;
 
     // Match opening bracket '['
     while (isspace(line[pos])) { pos++; }
@@ -53,7 +53,13 @@ vg_io_status_t vg_io_parse_section_header(const char line[], char titleid[], cha
 
     // TITLEID (required)
     while (isspace(line[pos])) { pos++; }
-    strncpy(titleid, &line[pos], TITLEID_LEN);
+    for (int i = 0; i < TITLEID_LEN; i++) {
+        char c = line[pos + i];
+        if (c == '\0' || !(isalpha(c) || isdigit(c)))
+            __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos + i);
+    }
+    memcpy(header->titleid, &line[pos], TITLEID_LEN);
+    header->titleid[TITLEID_LEN] = '\0';
     pos += TITLEID_LEN;
 
     // SELF & NID (optional)
@@ -71,7 +77,13 @@ vg_io_status_t vg_io_parse_section_header(const char line[], char titleid[], cha
 
         // SELF
         while (isspace(line[pos])) { pos++; }
-        strncpy(self, &line[pos], pos_sep - pos);
+        int pos_self_end = pos_sep;
+        while (pos_self_end > pos && isspace(line[pos_self_end - 1])) { pos_self_end--; }
+        size_t self_length = pos_self_end - pos;
+        if (self_length > SELF_LEN_MAX)
+            __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos);
+        memcpy(header->self, &line[pos], self_length);
+        header->self[self_length] = '\0';
         pos = pos_sep;
 
         // NID
@@ -79,7 +91,7 @@ vg_io_status_t vg_io_parse_section_header(const char line[], char titleid[], cha
             pos++;
             while (isspace(line[pos])) { pos++; }
             char *end = NULL;
-            *nid = strtoul(&line[pos], &end, 0);
+            header->nid = strtoul(&line[pos], &end, 0);
             if (end == &line[pos])
                 __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos);
 
@@ -90,6 +102,9 @@ vg_io_status_t vg_io_parse_section_header(const char line[], char titleid[], cha
     // Match closing bracket ']'
     while (isspace(line[pos])) { pos++; }
     if (line[pos] != ']')
+        __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos);
+    pos++;
+    if (!vg_io_is_line_end(line, pos))
         __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos);
 
     __ret_status(IO_OK, 0, pos);
@@ -111,7 +126,7 @@ vg_io_status_t vg_io_parse(const char *path, vg_io_status_t (*parse_line_fn)(con
     int pos = 0, end = 0, end_readable = 0;
     int line_counter = 0;
 
-    while ((chunk_size = sceIoRead(fd, chunk, IO_CHUNK_SIZE)) > 1) {
+    while ((chunk_size = sceIoRead(fd, chunk, IO_CHUNK_SIZE)) > 0) {
 #ifdef ENABLE_VERBOSE_LOGGING
         vg_log_printf("[IO] DEBUG: Parsing new chunk, size=%d\n", chunk_size);
 #endif
@@ -187,6 +202,10 @@ NEXT_LINE:
         // EOF
         if (chunk_size < IO_CHUNK_SIZE)
             break;
+    }
+
+    if (chunk_size < 0) {
+        ret.code = IO_ERROR_READ_FAILED;
     }
 
 EXIT_CLOSE:

@@ -12,35 +12,29 @@
 #define OSD_MSG_GAME_WRONG_VERSION   "Your game version is not supported :("
 
 #define VG_VERSION         "v6.0.0-dev"
-#define VG_FOLDER          "ux0:data/VitaGrafix/"
+#define VG_DIR             "ux0:data/VitaGrafix/"
 
 #define STRING_BUFFER_SIZE 1024
 
 #define MAX_INJECT_NUM 1024
-#define MAX_HOOK_NUM   4
+#define MAX_HOOK_NUM   3
 
-#define TITLEID_LEN  9
 #define TITLEID_ANY  "XXXXxxxxx"
-
-#define SELF_LEN_MAX 32
-#define SELF_ANY     ""
-#define SELF_EBOOT   "eboot.bin"
-
-#define NID_ANY      0
 
 int isspace(int c);
 int isdigit(int c);
+int isalpha(int c);
 int tolower(int c);
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
 
 typedef enum {
-    GAME_UNSUPPORTED,
-    GAME_SELF_SHELL,
-    GAME_WRONG_VERSION,
-    GAME_SUPPORTED
-} vg_game_support_t;
+    MODULE_TITLE_MISMATCH,
+    MODULE_SELF_MISMATCH,
+    MODULE_NID_MISMATCH,
+    MODULE_MATCH
+} vg_module_match_t;
 
 typedef struct {
     // OSD hook
@@ -53,28 +47,21 @@ typedef struct {
     tai_module_info_t tai_info;
     SceKernelModuleInfo sce_info;
 
-    // game support
-    vg_game_support_t support;
+    vg_module_match_t patch_match;
 
     // eboot patches
     uint32_t inject_num;
     SceUID inject[MAX_INJECT_NUM];
 
     // eboot hooks
-    uint8_t hook_num;
     SceUID hook[MAX_HOOK_NUM];
     tai_hook_ref_t hook_ref[MAX_HOOK_NUM];
 
-    // user config
-    vg_io_status_t config_status;
-    vg_config_t config;
-
-    // patchlist
-    vg_io_status_t patch_status;
 } vg_main_t;
 
 extern vg_main_t g_main;
 
-bool vg_main_is_game(const char titleid[], const char self[], uint32_t nid, bool update_support);
+const char *vg_main_get_self_filename();
+vg_module_match_t vg_main_match_current_module(const char titleid[], const char self[], uint32_t nid, bool require_exact_module);
 
 #endif

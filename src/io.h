@@ -5,6 +5,10 @@
 #define IO_MAX_LINE_SIZE 128
 #define IO_CHUNK_SIZE    1024
 
+#define TITLEID_LEN  9
+#define SELF_LEN_MAX 32
+#define NID_ANY      0
+
 #define __ret_status(code, line, pos_line) {\
     vg_io_status_t ret = {code, line, pos_line};\
     return ret;\
@@ -16,6 +20,7 @@ typedef enum {
     // I/O error
     IO_ERROR_LINE_TOO_LONG,
     IO_ERROR_OPEN_FAILED,
+    IO_ERROR_READ_FAILED,
 
     // Syntax error
     IO_ERROR_PARSE_INVALID_TOKEN,
@@ -23,7 +28,6 @@ typedef enum {
 
     // Patcher error
     IO_ERROR_TOO_MANY_PATCHES,
-    IO_ERROR_TOO_MANY_HOOKS,
     IO_ERROR_TAI_PATCH_EXISTS,
     IO_ERROR_TAI_GENERIC,
 
@@ -37,8 +41,15 @@ typedef struct {
     uint32_t pos_line;
 } vg_io_status_t;
 
+typedef struct {
+    char titleid[TITLEID_LEN + 1];
+    char self[SELF_LEN_MAX + 1];
+    uint32_t nid;
+} vg_io_section_header_t;
+
 const char *vg_io_status_code_to_string(vg_io_status_code_t code);
-vg_io_status_t vg_io_parse_section_header(const char line[], char titleid[], char self[], uint32_t *nid);
+bool vg_io_is_line_end(const char line[], int pos);
+vg_io_status_t vg_io_parse_section_header(const char line[], vg_io_section_header_t *header);
 vg_io_status_t vg_io_parse(const char *path, vg_io_status_t (*parse_line_fn)(const char line[]), bool create);
 
 #endif

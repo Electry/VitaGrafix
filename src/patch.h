@@ -1,8 +1,11 @@
 #ifndef _PATCH_H_
 #define _PATCH_H_
 
-#define PATCH_FOLDER      "ux0:data/VitaGrafix/patch/"
-#define PATCH_LIST_PATH   "ux0:data/VitaGrafix/patchlist.txt"
+#include "io.h"
+#include "config.h"
+
+#define PATCH_DIR       "ux0:data/VitaGrafix/patch/"
+#define PATCH_LIST_PATH "ux0:data/VitaGrafix/patchlist.txt"
 
 #define PATCH_ALTE_PATH_LEN 32
 
@@ -16,6 +19,7 @@ typedef struct {
     vg_feature_t type;
 } vg_patch_feature_token_t;
 
-void vg_patch_parse_and_apply();
+vg_io_status_t vg_patch_parse_and_apply();
+const vg_io_status_t *vg_patch_get_status();
 
 #endif
