@@ -45,9 +45,11 @@ static uint32_t op_encode_vfp_expand_imm(uint8_t imm8) {
 }
 
 static bool op_encode_find_arm_imm(uint32_t value, uint16_t *encoded_imm12) {
-    for (uint16_t candidate = 0; candidate < 0x1000; candidate++) {
-        if (op_encode_ror(candidate & 0xFF, ((candidate >> 8) & 0xF) * 2) == value) {
-            *encoded_imm12 = candidate;
+    for (uint8_t rotate = 0; rotate < 16; rotate++) {
+        uint8_t amount = rotate * 2;
+        uint32_t imm8 = op_encode_ror(value, (32 - amount) & 31);
+        if (imm8 <= UINT8_MAX) {
+            *encoded_imm12 = (rotate << 8) | imm8;
             return true;
         }
     }
