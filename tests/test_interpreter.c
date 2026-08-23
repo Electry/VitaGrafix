@@ -40,24 +40,24 @@ const intp_testcase_t _TESTS[] = {
     {"-0x123",    {0xDD, 0xFE, 0xFF, 0xFF}, INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
 
     // Raw primitives
-    {"12 34 r",   {0x12, 0x34},             2,                   DATA_TYPE_RAW},
-    {"12 34r",    {0x12, 0x34},             2,                   DATA_TYPE_RAW},
-    {"1234r",     {0x12, 0x34},             2,                   DATA_TYPE_RAW},
-    {"1234 r",    {0x12, 0x34},             2,                   DATA_TYPE_RAW},
-    {"DEADBEEFr", {0xDE, 0xAD, 0xBE, 0xEF}, 4,                   DATA_TYPE_RAW},
+    {"12 34 r",   {0x12, 0x34},             2, DATA_TYPE_RAW},
+    {"12 34r",    {0x12, 0x34},             2, DATA_TYPE_RAW},
+    {"1234r",     {0x12, 0x34},             2, DATA_TYPE_RAW},
+    {"1234 r",    {0x12, 0x34},             2, DATA_TYPE_RAW},
+    {"DEADBEEFr", {0xDE, 0xAD, 0xBE, 0xEF}, 4, DATA_TYPE_RAW},
 
     // Constants
     {"pi",        {0xDB, 0x0F, 0x49, 0x40}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
     {"e",         {0x54, 0xF8, 0x2D, 0x40}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
 
     // min/max
-    {"4294967295",    {0xFF, 0xFF, 0xFF, 0xFF},  INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"-2147483648",   {0x00, 0x00, 0x00, 0x80},  INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
-    {"1.9999999",     {0xFF, 0xFF, 0xFF, 0x3F},  INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
-    {"3.4028235E38",  {0xFF, 0xFF, 0x7F, 0x7F},  INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
-    {"-3.4028235E38", {0xFF, 0xFF, 0x7F, 0xFF},  INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
-    {"0xFFFFFFFF",    {0xFF, 0xFF, 0xFF, 0xFF},  INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"-0x80000000",   {0x00, 0x00, 0x00, 0x80},  INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
+    {"4294967295",    {0xFF, 0xFF, 0xFF, 0xFF}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"-2147483648",   {0x00, 0x00, 0x00, 0x80}, INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
+    {"1.9999999",     {0xFF, 0xFF, 0xFF, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"3.4028235E38",  {0xFF, 0xFF, 0x7F, 0x7F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"-3.4028235E38", {0xFF, 0xFF, 0x7F, 0xFF}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"0xFFFFFFFF",    {0xFF, 0xFF, 0xFF, 0xFF}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"-0x80000000",   {0x00, 0x00, 0x00, 0x80}, INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
     {"FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF r",
         {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
          0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
@@ -107,46 +107,46 @@ const intp_testcase_t _TESTS[] = {
     {"-123 \% -23", {0xF8, 0xFF, 0xFF, 0xFF}, INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
 
     // Floats
-    {"4f + 3f",     {0x00, 0x00, 0xE0, 0x40}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
-    {"4f - 3f",     {0x00, 0x00, 0x80, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
-    {"4f / 3f",     {0xAB, 0xAA, 0xAA, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
-    {"4f * 3f",     {0x00, 0x00, 0x40, 0x41}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"4f + 3f", {0x00, 0x00, 0xE0, 0x40}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"4f - 3f", {0x00, 0x00, 0x80, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"4f / 3f", {0xAB, 0xAA, 0xAA, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"4f * 3f", {0x00, 0x00, 0x40, 0x41}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
 
     // Bitwise
-    {"2 << 1",      {0x04},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"16>>2",       {0x04},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"6 & 2",       {0x02},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"3 | 4",       {0x07},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"255^0",       {0xFF},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"255^255",     {0x00},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"2 << 1",  {0x04}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"16>>2",   {0x04}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"6 & 2",   {0x02}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"3 | 4",   {0x07}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"255^0",   {0xFF}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"255^255", {0x00}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
 
     // Operator precedence
-    {"8 / 2 - 2",   {0x02},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"8 - 2 / 2",   {0x07},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"(8 - 2)/2",   {0x03},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"(8*2-1)/5",   {0x03},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"10+2/2*5",    {0x0F},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"2*(3+2)*2",   {0x14},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"10 & 2 | 8 << 1", {0x12},               INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"16 & (2 | 8)<<1", {0x10},               INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"8 / 2 - 2",       {0x02}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"8 - 2 / 2",       {0x07}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"(8 - 2)/2",       {0x03}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"(8*2-1)/5",       {0x03}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"10+2/2*5",        {0x0F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"2*(3+2)*2",       {0x14}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"10 & 2 | 8 << 1", {0x12}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"16 & (2 | 8)<<1", {0x10}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
 
     // Math fns
-    {"sin(pi / 2)", {0x00, 0x00, 0x80, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
-    {"tan(pi / 4)", {0x00, 0x00, 0x80, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
-    {"abs(1)",      {0x01},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"abs((1))",    {0x01},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"abs(    ( 1  ) )", {0x01},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"abs(-1)",     {0x01},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
-    {"abs(-1.0)",   {0x00, 0x00, 0x80, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
-    {"abs(1.0)",    {0x00, 0x00, 0x80, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
-    {"min(1,-5)",   {0xFB, 0xFF, 0xFF, 0xFF}, INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
-    {"max(-1,5)",   {0x05},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
-    {"align(720,32)", {0xE0, 0x02},           INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"align(736,32)", {0xE0, 0x02},           INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"align(737,32)", {0x00, 0x03},           INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"align(-16,32)", {0x00},                 INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
-    {"align(0.5,1.0)", {0x00, 0x00, 0x80, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
-    {"align(-0.5,1.0)", {0x00, 0x00, 0x00, 0x80}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"sin(pi / 2)",        {0x00, 0x00, 0x80, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"tan(pi / 4)",        {0x00, 0x00, 0x80, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"abs(1)",             {0x01},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"abs((1))",           {0x01},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"abs(    ( 1  ) )",   {0x01},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"abs(-1)",            {0x01},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
+    {"abs(-1.0)",          {0x00, 0x00, 0x80, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"abs(1.0)",           {0x00, 0x00, 0x80, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"min(1,-5)",          {0xFB, 0xFF, 0xFF, 0xFF}, INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
+    {"max(-1,5)",          {0x05},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
+    {"align(720,32)",      {0xE0, 0x02},             INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"align(736,32)",      {0xE0, 0x02},             INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"align(737,32)",      {0x00, 0x03},             INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"align(-16,32)",      {0x00},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
+    {"align(0.5,1.0)",     {0x00, 0x00, 0x80, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"align(-0.5,1.0)",    {0x00, 0x00, 0x00, 0x80}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
     {"align(720, -32)",    {0xE0, 0x02},             INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
     {"align(720, 32.0)",   {0x00, 0x00, 0x38, 0x44}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
     {"align(720, -32.0)",  {0x00, 0x00, 0x38, 0x44}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
@@ -166,17 +166,17 @@ const intp_testcase_t _TESTS[] = {
     {"pow(-2, 15)",       {0x00, 0x80, 0xFF, 0xFF},  INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
 
     // Auto type casting
-    {"4f + 3",     {0x00, 0x00, 0xE0, 0x40}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
-    {"4 - 3f",     {0x00, 0x00, 0x80, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
-    {"4f + -3",    {0x00, 0x00, 0x80, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
-    {"-4 + 3f",    {0x00, 0x00, 0x80, 0xBF}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"4f + 3",  {0x00, 0x00, 0xE0, 0x40}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"4 - 3f",  {0x00, 0x00, 0x80, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"4f + -3", {0x00, 0x00, 0x80, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"-4 + 3f", {0x00, 0x00, 0x80, 0xBF}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
 
     // Manual type casting
-    {"int(3)",     {0x03},   INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
-    {"int(3.0)",   {0x03},   INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
+    {"int(3)",     {0x03},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
+    {"int(3.0)",   {0x03},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
     {"int(-3.0)",  {0xFD, 0xFF, 0xFF, 0xFF}, INTP_PRIMITIVE_SIZE, DATA_TYPE_SIGNED},
-    {"uint(3)",    {0x03},   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"uint(3.0)",  {0x03},   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"uint(3)",    {0x03},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"uint(3.0)",  {0x03},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
     {"uint(-3)",   {0xFD, 0xFF, 0xFF, 0xFF}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
     {"float(3)",   {0x00, 0x00, 0x40, 0x40}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
     {"float(-3)",  {0x00, 0x00, 0x40, 0xC0}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
@@ -217,73 +217,79 @@ const intp_testcase_t _TESTS[] = {
     {"uint16(4294967295)", {0xFF, 0xFF},              2, DATA_TYPE_RAW},
 
     // Encoders
-    {"nop",                 {0x00, 0xBF},              2, DATA_TYPE_RAW},
-    {"bkpt",                {0x00, 0xBE},              2, DATA_TYPE_RAW},
-    {"t1_mov(1, 255)",      {0xFF, 0x21},              2, DATA_TYPE_RAW},
-    {"t2_mov(1,2,720/2*2)", {0x5F, 0xF4, 0x34, 0x72},  4, DATA_TYPE_RAW},
-    {"t3_mov(2,739)",       {0x40, 0xF2, 0xE3, 0x22},  4, DATA_TYPE_RAW},
-    {"t1_movt( 3 , 42 )",   {0xC0, 0xF2, 0x2A, 0x03},  4, DATA_TYPE_RAW},
-    {"a1_mov(1,5,255)",     {0xFF, 0x50, 0xB0, 0xE3},  4, DATA_TYPE_RAW},
-    {"a2_mov(1,736)",       {0xE0, 0x12, 0x00, 0xE3},  4, DATA_TYPE_RAW},
-    {"t2_vmov(1, 1.0)",     {0xF7, 0xEE, 0x00, 0x0A},  4, DATA_TYPE_RAW},
-    {"t2_vmov(8, -1.5)",    {0xBF, 0xEE, 0x08, 0x4A},  4, DATA_TYPE_RAW},
-    {"t2_vmov(16, 31.0)",   {0xB3, 0xEE, 0x0F, 0x8A},  4, DATA_TYPE_RAW},
+    {"nop",                       {0x00, 0xBF},             2, DATA_TYPE_RAW},
+    {"bkpt",                      {0x00, 0xBE},             2, DATA_TYPE_RAW},
+    {"t1_mov(1, 255)",            {0xFF, 0x21},             2, DATA_TYPE_RAW},
+    {"t2_mov(1,2,720/2*2)",       {0x5F, 0xF4, 0x34, 0x72}, 4, DATA_TYPE_RAW},
+    {"t2_mov(0,15,1)",            {0x4F, 0xF0, 0x01, 0x0F}, 4, DATA_TYPE_RAW},
+    {"t3_mov(2,739)",             {0x40, 0xF2, 0xE3, 0x22}, 4, DATA_TYPE_RAW},
+    {"t1_movt( 3 , 42 )",         {0xC0, 0xF2, 0x2A, 0x03}, 4, DATA_TYPE_RAW},
+    {"a1_mov(1,5,255)",           {0xFF, 0x50, 0xB0, 0xE3}, 4, DATA_TYPE_RAW},
+    {"a1_mov(0,15,1)",            {0x01, 0xF0, 0xA0, 0xE3}, 4, DATA_TYPE_RAW},
+    {"a2_mov(1,736)",             {0xE0, 0x12, 0x00, 0xE3}, 4, DATA_TYPE_RAW},
+    {"t2_vmov(1, 1.0)",           {0xF7, 0xEE, 0x00, 0x0A}, 4, DATA_TYPE_RAW},
+    {"t2_vmov(8, -1.5)",          {0xBF, 0xEE, 0x08, 0x4A}, 4, DATA_TYPE_RAW},
+    {"t2_vmov(16, 31.0)",         {0xB3, 0xEE, 0x0F, 0x8A}, 4, DATA_TYPE_RAW},
+    {"t2_imm(720)",               {0xD0, 0x02},             INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"t2_imm(725)",               {0xD4, 0x02},             INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"a1_imm(720)",               {0xD0, 0x02},             INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"a1_imm(725)",               {0xD4, 0x02},             INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"t2_mov(1, 2, t2_imm(725))", {0x5F, 0xF4, 0x35, 0x72}, 4, DATA_TYPE_RAW},
+    {"a1_mov(0, 2, a1_imm(725))", {0xB5, 0x2F, 0xA0, 0xE3}, 4, DATA_TYPE_RAW},
 
     // Mixed real world cases
     {"t1_movt(4, 725.0f >> 16)",                  {0xC4, 0xF2, 0x35, 0x44}, 4, DATA_TYPE_RAW},
     {"t1_movt(2, 544 / 2.0 >> 16)",               {0xC4, 0xF2, 0x88, 0x32}, 4, DATA_TYPE_RAW},
     {"t2_mov(0, 0, (544 + 31 & 0xFFFFFFE0) * 4)", {0x4F, 0xF4, 0x08, 0x60}, 4, DATA_TYPE_RAW},
     {"t2_mov(0, 0, align(544, 32) * 4)",          {0x4F, 0xF4, 0x08, 0x60}, 4, DATA_TYPE_RAW},
-    {"t2_mov(1, 1, 960 * 10222 / 10000)",         {0x5F, 0xF4, 0x75, 0x71}, 4, DATA_TYPE_RAW},
-    {"t2_mov(1, 1, uint(960 * 1.0222f))",         {0x5F, 0xF4, 0x75, 0x71}, 4, DATA_TYPE_RAW},
-    {"t2_mov(1, 1, uint(960 * (736 / 720f)))",    {0x5F, 0xF4, 0x75, 0x71}, 4, DATA_TYPE_RAW},
 
     // Case insens.
-    {"nOp",                 {0x00, 0xBF},              2, DATA_TYPE_RAW},
-    {"NoP",                 {0x00, 0xBF},              2, DATA_TYPE_RAW},
-    {"NOP",                 {0x00, 0xBF},              2, DATA_TYPE_RAW},
-    {"t1_MOV(1, 255)",      {0xFF, 0x21},              2, DATA_TYPE_RAW},
-    {"T1_MOV(1, 255)",      {0xFF, 0x21},              2, DATA_TYPE_RAW},
+    {"nOp",                 {0x00, 0xBF},             2, DATA_TYPE_RAW},
+    {"NoP",                 {0x00, 0xBF},             2, DATA_TYPE_RAW},
+    {"NOP",                 {0x00, 0xBF},             2, DATA_TYPE_RAW},
+    {"t1_MOV(1, 255)",      {0xFF, 0x21},             2, DATA_TYPE_RAW},
+    {"T1_MOV(1, 255)",      {0xFF, 0x21},             2, DATA_TYPE_RAW},
 #ifdef BUILD_LEGACY_SUPPORT
-    {"BYTES(deadbeefR)",    {0xDE, 0xAD, 0xBE, 0xEF},  4, DATA_TYPE_RAW},
+    {"BYTES(deadbeefR)",    {0xDE, 0xAD, 0xBE, 0xEF}, 4, DATA_TYPE_RAW},
 #endif
-    {"INT16(-32768)",       {0x00, 0x80},              2, DATA_TYPE_RAW},
-    {"4F + 3F",             {0x00, 0x00, 0xE0, 0x40},  INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"INT16(-32768)",       {0x00, 0x80},             2, DATA_TYPE_RAW},
+    {"4F + 3F",             {0x00, 0x00, 0xE0, 0x40}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
 
     // Sum spaces
-    {"sin    (  pi / 2 ) ", {0x00, 0x00, 0x80, 0x3F},  INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
-    {"1.0 f",   {0x00, 0x00, 0x80, 0x3F},  INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
-    {"1 f",     {0x00, 0x00, 0x80, 0x3F},  INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"sin    (  pi / 2 ) ", {0x00, 0x00, 0x80, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"1.0 f",               {0x00, 0x00, 0x80, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
+    {"1 f",                 {0x00, 0x00, 0x80, 0x3F}, INTP_PRIMITIVE_SIZE, DATA_TYPE_FLOAT},
 
     // Concatenations
-    {"2 . 3",               {0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00}, 8, DATA_TYPE_RAW},
-    {"uint8(2) . uint8(3)", {0x02, 0x03}, 2, DATA_TYPE_RAW},
-    {"float(1) . float(1)", {0x00, 0x00, 0x80, 0x3F, 0x00, 0x00, 0x80, 0x3F}, 8, DATA_TYPE_RAW},
-    {"DEr . ADr",             {0xDE, 0xAD}, 2, DATA_TYPE_RAW},
-    {"DEr.ADr",               {0xDE, 0xAD}, 2, DATA_TYPE_RAW},
+    {"2 . 3",                 {0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00}, 8, DATA_TYPE_RAW},
+    {"uint8(2) . uint8(3)",   {0x02, 0x03},                                     2, DATA_TYPE_RAW},
+    {"float(1) . float(1)",   {0x00, 0x00, 0x80, 0x3F, 0x00, 0x00, 0x80, 0x3F}, 8, DATA_TYPE_RAW},
+    {"DEr . ADr",             {0xDE, 0xAD},                                     2, DATA_TYPE_RAW},
+    {"DEr.ADr",               {0xDE, 0xAD},                                     2, DATA_TYPE_RAW},
 #ifdef BUILD_LEGACY_SUPPORT
-    {"bytes(DE) . bytes(AD)", {0xDE, 0xAD}, 2, DATA_TYPE_RAW},
+    {"bytes(DE) . bytes(AD)", {0xDE, 0xAD},                                     2, DATA_TYPE_RAW},
 #endif
-    {"t1_mov(1, 255) . nop",  {0xFF, 0x21, 0x00, 0xBF}, 4, DATA_TYPE_RAW},
+    {"t1_mov(1, 255) . nop",  {0xFF, 0x21, 0x00, 0xBF},                         4, DATA_TYPE_RAW},
 
     // Repeat
 #ifdef BUILD_LEGACY_SUPPORT
     {"bytes(DEAD) *2",  {0xDE, 0xAD, 0xDE, 0xAD}, 4, DATA_TYPE_RAW},
     {"bytes(DEAD) * 2", {0xDE, 0xAD, 0xDE, 0xAD}, 4, DATA_TYPE_RAW},
 #endif
-    {"uint8(255) *3",   {0xFF, 0xFF, 0xFF}, 3, DATA_TYPE_RAW},
+    {"uint8(255) *3",   {0xFF, 0xFF, 0xFF},       3, DATA_TYPE_RAW},
     {"nop *2",          {0x00, 0xBF, 0x00, 0xBF}, 4, DATA_TYPE_RAW},
     {"2 * nop",         {0x00, 0xBF, 0x00, 0xBF}, 4, DATA_TYPE_RAW},
 
     // VG
-    {"fb_w",     {0xC0, 0x03}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"fb_h",     {0x20, 0x02}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"ib_w",     {0xC0, 0x03}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"ib_h",     {0x20, 0x02}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"ib_wi(1)", {0xC0, 0x03}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"ib_hi(1)", {0x20, 0x02}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"vblank",   {0x01},       INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"msaa",     {0x02},       INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"fb_w",      {0xC0, 0x03}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"fb_h",      {0x20, 0x02}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"ib_w",      {0xC0, 0x03}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"ib_h",      {0x20, 0x02}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"ib_wi(1)",  {0xC0, 0x03}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"ib_hi(1)",  {0x20, 0x02}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"vblank",    {0x01},       INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"fps_limit", {0x3C},       INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"msaa",      {0x02},       INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
 
 #ifdef BUILD_LEGACY_SUPPORT
     // Legacy
@@ -292,87 +298,126 @@ const intp_testcase_t _TESTS[] = {
     {"t1_movt(4,<r,<to_fl,</,<*,960,544>,720>>,16>)", {0xC4, 0xF2, 0x35, 0x44}, 4, DATA_TYPE_RAW},
     {"t1_movt(2,<r,<to_fl,</,544,2>>,16>)",           {0xC4, 0xF2, 0x88, 0x32}, 4, DATA_TYPE_RAW},
     {"t2_mov(1,0,<*,<&,<+,544,31>,0xFFFFFFE0>,4>)",   {0x5F, 0xF4, 0x08, 0x60}, 4, DATA_TYPE_RAW},
-    {"t2_mov(1,2,</,<*,960,10222>,10000>)",           {0x5F, 0xF4, 0x75, 0x72}, 4, DATA_TYPE_RAW},
 #endif
 
     // Terminator
-    {"4 / 2$",       {0x02},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"4 / 2 $",      {0x02},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"4 $/ 2",       {0x04},                   INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"2 . 3 $",      {0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00}, 8, DATA_TYPE_RAW},
-    {"2 $. 3",       {0x02, 0x00, 0x00, 0x00}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
-    {"t1_mov(1, 255) . nop $",  {0xFF, 0x21, 0x00, 0xBF}, 4, DATA_TYPE_RAW},
+    {"4 / 2$",                 {0x02},                                           INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"4 / 2 $",                {0x02},                                           INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"4 $/ 2",                 {0x04},                                           INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"2 . 3 $",                {0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00}, 8,                   DATA_TYPE_RAW},
+    {"2 $. 3",                 {0x02, 0x00, 0x00, 0x00},                         INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"t1_mov(1, 255) . nop $", {0xFF, 0x21, 0x00, 0xBF},                         4,                   DATA_TYPE_RAW},
 #ifdef BUILD_LEGACY_SUPPORT
-    {"bytes(DE AD BE EF)$",     {0xDE, 0xAD, 0xBE, 0xEF}, 4, DATA_TYPE_RAW},
+    {"bytes(DE AD BE EF)$",    {0xDE, 0xAD, 0xBE, 0xEF},                         4,                   DATA_TYPE_RAW},
 #endif
+};
+
+const intp_testcase_t _TESTS_VG_CONTEXT[] = {
+    {"fb_w",      {0x80, 0x02}, INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"ib_hi(1)",  {0xF0},       INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"vblank",    {0x03},       INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"fps_limit", {0x14},       INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
+    {"msaa",      {0x00},       INTP_PRIMITIVE_SIZE, DATA_TYPE_UNSIGNED},
 };
 
 const intp_error_testcase_t _TESTS_ERROR[] = {
     // Invalid token
-    {"abcd",      INTP_STATUS_ERROR_INVALID_TOKEN, 0},
-    {"   abcd",   INTP_STATUS_ERROR_INVALID_TOKEN, 3},
-    {"DEADBEEF",  INTP_STATUS_ERROR_INVALID_TOKEN, 0},
-    {"0xZZ",      INTP_STATUS_ERROR_INVALID_TOKEN, 1},
-    {".0f",       INTP_STATUS_ERROR_INVALID_TOKEN, 0},
-    {"+",         INTP_STATUS_ERROR_INVALID_TOKEN, 0},
-    {".",         INTP_STATUS_ERROR_INVALID_TOKEN, 0},
-    {"f",         INTP_STATUS_ERROR_INVALID_TOKEN, 0},
-    {"0 x 123",   INTP_STATUS_ERROR_INVALID_TOKEN, 2},
+    {"abcd",         INTP_STATUS_ERROR_INVALID_TOKEN, 0},
+    {"   abcd",      INTP_STATUS_ERROR_INVALID_TOKEN, 3},
+    {"DEADBEEF",     INTP_STATUS_ERROR_INVALID_TOKEN, 0},
+    {"0xZZ",         INTP_STATUS_ERROR_INVALID_TOKEN, 1},
+    {".0f",          INTP_STATUS_ERROR_INVALID_TOKEN, 0},
+    {"+",            INTP_STATUS_ERROR_INVALID_TOKEN, 0},
+    {".",            INTP_STATUS_ERROR_INVALID_TOKEN, 0},
+    {"f",            INTP_STATUS_ERROR_INVALID_TOKEN, 0},
+    {"0 x 123",      INTP_STATUS_ERROR_INVALID_TOKEN, 2},
 #ifdef BUILD_LEGACY_SUPPORT
     {"bytes(0x123)", INTP_STATUS_ERROR_INVALID_TOKEN, 7},
 #endif
-    {"1)",        INTP_STATUS_ERROR_INVALID_TOKEN, 1},
-    {"1 + ()",    INTP_STATUS_ERROR_INVALID_TOKEN, 5},
-    {"()",        INTP_STATUS_ERROR_INVALID_TOKEN, 1},
-    {"(",         INTP_STATUS_ERROR_INVALID_TOKEN, 1},
-    {"1 +",       INTP_STATUS_ERROR_INVALID_TOKEN, 3},
+    {"1)",           INTP_STATUS_ERROR_INVALID_TOKEN, 1},
+    {"1 + ()",       INTP_STATUS_ERROR_INVALID_TOKEN, 5},
+    {"()",           INTP_STATUS_ERROR_INVALID_TOKEN, 1},
+    {"(",            INTP_STATUS_ERROR_INVALID_TOKEN, 1},
+    {"1 +",          INTP_STATUS_ERROR_INVALID_TOKEN, 3},
 
     // Invalid argument count
 #ifdef BUILD_LEGACY_SUPPORT
-    {"nop(1)",               INTP_STATUS_ERROR_TOO_MANY_ARGS, 4},
+    {"nop(1)",                     INTP_STATUS_ERROR_TOO_MANY_ARGS, 4},
 #else
-    {"nop(1)",               INTP_STATUS_ERROR_INVALID_TOKEN, 3},
+    {"nop(1)",                     INTP_STATUS_ERROR_INVALID_TOKEN, 3},
 #endif
-    {"sin(1, 2)",            INTP_STATUS_ERROR_TOO_MANY_ARGS, 5},
-    {"abs(1, 2)",            INTP_STATUS_ERROR_TOO_MANY_ARGS, 5},
-    {"t2_mov()",             INTP_STATUS_ERROR_TOO_FEW_ARGS, 7},
-    {"t2_mov(1)",            INTP_STATUS_ERROR_TOO_FEW_ARGS, 8},
-    {"t2_mov(1, 2)",         INTP_STATUS_ERROR_TOO_FEW_ARGS, 11},
-    {"t2_mov(1, 2, 3, 4)",   INTP_STATUS_ERROR_TOO_MANY_ARGS, 14},
-    {"t2_mov(1, 2, 3121313, 422)",   INTP_STATUS_ERROR_TOO_MANY_ARGS, 20},
+    {"sin(1, 2)",                  INTP_STATUS_ERROR_TOO_MANY_ARGS, 5},
+    {"abs(1, 2)",                  INTP_STATUS_ERROR_TOO_MANY_ARGS, 5},
+    {"t2_mov()",                   INTP_STATUS_ERROR_TOO_FEW_ARGS,  7},
+    {"t2_mov(1)",                  INTP_STATUS_ERROR_TOO_FEW_ARGS,  8},
+    {"t2_mov(1, 2)",               INTP_STATUS_ERROR_TOO_FEW_ARGS,  11},
+    {"t2_mov(1, 2, 3, 4)",         INTP_STATUS_ERROR_TOO_MANY_ARGS, 14},
+    {"t2_mov(1, 2, 3121313, 422)", INTP_STATUS_ERROR_TOO_MANY_ARGS, 20},
 
     // Missing brackets
-    {"sin(pi",               INTP_STATUS_ERROR_MISSING_CLOSE_BRACKET, 6},
-    {"sin(pi + 2.0",         INTP_STATUS_ERROR_MISSING_CLOSE_BRACKET, 12},
-    {"sinpi)",               INTP_STATUS_ERROR_MISSING_OPEN_BRACKET, 3},
+    {"sin(pi",       INTP_STATUS_ERROR_MISSING_CLOSE_BRACKET, 6},
+    {"sin(pi + 2.0", INTP_STATUS_ERROR_MISSING_CLOSE_BRACKET, 12},
+    {"sinpi)",       INTP_STATUS_ERROR_MISSING_OPEN_BRACKET,  3},
 
     // Invalid data type
-    {"DEr + ADr",    INTP_STATUS_ERROR_INVALID_DATATYPE, 4},
-    {"abs(DEADr)",   INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"DEr + ADr",   INTP_STATUS_ERROR_INVALID_DATATYPE, 4},
+    {"abs(DEADr)",  INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
 #ifdef BUILD_LEGACY_SUPPORT
     {"bytes(DE AD) * bytes(DE AD)", INTP_STATUS_ERROR_INVALID_DATATYPE, 13},
 #endif
-    {"1.0 % 5",      INTP_STATUS_ERROR_INVALID_DATATYPE, 4},
+    {"1.0 % 5",     INTP_STATUS_ERROR_INVALID_DATATYPE, 4},
     {"FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF r",
                     INTP_STATUS_ERROR_INVALID_DATATYPE, 96},
     {"FF FF FF r . FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF r",
                     INTP_STATUS_ERROR_INVALID_DATATYPE, 11},
+    {"rawn(1, 0)",  INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"rawn(1, 33)", INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"1 / 0",       INTP_STATUS_ERROR_INVALID_DATATYPE, 2},
+    {"1 % 0",       INTP_STATUS_ERROR_INVALID_DATATYPE, 2},
+    {"align(1, 0)", INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"1 << -1",     INTP_STATUS_ERROR_INVALID_DATATYPE, 2},
+    {"1 >> 32",     INTP_STATUS_ERROR_INVALID_DATATYPE, 2},
+
+    // Encoders
+    {"t1_mov(8, 0)",                           INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"t1_mov(0, 256)",                         INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"t2_mov(2, 0, 1)",                        INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"t2_mov(1, 15, 1)",                       INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"t2_mov(1, 1, 981)",                      INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"t3_mov(15, 1)",                          INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"t3_mov(1, 65536)",                       INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"t1_movt(15, 1)",                         INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"a1_mov(2, 0, 1)",                        INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"a1_mov(1, 15, 1)",                       INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"a1_mov(0, 0, 0x12345678)",               INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"a2_mov(15, 1)",                          INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"t2_vmov(32, 1.0)",                       INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"t2_vmov(0, 1.1)",                        INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"mov32(15, 1, 0)",                        INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"t2_imm(DEADr)",                          INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"a1_imm(DEADr)",                          INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"t2_mov(1, 1, 960 * 10222 / 10000)",      INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"t2_mov(1, 1, uint(960 * 1.0222f))",      INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"t2_mov(1, 1, uint(960 * (736 / 720f)))", INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+#ifdef BUILD_LEGACY_SUPPORT
+    {"t2_mov(1,2,</,<*,960,10222>,10000>)",    INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+#endif
 
     // VG
 #ifdef BUILD_LEGACY_SUPPORT
-    {"ib_w(0)",      INTP_STATUS_ERROR_TOO_MANY_ARGS, 5},
+    {"ib_w(0)",   INTP_STATUS_ERROR_TOO_MANY_ARGS,    5},
 #else
-    {"ib_w(0)",      INTP_STATUS_ERROR_INVALID_TOKEN, 4},
+    {"ib_w(0)",   INTP_STATUS_ERROR_INVALID_TOKEN,    4},
 #endif
-    {"ib_wi(-1)",    INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
+    {"ib_wi(-1)", INTP_STATUS_ERROR_INVALID_DATATYPE, 0},
 
     // Terminator
-    {"sin(pi$",      INTP_STATUS_ERROR_MISSING_CLOSE_BRACKET, 6},
-    {"sin$pi)",      INTP_STATUS_ERROR_MISSING_OPEN_BRACKET, 3},
-    {"1 + ($",       INTP_STATUS_ERROR_INVALID_TOKEN, 5},
-    {"1 + $",        INTP_STATUS_ERROR_INVALID_TOKEN, 4},
-    {"t2_mov(1,$",   INTP_STATUS_ERROR_INVALID_TOKEN, 9},
-    {"t2_mov(1, $, 3)", INTP_STATUS_ERROR_INVALID_TOKEN, 10},
+    {"sin(pi$",            INTP_STATUS_ERROR_MISSING_CLOSE_BRACKET, 6},
+    {"sin$pi)",            INTP_STATUS_ERROR_MISSING_OPEN_BRACKET,  3},
+    {"1 + ($",             INTP_STATUS_ERROR_INVALID_TOKEN,         5},
+    {"1 + $",              INTP_STATUS_ERROR_INVALID_TOKEN,         4},
+    {"t2_mov(1,$",         INTP_STATUS_ERROR_INVALID_TOKEN,         9},
+    {"t2_mov(1, $, 3)",    INTP_STATUS_ERROR_INVALID_TOKEN,         10},
 #ifdef BUILD_LEGACY_SUPPORT
     {"bytes(DE AD$BE EF)", INTP_STATUS_ERROR_MISSING_CLOSE_BRACKET, 11},
 #endif
@@ -387,6 +432,7 @@ const intp_unk_testcase_t _TESTS_UNK[] = {
 };
 
 uint32_t g_success_cnt = 0;
+uint32_t g_failure_cnt = 0;
 
 void pr_bytes(byte_t *bytes, int size) {
     for (int i = 0; i < size; i++) {
@@ -437,8 +483,10 @@ void test_assert(intp_testcase_t test, uint32_t pos, intp_value_t *value, intp_s
 
     //printf("SUCCES: '%s'\n", test.expr);
     g_success_cnt++;
+    return;
 
 ERROR:
+    g_failure_cnt++;
     return;
 }
 
@@ -457,8 +505,10 @@ void test_error_assert(intp_error_testcase_t test, intp_status_t status) {
 
     //printf("SUCCES: '%s'\n", test.expr);
     g_success_cnt++;
+    return;
 
 ERROR_ETEST:
+    g_failure_cnt++;
     return;
 }
 
@@ -518,8 +568,10 @@ void test_unk_assert(intp_unk_testcase_t test, uint32_t pos, intp_value_t *value
     }
 
     g_success_cnt++;
+    return;
 
 ERROR_UNKTEST:
+    g_failure_cnt++;
     return;
 }
 
@@ -530,12 +582,14 @@ int main() {
     printf("\n");
 
     g_success_cnt = 0;
+    g_failure_cnt = 0;
 
     intp_value_t value;
     uint32_t pos;
     uint32_t tests_cnt = sizeof(_TESTS) / sizeof(intp_testcase_t);
     uint32_t tests_error_cnt = sizeof(_TESTS_ERROR) / sizeof(intp_error_testcase_t);
     uint32_t tests_unk_cnt = sizeof(_TESTS_UNK) / sizeof(intp_unk_testcase_t);
+    uint32_t tests_vg_context_cnt = sizeof(_TESTS_VG_CONTEXT) / sizeof(intp_testcase_t);
 
     intp_status_t ret;
 
@@ -576,9 +630,32 @@ int main() {
         test_unk_assert(_TESTS_UNK[i], pos, &value, ret);
     }
 
+    intp_vg_context_t context = {0};
+    context.fb_width = 640;
+    context.fb_height = 368;
+    context.ib_width[0] = 320;
+    context.ib_height[0] = 180;
+    context.ib_width[1] = 426;
+    context.ib_height[1] = 240;
+    context.vblank = 3;
+    context.fps_limit = 20;
+    context.msaa = 0;
+    intp_set_vg_context(&context);
+    context.fb_width = 1;
+
+    for (int i = 0; i < tests_vg_context_cnt; i++) {
+        memset(&value, 0, sizeof(intp_value_t));
+        pos = 0;
+
+        ret = intp_evaluate(_TESTS_VG_CONTEXT[i].expr, &pos, &value);
+        test_assert(_TESTS_VG_CONTEXT[i], pos, &value, ret);
+    }
+
     printf("\n");
-    printf("%d out of %d tests succeeded!\n", g_success_cnt, tests_cnt + tests_error_cnt + tests_unk_cnt);
+    printf("%d out of %d tests succeeded!\n", g_success_cnt, tests_cnt + tests_error_cnt + tests_unk_cnt + tests_vg_context_cnt);
+    if (g_failure_cnt > 0)
+        printf("%d tests failed!\n", g_failure_cnt);
     printf("\n");
 
-    return 0;
+    return tt_broken || g_failure_cnt > 0;
 }

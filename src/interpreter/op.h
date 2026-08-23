@@ -67,6 +67,8 @@ bool op_encode_bkpt(value_t *out);
 bool op_encode_nop(value_t *out);
 bool op_encode_unk(value_t *out);
 bool op_encode_mov32(value_t *out, value_t *value, value_t *gap);
+bool op_encode_t2_imm(value_t *out);
+bool op_encode_a1_imm(value_t *out);
 
 bool op_vg_config_fb_width(value_t *out);
 bool op_vg_config_fb_height(value_t *out);
@@ -75,6 +77,7 @@ bool op_vg_config_ib_height(value_t *out);
 bool op_vg_config_ib_width_i(value_t *out);
 bool op_vg_config_ib_height_i(value_t *out);
 bool op_vg_config_vblank(value_t *out);
+bool op_vg_config_fps_limit(value_t *out);
 bool op_vg_config_msaa(value_t *out);
 
 #endif

@@ -6,23 +6,14 @@
 #include <stdbool.h>
 
 #ifdef BUILD_VITAGRAFIX
-#include <vitasdk.h>
-#include <taihen.h>
-#include "../io.h"
-#include "../config.h"
 #include "../log.h"
-#include "../main.h"
 #endif
 
 #include "interpreter.h"
 #include "parser.h"
 
+intp_status_t legacy_parse_gen_value(const char chunk[], int pos, int end, uint32_t *value);
 
-intp_status_t legacy_parse_gen_value(
-        const char chunk[], int pos, int end,
-        uint32_t *value);
-
-//int vgPatchGetNextMacroArgPos()
 int legacy_get_next_macro_arg_pos(const char chunk[], int pos, int end) {
     int inner_open = 0;
 
@@ -59,68 +50,64 @@ intp_status_t legacy_parse_gen(const char *expr, uint32_t *pos, value_t *value) 
     return ret;
 }
 
-
-// VG_IoParseState vgPatchParseGenValue()
-intp_status_t legacy_parse_gen_value(
-        const char chunk[], int pos, int end,
-        uint32_t *value) {
+intp_status_t legacy_parse_gen_value(const char chunk[], int pos, int end, uint32_t *value) {
     intp_status_t ret = {INTP_STATUS_OK, 0};
 
     // Check for macros
     if (chunk[pos] == '<') {
 #ifdef BUILD_VITAGRAFIX
+        const intp_vg_context_t *context = intp_get_vg_context();
+
         if (!strncasecmp(&chunk[pos], "<fb_w>", 6)) {
-            *value = g_main.config.fb.width;
+            *value = context->fb_width;
             return ret;
         }
         if (!strncasecmp(&chunk[pos], "<fb_h>", 6)) {
-            *value = g_main.config.fb.height;
+            *value = context->fb_height;
             return ret;
         }
         if (!strncasecmp(&chunk[pos], "<ib_w", 5)) {
             if (chunk[pos + 5] == '>') {
-                *value = g_main.config.ib[0].width;
+                *value = context->ib_width[0];
                 return ret;
             }
             else if (chunk[pos + 5] == ',') {
                 uint8_t ib_n = strtoul(&chunk[pos + 6], NULL, 10);
-                if (ib_n >= MAX_RES_COUNT) {
+                if (ib_n >= INTP_VG_MAX_RES_COUNT) {
                     vg_log_printf("[PATCH] ERROR: Accessed [%u] IB res out of range!\n", ib_n);
                     __intp_ret_status(INTP_STATUS_ERROR_VG_IB_OOB, pos + 6);
                 }
 
-                *value = g_main.config.ib[ib_n].width;
+                *value = context->ib_width[ib_n];
                 return ret;
             }
         }
         if (!strncasecmp(&chunk[pos], "<ib_h", 5)) {
             if (chunk[pos + 5] == '>') {
-                *value = g_main.config.ib[0].height;
+                *value = context->ib_height[0];
                 return ret;
             }
             else if (chunk[pos + 5] == ',') {
                 uint8_t ib_n = strtoul(&chunk[pos + 6], NULL, 10);
-                if (ib_n >= MAX_RES_COUNT) {
+                if (ib_n >= INTP_VG_MAX_RES_COUNT) {
                     vg_log_printf("[PATCH] ERROR: Accessed [%u] IB res out of range!\n", ib_n);
                     __intp_ret_status(INTP_STATUS_ERROR_VG_IB_OOB, pos + 6);
                 }
 
-                *value = g_main.config.ib[ib_n].height;
+                *value = context->ib_height[ib_n];
                 return ret;
             }
         }
         if (!strncasecmp(&chunk[pos], "<vblank>", 8)) {
-            *value = g_main.config.fps == FPS_60 ? 1 :
-                    (g_main.config.fps == FPS_30 ? 2 : 3);
+            *value = context->vblank;
             return ret;
         }
         if (!strncasecmp(&chunk[pos], "<msaa>", 6)) {
-            *value = g_main.config.msaa == MSAA_4X ? 2 :
-                    (g_main.config.msaa == MSAA_2X ? 1 : 0);
+            *value = context->msaa;
             return ret;
         }
         if (!strncasecmp(&chunk[pos], "<msaa_enabled>", 14)) {
-            *value = g_main.config.msaa_enabled == FT_ENABLED;
+            *value = context->msaa_enabled;
             return ret;
         }
 #endif

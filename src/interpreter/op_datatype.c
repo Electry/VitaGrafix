@@ -20,7 +20,8 @@ bool op_datatype_raw_bytes(value_t *lhs)  { __datatype_raw_cast_op(lhs, DATA_TYP
 bool op_datatype_raw_bytes_n(value_t *lhs, value_t *rhs) {
     if ((rhs->type != DATA_TYPE_UNSIGNED && rhs->type != DATA_TYPE_SIGNED)
             || (rhs->type == DATA_TYPE_SIGNED && rhs->data.int32 <= 0)
-            || rhs->data.uint32 == 0)
+            || rhs->data.uint32 == 0
+            || rhs->data.uint32 > MAX_VALUE_SIZE)
         return false;
 
     __datatype_raw_cast_op(lhs, DATA_TYPE_RAW, rhs->data.uint32);

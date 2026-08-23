@@ -93,6 +93,7 @@ typedef enum {
     TOKEN_VG_CONFIG_IB_WIDTH,
     TOKEN_VG_CONFIG_IB_HEIGHT,
     TOKEN_VG_CONFIG_VBLANK,
+    TOKEN_VG_CONFIG_FPS_LIMIT,
     TOKEN_VG_CONFIG_MSAA,
 
     TOKEN_ENCODE_MOV32,
@@ -106,6 +107,8 @@ typedef enum {
     TOKEN_ENCODE_BKPT,
     TOKEN_ENCODE_NOP,
     TOKEN_ENCODE_UNK,
+    TOKEN_ENCODE_T2_IMM,
+    TOKEN_ENCODE_A1_IMM,
 
 #ifdef BUILD_LEGACY_SUPPORT
     TOKEN_LEGACY,
@@ -116,15 +119,20 @@ typedef enum {
 } token_type_t;
 
 typedef struct {
+    bool (*unary)(value_t *);
+    bool (*binary)(value_t *, value_t *);
+    bool (*ternary)(value_t *, value_t *, value_t *);
+    bool (*quaternary)(value_t *, value_t *, value_t *, value_t *);
+} token_op_t;
+
+typedef struct {
     int precedence;
     const char *string;
     token_type_t type;
     byte_t flags;
 
-    bool *op;
+    token_op_t op;
 } token_t;
-
-//printf("%s returning code: %d [%d]\n", __func__, code, pos);
 
 #define __intp_ret_status(code, pos) {\
     intp_status_t ret = {code, pos};\

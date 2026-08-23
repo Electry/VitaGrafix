@@ -7,105 +7,112 @@
 
 #include "interpreter.h"
 #include "parser.h"
-
 #ifdef BUILD_LEGACY_SUPPORT
 #include "legacy.h"
 #endif
-
 #include "op.h"
 
+#define OP_NONE           {0}
+#define OP_UNARY(fn)      {.unary = (fn)}
+#define OP_BINARY(fn)     {.binary = (fn)}
+#define OP_TERNARY(fn)    {.ternary = (fn)}
+#define OP_QUATERNARY(fn) {.quaternary = (fn)}
 
 #define TOKEN(type) &_TOKENS[type]
 const token_t _TOKENS[TOKEN_INVALID + 1] = {
-    {90, NULL,      TOKEN_PRIMITIVE,      0,              NULL},
+    {90, NULL,        TOKEN_PRIMITIVE,             0,              OP_NONE},
 
-    {10, "+",       TOKEN_ADD,            TOKEN_INFIX,    (bool *)op_math_add},
-    {10, "-",       TOKEN_SUBTRACT,       TOKEN_INFIX,    (bool *)op_math_subtract},
-    {11, "*",       TOKEN_MULTIPLY,       TOKEN_INFIX,    (bool *)op_math_multiply},
-    {11, "/",       TOKEN_DIVIDE,         TOKEN_INFIX,    (bool *)op_math_divide},
-    {11, "\%",      TOKEN_MODULO,         TOKEN_INFIX,    (bool *)op_math_modulo},
+    {10, "+",         TOKEN_ADD,                   TOKEN_INFIX,    OP_BINARY(op_math_add)},
+    {10, "-",         TOKEN_SUBTRACT,              TOKEN_INFIX,    OP_BINARY(op_math_subtract)},
+    {11, "*",         TOKEN_MULTIPLY,              TOKEN_INFIX,    OP_BINARY(op_math_multiply)},
+    {11, "/",         TOKEN_DIVIDE,                TOKEN_INFIX,    OP_BINARY(op_math_divide)},
+    {11, "\%",        TOKEN_MODULO,                TOKEN_INFIX,    OP_BINARY(op_math_modulo)},
 
-    {6,  "|",       TOKEN_BITWISE_OR,     TOKEN_INFIX,    (bool *)op_math_bitwise_or},
-    {7,  "^",       TOKEN_BITWISE_XOR,    TOKEN_INFIX,    (bool *)op_math_bitwise_xor},
-    {8,  "&",       TOKEN_BITWISE_AND,    TOKEN_INFIX,    (bool *)op_math_bitwise_and},
-    {9,  "<<",      TOKEN_BITWISE_L,      TOKEN_INFIX,    (bool *)op_math_bitwise_l},
-    {9,  ">>",      TOKEN_BITWISE_R,      TOKEN_INFIX,    (bool *)op_math_bitwise_r},
+    {6,  "|",         TOKEN_BITWISE_OR,            TOKEN_INFIX,    OP_BINARY(op_math_bitwise_or)},
+    {7,  "^",         TOKEN_BITWISE_XOR,           TOKEN_INFIX,    OP_BINARY(op_math_bitwise_xor)},
+    {8,  "&",         TOKEN_BITWISE_AND,           TOKEN_INFIX,    OP_BINARY(op_math_bitwise_and)},
+    {9,  "<<",        TOKEN_BITWISE_L,             TOKEN_INFIX,    OP_BINARY(op_math_bitwise_l)},
+    {9,  ">>",        TOKEN_BITWISE_R,             TOKEN_INFIX,    OP_BINARY(op_math_bitwise_r)},
 
-    {20, "(",       TOKEN_BRACKET_OPEN,   0,              NULL},
-    {20, ")",       TOKEN_BRACKET_CLOSE,  0,              NULL},
-    {20, ",",       TOKEN_ARGUMENT_SEP,   0,              NULL},
+    {20, "(",         TOKEN_BRACKET_OPEN,          0,              OP_NONE},
+    {20, ")",         TOKEN_BRACKET_CLOSE,         0,              OP_NONE},
+    {20, ",",         TOKEN_ARGUMENT_SEP,          0,              OP_NONE},
 
-    {50, "abs",     TOKEN_FN_ABS,         TOKEN_ARITY_1,  (bool *)op_math_fn_abs},
-    {50, "acos",    TOKEN_FN_ACOS,        TOKEN_ARITY_1,  (bool *)op_math_fn_acos},
-    {50, "align",   TOKEN_FN_ALIGN,       TOKEN_ARITY_2,  (bool *)op_math_fn_align},
-    {50, "asin",    TOKEN_FN_ASIN,        TOKEN_ARITY_1,  (bool *)op_math_fn_asin},
-    {50, "atan2",   TOKEN_FN_ATAN2,       TOKEN_ARITY_2,  (bool *)op_math_fn_atan2},
-    {50, "atan",    TOKEN_FN_ATAN,        TOKEN_ARITY_1,  (bool *)op_math_fn_atan},
-    {50, "ceil",    TOKEN_FN_CEIL,        TOKEN_ARITY_1,  (bool *)op_math_fn_ceil},
-    {50, "cosh",    TOKEN_FN_COSH,        TOKEN_ARITY_1,  (bool *)op_math_fn_cosh},
-    {50, "cos",     TOKEN_FN_COS,         TOKEN_ARITY_1,  (bool *)op_math_fn_cos},
-    {50, "exp",     TOKEN_FN_EXP,         TOKEN_ARITY_1,  (bool *)op_math_fn_exp},
-    {50, "floor",   TOKEN_FN_FLOOR,       TOKEN_ARITY_1,  (bool *)op_math_fn_floor},
-    {50, "ln",      TOKEN_FN_LN,          TOKEN_ARITY_1,  (bool *)op_math_fn_ln},
-    {50, "log10",   TOKEN_FN_LOG10,       TOKEN_ARITY_1,  (bool *)op_math_fn_log10},
-    {50, "min",     TOKEN_FN_MIN,         TOKEN_ARITY_2,  (bool *)op_math_fn_min},
-    {50, "max",     TOKEN_FN_MAX,         TOKEN_ARITY_2,  (bool *)op_math_fn_max},
-    {50, "pow",     TOKEN_FN_POW,         TOKEN_ARITY_2,  (bool *)op_math_fn_pow},
-    {50, "round",   TOKEN_FN_ROUND,       TOKEN_ARITY_1,  (bool *)op_math_fn_round},
-    {50, "sinh",    TOKEN_FN_SINH,        TOKEN_ARITY_1,  (bool *)op_math_fn_sinh},
-    {50, "sin",     TOKEN_FN_SIN,         TOKEN_ARITY_1,  (bool *)op_math_fn_sin},
-    {50, "sqrt",    TOKEN_FN_SQRT,        TOKEN_ARITY_1,  (bool *)op_math_fn_sqrt},
-    {50, "tanh",    TOKEN_FN_TANH,        TOKEN_ARITY_1,  (bool *)op_math_fn_tanh},
-    {50, "tan",     TOKEN_FN_TAN,         TOKEN_ARITY_1,  (bool *)op_math_fn_tan},
+    {50, "abs",       TOKEN_FN_ABS,                TOKEN_ARITY_1,  OP_UNARY(op_math_fn_abs)},
+    {50, "acos",      TOKEN_FN_ACOS,               TOKEN_ARITY_1,  OP_UNARY(op_math_fn_acos)},
+    {50, "align",     TOKEN_FN_ALIGN,              TOKEN_ARITY_2,  OP_BINARY(op_math_fn_align)},
+    {50, "asin",      TOKEN_FN_ASIN,               TOKEN_ARITY_1,  OP_UNARY(op_math_fn_asin)},
+    {50, "atan2",     TOKEN_FN_ATAN2,              TOKEN_ARITY_2,  OP_BINARY(op_math_fn_atan2)},
+    {50, "atan",      TOKEN_FN_ATAN,               TOKEN_ARITY_1,  OP_UNARY(op_math_fn_atan)},
+    {50, "ceil",      TOKEN_FN_CEIL,               TOKEN_ARITY_1,  OP_UNARY(op_math_fn_ceil)},
+    {50, "cosh",      TOKEN_FN_COSH,               TOKEN_ARITY_1,  OP_UNARY(op_math_fn_cosh)},
+    {50, "cos",       TOKEN_FN_COS,                TOKEN_ARITY_1,  OP_UNARY(op_math_fn_cos)},
+    {50, "exp",       TOKEN_FN_EXP,                TOKEN_ARITY_1,  OP_UNARY(op_math_fn_exp)},
+    {50, "floor",     TOKEN_FN_FLOOR,              TOKEN_ARITY_1,  OP_UNARY(op_math_fn_floor)},
+    {50, "ln",        TOKEN_FN_LN,                 TOKEN_ARITY_1,  OP_UNARY(op_math_fn_ln)},
+    {50, "log10",     TOKEN_FN_LOG10,              TOKEN_ARITY_1,  OP_UNARY(op_math_fn_log10)},
+    {50, "min",       TOKEN_FN_MIN,                TOKEN_ARITY_2,  OP_BINARY(op_math_fn_min)},
+    {50, "max",       TOKEN_FN_MAX,                TOKEN_ARITY_2,  OP_BINARY(op_math_fn_max)},
+    {50, "pow",       TOKEN_FN_POW,                TOKEN_ARITY_2,  OP_BINARY(op_math_fn_pow)},
+    {50, "round",     TOKEN_FN_ROUND,              TOKEN_ARITY_1,  OP_UNARY(op_math_fn_round)},
+    {50, "sinh",      TOKEN_FN_SINH,               TOKEN_ARITY_1,  OP_UNARY(op_math_fn_sinh)},
+    {50, "sin",       TOKEN_FN_SIN,                TOKEN_ARITY_1,  OP_UNARY(op_math_fn_sin)},
+    {50, "sqrt",      TOKEN_FN_SQRT,               TOKEN_ARITY_1,  OP_UNARY(op_math_fn_sqrt)},
+    {50, "tanh",      TOKEN_FN_TANH,               TOKEN_ARITY_1,  OP_UNARY(op_math_fn_tanh)},
+    {50, "tan",       TOKEN_FN_TAN,                TOKEN_ARITY_1,  OP_UNARY(op_math_fn_tan)},
 
-    {52, "int8",    TOKEN_RAW_INT8,       TOKEN_ARITY_1,  (bool *)op_datatype_raw_int8},
-    {52, "int16",   TOKEN_RAW_INT16,      TOKEN_ARITY_1,  (bool *)op_datatype_raw_int16},
-    {52, "int32",   TOKEN_RAW_INT32,      TOKEN_ARITY_1,  (bool *)op_datatype_raw_int32},
-    {52, "uint8",   TOKEN_RAW_UINT8,      TOKEN_ARITY_1,  (bool *)op_datatype_raw_uint8},
-    {52, "uint16",  TOKEN_RAW_UINT16,     TOKEN_ARITY_1,  (bool *)op_datatype_raw_uint16},
-    {52, "uint32",  TOKEN_RAW_UINT32,     TOKEN_ARITY_1,  (bool *)op_datatype_raw_uint32},
-    {52, "fl32",    TOKEN_RAW_FL32,       TOKEN_ARITY_1,  (bool *)op_datatype_raw_fl32},
-    {52, "rawn",    TOKEN_RAW_RAWN,       TOKEN_ARITY_2,  (bool *)op_datatype_raw_bytes_n},
-    {52, "raw",     TOKEN_RAW_RAW,        TOKEN_ARITY_1,  (bool *)op_datatype_raw_bytes},
+    {52, "int8",      TOKEN_RAW_INT8,              TOKEN_ARITY_1,  OP_UNARY(op_datatype_raw_int8)},
+    {52, "int16",     TOKEN_RAW_INT16,             TOKEN_ARITY_1,  OP_UNARY(op_datatype_raw_int16)},
+    {52, "int32",     TOKEN_RAW_INT32,             TOKEN_ARITY_1,  OP_UNARY(op_datatype_raw_int32)},
+    {52, "uint8",     TOKEN_RAW_UINT8,             TOKEN_ARITY_1,  OP_UNARY(op_datatype_raw_uint8)},
+    {52, "uint16",    TOKEN_RAW_UINT16,            TOKEN_ARITY_1,  OP_UNARY(op_datatype_raw_uint16)},
+    {52, "uint32",    TOKEN_RAW_UINT32,            TOKEN_ARITY_1,  OP_UNARY(op_datatype_raw_uint32)},
+    {52, "fl32",      TOKEN_RAW_FL32,              TOKEN_ARITY_1,  OP_UNARY(op_datatype_raw_fl32)},
+    {52, "rawn",      TOKEN_RAW_RAWN,              TOKEN_ARITY_2,  OP_BINARY(op_datatype_raw_bytes_n)},
+    {52, "raw",       TOKEN_RAW_RAW,               TOKEN_ARITY_1,  OP_UNARY(op_datatype_raw_bytes)},
 #ifdef BUILD_LEGACY_SUPPORT
-    {52, "bytes",   TOKEN_RAW_BYTES,      TOKEN_ARITY_1 | TOKEN_FORCE_RAW,  (bool *)op_datatype_raw_bytes},
+    {52, "bytes",     TOKEN_RAW_BYTES,             TOKEN_ARITY_1 | TOKEN_FORCE_RAW, OP_UNARY(op_datatype_raw_bytes)},
 #endif
 
-    {5,  ".",       TOKEN_RAW_CONCAT,     TOKEN_INFIX,    (bool *)op_datatype_raw_concat},
+    {5,  ".",         TOKEN_RAW_CONCAT,            TOKEN_INFIX,    OP_BINARY(op_datatype_raw_concat)},
 
-    {51, "int",     TOKEN_CAST_INT,       TOKEN_ARITY_1,  (bool *)op_datatype_cast_int},
-    {51, "uint",    TOKEN_CAST_UINT,      TOKEN_ARITY_1,  (bool *)op_datatype_cast_uint},
-    {51, "float",   TOKEN_CAST_FLOAT,     TOKEN_ARITY_1,  (bool *)op_datatype_cast_float},
+    {51, "int",       TOKEN_CAST_INT,              TOKEN_ARITY_1,  OP_UNARY(op_datatype_cast_int)},
+    {51, "uint",      TOKEN_CAST_UINT,             TOKEN_ARITY_1,  OP_UNARY(op_datatype_cast_uint)},
+    {51, "float",     TOKEN_CAST_FLOAT,            TOKEN_ARITY_1,  OP_UNARY(op_datatype_cast_float)},
 
-    {90, "pi",      TOKEN_CONST_PI,       TOKEN_CONSTANT, (bool *)op_math_const_pi},
-    {90, "e",       TOKEN_CONST_E,        TOKEN_CONSTANT, (bool *)op_math_const_e},
+    {90, "pi",        TOKEN_CONST_PI,              TOKEN_CONSTANT, OP_UNARY(op_math_const_pi)},
+    {90, "e",         TOKEN_CONST_E,               TOKEN_CONSTANT, OP_UNARY(op_math_const_e)},
 
-    {90, "fb_w",    TOKEN_VG_CONFIG_FB_WIDTH,    TOKEN_CONSTANT, (bool *)op_vg_config_fb_width},
-    {90, "fb_h",    TOKEN_VG_CONFIG_FB_HEIGHT,   TOKEN_CONSTANT, (bool *)op_vg_config_fb_height},
-    {90, "ib_wi",   TOKEN_VG_CONFIG_IB_WIDTH_I,  TOKEN_ARITY_1,  (bool *)op_vg_config_ib_width_i},
-    {90, "ib_hi",   TOKEN_VG_CONFIG_IB_HEIGHT_I, TOKEN_ARITY_1,  (bool *)op_vg_config_ib_height_i},
-    {90, "ib_w",    TOKEN_VG_CONFIG_IB_WIDTH,    TOKEN_CONSTANT, (bool *)op_vg_config_ib_width},
-    {90, "ib_h",    TOKEN_VG_CONFIG_IB_HEIGHT,   TOKEN_CONSTANT, (bool *)op_vg_config_ib_height},
-    {90, "vblank",  TOKEN_VG_CONFIG_VBLANK,      TOKEN_CONSTANT, (bool *)op_vg_config_vblank},
-    {90, "msaa",    TOKEN_VG_CONFIG_MSAA,        TOKEN_CONSTANT, (bool *)op_vg_config_msaa},
+    {90, "fb_w",      TOKEN_VG_CONFIG_FB_WIDTH,    TOKEN_CONSTANT, OP_UNARY(op_vg_config_fb_width)},
+    {90, "fb_h",      TOKEN_VG_CONFIG_FB_HEIGHT,   TOKEN_CONSTANT, OP_UNARY(op_vg_config_fb_height)},
+    {90, "ib_wi",     TOKEN_VG_CONFIG_IB_WIDTH_I,  TOKEN_ARITY_1,  OP_UNARY(op_vg_config_ib_width_i)},
+    {90, "ib_hi",     TOKEN_VG_CONFIG_IB_HEIGHT_I, TOKEN_ARITY_1,  OP_UNARY(op_vg_config_ib_height_i)},
+    {90, "ib_w",      TOKEN_VG_CONFIG_IB_WIDTH,    TOKEN_CONSTANT, OP_UNARY(op_vg_config_ib_width)},
+    {90, "ib_h",      TOKEN_VG_CONFIG_IB_HEIGHT,   TOKEN_CONSTANT, OP_UNARY(op_vg_config_ib_height)},
+    {90, "vblank",    TOKEN_VG_CONFIG_VBLANK,      TOKEN_CONSTANT, OP_UNARY(op_vg_config_vblank)},
+    {90, "fps_limit", TOKEN_VG_CONFIG_FPS_LIMIT,   TOKEN_CONSTANT, OP_UNARY(op_vg_config_fps_limit)},
+    {90, "msaa",      TOKEN_VG_CONFIG_MSAA,        TOKEN_CONSTANT, OP_UNARY(op_vg_config_msaa)},
 
-    {52, "mov32",   TOKEN_ENCODE_MOV32,   TOKEN_ARITY_3,  (bool *)op_encode_mov32},
-    {52, "t2_vmov", TOKEN_ENCODE_T2_VMOV_F32,  TOKEN_ARITY_2,  (bool *)op_encode_t2_vmov_f32},
-    {52, "t1_movt", TOKEN_ENCODE_T1_MOVT, TOKEN_ARITY_2,  (bool *)op_encode_t1_movt},
-    {52, "t1_mov",  TOKEN_ENCODE_T1_MOV,  TOKEN_ARITY_2,  (bool *)op_encode_t1_mov},
-    {52, "t2_mov",  TOKEN_ENCODE_T2_MOV,  TOKEN_ARITY_3,  (bool *)op_encode_t2_mov},
-    {52, "t3_mov",  TOKEN_ENCODE_T3_MOV,  TOKEN_ARITY_2,  (bool *)op_encode_t3_mov},
-    {52, "a1_mov",  TOKEN_ENCODE_A1_MOV,  TOKEN_ARITY_3,  (bool *)op_encode_a1_mov},
-    {52, "a2_mov",  TOKEN_ENCODE_A2_MOV,  TOKEN_ARITY_2,  (bool *)op_encode_a2_mov},
-    {52, "bkpt",    TOKEN_ENCODE_BKPT,    TOKEN_CONSTANT, (bool *)op_encode_bkpt},
-    {52, "nop",     TOKEN_ENCODE_NOP,     TOKEN_CONSTANT, (bool *)op_encode_nop},
-    {52, "??",      TOKEN_ENCODE_UNK,     TOKEN_ARITY_1,  (bool *)op_encode_unk},
+    {52, "mov32",     TOKEN_ENCODE_MOV32,          TOKEN_ARITY_3,  OP_TERNARY(op_encode_mov32)},
+    {52, "t2_vmov",   TOKEN_ENCODE_T2_VMOV_F32,    TOKEN_ARITY_2,  OP_BINARY(op_encode_t2_vmov_f32)},
+    {52, "t1_movt",   TOKEN_ENCODE_T1_MOVT,        TOKEN_ARITY_2,  OP_BINARY(op_encode_t1_movt)},
+    {52, "t1_mov",    TOKEN_ENCODE_T1_MOV,         TOKEN_ARITY_2,  OP_BINARY(op_encode_t1_mov)},
+    {52, "t2_mov",    TOKEN_ENCODE_T2_MOV,         TOKEN_ARITY_3,  OP_TERNARY(op_encode_t2_mov)},
+    {52, "t3_mov",    TOKEN_ENCODE_T3_MOV,         TOKEN_ARITY_2,  OP_BINARY(op_encode_t3_mov)},
+    {52, "a1_mov",    TOKEN_ENCODE_A1_MOV,         TOKEN_ARITY_3,  OP_TERNARY(op_encode_a1_mov)},
+    {52, "a2_mov",    TOKEN_ENCODE_A2_MOV,         TOKEN_ARITY_2,  OP_BINARY(op_encode_a2_mov)},
+    {52, "bkpt",      TOKEN_ENCODE_BKPT,           TOKEN_CONSTANT, OP_UNARY(op_encode_bkpt)},
+    {52, "nop",       TOKEN_ENCODE_NOP,            TOKEN_CONSTANT, OP_UNARY(op_encode_nop)},
+    {52, "??",        TOKEN_ENCODE_UNK,            TOKEN_ARITY_1,  OP_UNARY(op_encode_unk)},
+
+    {52, "t2_imm",    TOKEN_ENCODE_T2_IMM,         TOKEN_ARITY_1,  OP_UNARY(op_encode_t2_imm)},
+    {52, "a1_imm",    TOKEN_ENCODE_A1_IMM,         TOKEN_ARITY_1,  OP_UNARY(op_encode_a1_imm)},
 
 #ifdef BUILD_LEGACY_SUPPORT
-    {0,  "<",       TOKEN_LEGACY,         0,              NULL},
+    {0,  "<",         TOKEN_LEGACY,                0,              OP_NONE},
 #endif
-    {0,  "$",       TOKEN_TERMINATOR,     0,              NULL},
-    {0,  NULL,      TOKEN_INVALID,        0,              NULL}
+    {0,  "$",         TOKEN_TERMINATOR,            0,              OP_NONE},
+    {0,  NULL,        TOKEN_INVALID,               0,              OP_NONE}
 };
 
 void value_raw(value_t *lhs, int size) {
@@ -469,9 +476,9 @@ intp_status_t parse_call(const char *expr, uint32_t *pos, value_t *value, bool a
         return ret;
 
     // Constant?
-    if ((token->flags & TOKEN_CONSTANT) && token->op != NULL) {
+    if ((token->flags & TOKEN_CONSTANT) && token->op.unary != NULL) {
         // Apply op
-        bool op_ret = ((bool (*)(value_t *))(token->op))(value);
+        bool op_ret = token->op.unary(value);
         if (!op_ret)
             __intp_ret_status(INTP_STATUS_ERROR_INVALID_DATATYPE, pos_fn_begin);
 
@@ -511,10 +518,10 @@ intp_status_t parse_call(const char *expr, uint32_t *pos, value_t *value, bool a
     else if (((token->flags & TOKEN_ARITY_1)
             || (token->flags & TOKEN_ARITY_2)
             || (token->flags & TOKEN_ARITY_3)
-            || (token->flags & TOKEN_ARITY_4)) && token->op != NULL) {
+            || (token->flags & TOKEN_ARITY_4))) {
         const token_t *op = token;
-        value_t arg[TOKEN_ARITY_4 - 1];
-        memset(arg, 0, (TOKEN_ARITY_4 - 1) * sizeof(value_t));
+        value_t arg[MAX_FN_ARGS - 1];
+        memset(arg, 0, (MAX_FN_ARGS - 1) * sizeof(value_t));
 
         // Check for opening bracket
         pos_error = *pos;
@@ -579,10 +586,10 @@ intp_status_t parse_call(const char *expr, uint32_t *pos, value_t *value, bool a
         // Apply op
         bool op_ret = false;
         switch (TOKEN_GET_ARGN(op)) {
-            case 1: op_ret = ((bool (*)(value_t *))(op->op))(value); break;
-            case 2: op_ret = ((bool (*)(value_t *, value_t *))(op->op))(value, &arg[0]); break;
-            case 3: op_ret = ((bool (*)(value_t *, value_t *, value_t *))(op->op))(value, &arg[0], &arg[1]); break;
-            case 4: op_ret = ((bool (*)(value_t *, value_t *, value_t *, value_t *))(op->op))(value, &arg[0], &arg[1], &arg[2]); break;
+            case 1: op_ret = op->op.unary(value); break;
+            case 2: op_ret = op->op.binary(value, &arg[0]); break;
+            case 3: op_ret = op->op.ternary(value, &arg[0], &arg[1]); break;
+            case 4: op_ret = op->op.quaternary(value, &arg[0], &arg[1], &arg[2]); break;
             default: /*printf("DEBUG: Invalid fn argn! %d\n", TOKEN_GET_ARGN(op));*/ break;
         }
         if (!op_ret)
@@ -729,7 +736,7 @@ intp_status_t parse_subtree(const char *expr, uint32_t *pos, value_t *value, int
     // While next token is infix operator with minimal precedence
     while ((token->flags & TOKEN_INFIX)
             && token->precedence >= min_precedence
-            && token->op != NULL) {
+            && token->op.binary != NULL) {
         const token_t *op = token;
 
         // Advance to next token (skip infix)
@@ -762,7 +769,7 @@ intp_status_t parse_subtree(const char *expr, uint32_t *pos, value_t *value, int
         }
 
         // Apply op
-        bool op_ret = ((bool (*)(value_t *, value_t *))(op->op))(value, &rhs);
+        bool op_ret = op->op.binary(value, &rhs);
         if (!op_ret)
             __intp_ret_status(INTP_STATUS_ERROR_INVALID_DATATYPE, pos_infix_op);
     }
