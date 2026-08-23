@@ -384,7 +384,7 @@ bool op_encode_mov32(value_t *out, value_t *value, value_t *gap) {
     if (!ret) return ret;
 
     // Encode MOVT
-    top.size = 2;
+    top.type = DATA_TYPE_UNSIGNED;
     top.data.uint32 >>= 16; // shift
     ret = op_encode_t1_movt(&reg, &top);
     if (!ret) return ret;
