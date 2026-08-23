@@ -4,8 +4,37 @@
 #include "interpreter.h"
 #include "parser.h"
 
+static intp_vg_context_t g_vg_context = {
+    .fb_width = 960,
+    .fb_height = 544,
+    .ib_width = {[0 ... INTP_VG_MAX_RES_COUNT - 1] = 960},
+    .ib_height = {[0 ... INTP_VG_MAX_RES_COUNT - 1] = 544},
+    .vblank = 1,
+    .fps_limit = 60,
+    .msaa = 2,
+    .msaa_enabled = true
+};
+
 intp_status_t intp_evaluate(const char *expression, uint32_t *pos, intp_value_t *value) {
     return parse_expression(expression, pos, value, false, false);
+}
+
+/**
+ * @brief Copy context into interpreter-global state
+ *
+ * @param context must not be NULL
+ */
+void intp_set_vg_context(const intp_vg_context_t *context) {
+    g_vg_context = *context;
+}
+
+/**
+ * @brief Return a borrowed, read-only view of interpreter-global state
+ *
+ * @return context
+ */
+const intp_vg_context_t *intp_get_vg_context() {
+    return &g_vg_context;
 }
 
 void intp_format_error(const char *expression, intp_status_t status, char *destination, uint32_t size) {

@@ -1,7 +1,9 @@
 build/
+internal/
 .vscode/
 *.project
 *.o
 
 tests/interpreter
 tests/test_interpreter
+tests/test_patchlist

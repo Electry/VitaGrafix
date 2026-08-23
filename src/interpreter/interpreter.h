@@ -13,6 +13,18 @@ int tolower(int c);
 #endif
 
 #define MAX_VALUE_SIZE 32
+#define INTP_VG_MAX_RES_COUNT 16
+
+typedef struct {
+    uint16_t fb_width;
+    uint16_t fb_height;
+    uint16_t ib_width[INTP_VG_MAX_RES_COUNT];
+    uint16_t ib_height[INTP_VG_MAX_RES_COUNT];
+    uint32_t vblank;
+    uint32_t fps_limit;
+    uint32_t msaa;
+    bool msaa_enabled; // legacy
+} intp_vg_context_t;
 
 typedef enum {
     DATA_TYPE_SIGNED,
@@ -67,6 +79,10 @@ typedef struct {
 } intp_status_t;
 
 intp_status_t intp_evaluate(const char *expression, uint32_t *pos, intp_value_t *value);
+
+void intp_set_vg_context(const intp_vg_context_t *context);
+const intp_vg_context_t *intp_get_vg_context();
+
 void intp_format_error(const char *expression, intp_status_t status, char *destination, uint32_t size);
 const char *intp_data_type_to_string(intp_value_data_type_t type);
 const char *intp_status_code_to_string(intp_status_code_t code);

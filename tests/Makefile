@@ -4,10 +4,13 @@ CFLAGS=-Wall -Wno-trigraphs -DBUILD_LEGACY_SUPPORT
 all: tests
 default: tests
 
-tests: test_interpreter
+tests: test_interpreter test_patchlist
 
 test_interpreter: test_interpreter.c interpreter.obj
 	$(CC) $(CFLAGS) test_interpreter.c $(interpreter_obj) -o test_interpreter -lm
+
+test_patchlist: test_patchlist.c interpreter.obj
+	$(CC) $(CFLAGS) test_patchlist.c $(interpreter_obj) -o test_patchlist -lm
 
 interpreter_incl :=\
 	../src/interpreter/interpreter.h\
@@ -40,4 +43,4 @@ interpreter.obj: $(interpreter_src) $(interpreter_incl)
 	$(CC) $(CFLAGS) -c $(interpreter_src) -lm
 
 clean:
-	rm test_interpreter interpreter *.o
+	rm -f test_interpreter test_patchlist interpreter *.o
