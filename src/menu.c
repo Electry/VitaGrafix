@@ -11,7 +11,7 @@
 #define MENU_REPEAT_INTERVAL 33333
 #define MENU_REPEAT_STEP 2
 #define MENU_HEADER_ROWS 3
-#define MENU_LEGEND "CROSS = toggle START = save"
+#define MENU_LEGEND "CROSS = toggle  START = save"
 
 static vg_menu_t g_menu = {0};
 
@@ -137,6 +137,10 @@ static void vg_menu_move_selected_item_value(int direction) {
 
             config->ib[g_menu.selected_ib_index].width = vg_menu_adjust_value(
                     config->ib[g_menu.selected_ib_index].width, direction, 4, 960, 4);
+            if (g_menu.selected_ib_index + 1 >= config->ib_count) {
+                config->ib_count = g_menu.selected_ib_index + 1;
+                vg_config_propagate_ib();
+            }
             break;
         }
 
@@ -148,6 +152,10 @@ static void vg_menu_move_selected_item_value(int direction) {
 
             config->ib[g_menu.selected_ib_index].height = vg_menu_adjust_value(
                     config->ib[g_menu.selected_ib_index].height, direction, 4, 544, 4);
+            if (g_menu.selected_ib_index + 1 >= config->ib_count) {
+                config->ib_count = g_menu.selected_ib_index + 1;
+                vg_config_propagate_ib();
+            }
             break;
         }
 
@@ -266,6 +274,8 @@ void vg_menu_check_input(SceCtrlData *ctrl) {
                 config->ib_enabled = config->ib_enabled == FT_ENABLED ? FT_DISABLED : FT_ENABLED;
                 if (vg_config_is_feature_enabled(FEATURE_IB)) {
                     g_menu.selected_ib_index = 0;
+                    config->ib_count = 1;
+                    vg_config_propagate_ib();
                 }
                 break;
 

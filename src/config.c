@@ -149,6 +149,7 @@ static vg_io_status_t vg_config_parse_internal_buffer_resolution(const char line
         __ret_status(IO_OK, 0, 0);
     }
 
+    *count = 0;
     while (true) {
         if (*count >= MAX_RES_COUNT)
             __ret_status(IO_ERROR_PARSE_INVALID_TOKEN, 0, pos);
@@ -401,7 +402,7 @@ static bool vg_config_format_current_title_section(char buffer[], size_t size, i
             }
             for (uint8_t i = 0; i < g_config.ib_count; i++) {
                 if (!vg_config_buffer_append(buffer, size, length, "%s%dx%d",
-                        i > 0 ? ", " : "", g_config.ib[i].width, g_config.ib[i].height)) {
+                        i > 0 ? "," : "", g_config.ib[i].width, g_config.ib[i].height)) {
                     return false;
                 }
             }
