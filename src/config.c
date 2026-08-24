@@ -1,8 +1,9 @@
 #include <vitasdk.h>
 #include <taihen.h>
-#include <stdlib.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "io.h"
@@ -346,6 +347,222 @@ void vg_config_propagate_ib() {
         g_config.ib[i].width = g_config.ib[i - 1].width;
         g_config.ib[i].height = g_config.ib[i - 1].height;
     }
+}
+
+static bool vg_config_write_section_separator(SceUID fd, bool output_has_data, char last_output_char) {
+    if (!output_has_data) {
+        return true;
+    }
+
+    const char *separator = last_output_char == '\n' ? "\n" : "\n\n";
+    return sceIoWrite(fd, separator, strlen(separator)) == (int)strlen(separator);
+}
+
+static bool vg_config_buffer_append(char buffer[], size_t size, int *length, const char format[], ...) {
+    if (*length < 0 || (size_t)*length >= size) {
+        return false;
+    }
+
+    va_list args;
+    va_start(args, format);
+    int written = vsnprintf(buffer + *length, size - *length, format, args);
+    va_end(args);
+    if (written < 0 || written >= (int)(size - *length)) {
+        return false;
+    }
+
+    *length += written;
+    return true;
+}
+
+static bool vg_config_format_current_title_section(char buffer[], size_t size, int *length) {
+    *length = 0;
+    const char *off = "off";
+
+    if (!vg_config_buffer_append(buffer, size, length, "[%s,%s,0x%X]\n",
+            g_main.titleid, vg_main_get_self_filename(), g_main.tai_info.module_nid)) {
+        return false;
+    }
+
+    if (g_config.fb_enabled != FT_UNSUPPORTED) {
+        if (g_config.fb_enabled == FT_ENABLED) {
+            if (!vg_config_buffer_append(buffer, size, length, "FB=%dx%d\n", g_config.fb.width, g_config.fb.height)) {
+                return false;
+            }
+        } else if (!vg_config_buffer_append(buffer, size, length, "FB=%s\n", off)) {
+            return false;
+        }
+    }
+
+    if (g_config.ib_enabled != FT_UNSUPPORTED) {
+        if (g_config.ib_enabled == FT_ENABLED && g_config.ib_count > 0) {
+            if (!vg_config_buffer_append(buffer, size, length, "IB=")) {
+                return false;
+            }
+            for (uint8_t i = 0; i < g_config.ib_count; i++) {
+                if (!vg_config_buffer_append(buffer, size, length, "%s%dx%d",
+                        i > 0 ? ", " : "", g_config.ib[i].width, g_config.ib[i].height)) {
+                    return false;
+                }
+            }
+            if (!vg_config_buffer_append(buffer, size, length, "\n")) {
+                return false;
+            }
+        } else if (!vg_config_buffer_append(buffer, size, length, "IB=%s\n", off)) {
+            return false;
+        }
+    }
+
+    if (g_config.fps_enabled != FT_UNSUPPORTED) {
+        if (g_config.fps_enabled == FT_ENABLED) {
+            if (!vg_config_buffer_append(buffer, size, length, "FPS=%s\n",
+                    g_config.fps == FPS_20 ? "20" : g_config.fps == FPS_30 ? "30" : "60")) {
+                return false;
+            }
+        } else if (!vg_config_buffer_append(buffer, size, length, "FPS=%s\n", off)) {
+            return false;
+        }
+    }
+
+    if (g_config.msaa_enabled != FT_UNSUPPORTED) {
+        if (g_config.msaa_enabled == FT_ENABLED) {
+            if (!vg_config_buffer_append(buffer, size, length, "MSAA=%s\n",
+                    g_config.msaa == MSAA_NONE ? "1" : g_config.msaa == MSAA_2X ? "2" : "4")) {
+                return false;
+            }
+        } else if (!vg_config_buffer_append(buffer, size, length, "MSAA=%s\n", off)) {
+            return false;
+        }
+    }
+
+    return vg_config_buffer_append(buffer, size, length, "\n");
+}
+
+static bool vg_config_replace_title_section(const char path[], const char section[], int section_length) {
+    char temp_path[CONFIG_PATH_SIZE + sizeof(".tmp")];
+    snprintf(temp_path, sizeof(temp_path), "%s.tmp", path);
+    sceIoRemove(temp_path);
+
+    SceUID input = -1;
+    SceUID output = sceIoOpen(temp_path, SCE_O_WRONLY | SCE_O_CREAT | SCE_O_TRUNC, 0777);
+    if (output < 0) {
+        goto SAVE_FAILURE;
+    }
+
+    input = sceIoOpen(path, SCE_O_RDONLY, 0777);
+    bool had_input = input >= 0;
+    bool section_written = false;
+    bool skip_section = false;
+    bool output_has_data = false;
+    char last_output_char = '\0';
+    char line[IO_CHUNK_SIZE + 1];
+    int line_length = 0;
+
+    if (input >= 0) {
+        char c;
+        while (true) {
+            int read = sceIoRead(input, &c, 1);
+            if (read == 1) {
+                if (line_length >= IO_CHUNK_SIZE) {
+                    goto SAVE_FAILURE;
+                }
+                line[line_length++] = c;
+            } else if (read < 0) {
+                goto SAVE_FAILURE;
+            } else if (line_length == 0) {
+                break;
+            }
+
+            if (read == 1 && c != '\n') {
+                continue;
+            }
+
+            line[line_length] = '\0';
+
+            int pos = 0;
+            while (isspace(line[pos])) { pos++; }
+            if (line[pos] == '[') {
+                skip_section = false;
+
+                vg_io_section_header_t header;
+                if (vg_io_parse_section_header(&line[pos], &header).code != IO_OK) {
+                    goto SAVE_FAILURE;
+                }
+
+                skip_section = vg_main_match_current_module(header.titleid, header.self, header.nid, true)
+                    == MODULE_MATCH;
+
+                if (skip_section && !section_written) {
+                    if (!vg_config_write_section_separator(output, output_has_data, last_output_char)
+                            || sceIoWrite(output, section, section_length) != section_length) {
+                        goto SAVE_FAILURE;
+                    }
+
+                    section_written = true;
+                    output_has_data = true;
+                    last_output_char = section[section_length - 1];
+                }
+            }
+
+            if (!skip_section) {
+                if (sceIoWrite(output, line, line_length) != line_length) {
+                    goto SAVE_FAILURE;
+                }
+
+                output_has_data = true;
+                last_output_char = line[line_length - 1];
+            }
+
+            line_length = 0;
+            if (read != 1) {
+                break;
+            }
+        }
+
+        sceIoClose(input);
+        input = -1;
+    }
+
+    if (!section_written && (!vg_config_write_section_separator(output, output_has_data, last_output_char)
+            || sceIoWrite(output, section, section_length) != section_length)) {
+        goto SAVE_FAILURE;
+    }
+
+    if (sceIoClose(output) < 0) {
+        output = -1;
+        goto SAVE_FAILURE;
+    }
+
+    output = -1;
+    if ((had_input && sceIoRemove(path) < 0) || sceIoRename(temp_path, path) < 0) {
+        goto SAVE_FAILURE;
+    }
+
+    return true;
+
+SAVE_FAILURE:
+    if (input >= 0) {
+        sceIoClose(input);
+    }
+    if (output >= 0) {
+        sceIoClose(output);
+    }
+    sceIoRemove(temp_path);
+    return false;
+}
+
+bool vg_config_save_current_title_override() {
+    char section[512];
+    int section_length;
+    if (!vg_config_format_current_title_section(section, sizeof(section), &section_length)) {
+        return false;
+    }
+
+    sceIoMkdir(CONFIG_DIR, 0777);
+
+    char path[CONFIG_PATH_SIZE];
+    snprintf(path, sizeof(path), "%s%s.txt", CONFIG_DIR, g_main.titleid);
+    return vg_config_replace_title_section(path, section, section_length);
 }
 
 vg_io_status_t vg_config_parse() {

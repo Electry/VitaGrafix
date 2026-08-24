@@ -96,8 +96,12 @@ extern const vg_res_t vg_config_framebuffer_resolutions[FRAMEBUFFER_RESOLUTION_C
 
 void vg_config_propagate_ib();
 vg_io_status_t vg_config_parse();
+
 vg_config_t *vg_config_get();
 const vg_io_status_t *vg_config_get_status();
+
+bool vg_config_save_current_title_override();
+
 bool vg_config_is_feature_enabled(vg_feature_t feature);
 bool vg_config_is_feature_supported(vg_feature_t feature);
 

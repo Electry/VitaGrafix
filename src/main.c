@@ -8,6 +8,7 @@
 #include "io.h"
 #include "log.h"
 #include "config.h"
+#include "menu.h"
 #include "patch.h"
 #include "main.h"
 #include "osd.h"
@@ -17,39 +18,24 @@ vg_main_t g_main = {0};
 // string buffer
 char g_osd_buffer[STRING_BUFFER_SIZE] = "";
 
-static int vg_main_get_osd_width() {
-    const vg_config_t config = *vg_config_get();
-
-    // TODO: Maybe just snprintf both lines to buf, and then osd_get_text_width(buf) ¯\_(ツ)_/¯
-    int w = 180;      // Fit "960x544" or "60 FPS"
-
-    if (config.fb_enabled == FT_UNSUPPORTED && config.ib_enabled == FT_UNSUPPORTED
-            && (config.msaa_enabled == FT_DISABLED || config.msaa_enabled == FT_UNSPECIFIED)) {
-        w += 60;      // Fit "MSAA: default"
-    } else if (config.fb_enabled == FT_DISABLED || config.fb_enabled == FT_UNSPECIFIED
-            || config.ib_enabled == FT_DISABLED || config.ib_enabled == FT_UNSPECIFIED
-            || config.fps_enabled == FT_DISABLED || config.fps_enabled == FT_UNSPECIFIED) {
-        w += 50;      // Fit "Res: default" or "FPS: default"
-    } else if (config.fb_enabled == FT_UNSUPPORTED && config.ib_enabled == FT_UNSUPPORTED
-            && config.msaa_enabled == FT_ENABLED) {
-        w += 10;      // Fit "MSAA: 4x"
+#define DECL_FUNC_HOOK_INTERCEPT_CTRL(index, name, negative) \
+    static int name##_patched(int port, SceCtrlData *ctrl, int count) { \
+        int ret = TAI_CONTINUE(int, g_main.input_hook_ref[(index)], port, ctrl, count); \
+        if (vg_menu_is_open()) { \
+            for (int i = 0; i < ret; i++) \
+                ctrl[i].buttons = (negative) ? ~0u : 0; \
+        } \
+        return ret; \
     }
 
-    if (config.ib_enabled == FT_ENABLED) {
-        if (config.ib[0].width > 999)
-            w += 10;  // Fit "1280x720"
-        if (config.ib_count > 1)
-            w += 110; // Fit "960x544 >> 720x408"
-    }
-    if ((config.fb_enabled != FT_UNSUPPORTED || config.ib_enabled != FT_UNSUPPORTED)
-            && !((config.fb_enabled == FT_ENABLED || config.ib_enabled == FT_ENABLED)           // "960x544 (4x)"
-                && (config.fps_enabled == FT_DISABLED || config.fps_enabled == FT_UNSPECIFIED)) // "FPS: default"
-            && config.msaa_enabled == FT_ENABLED) {
-        w += 50;      // Fit "960x544 (4x)" or "Res: default (4x)"
-    }
-
-    return w;
-}
+DECL_FUNC_HOOK_INTERCEPT_CTRL(0, sceCtrlPeekBufferNegative, true)
+DECL_FUNC_HOOK_INTERCEPT_CTRL(1, sceCtrlPeekBufferNegative2, true)
+DECL_FUNC_HOOK_INTERCEPT_CTRL(2, sceCtrlPeekBufferPositive, false)
+DECL_FUNC_HOOK_INTERCEPT_CTRL(3, sceCtrlPeekBufferPositive2, false)
+DECL_FUNC_HOOK_INTERCEPT_CTRL(4, sceCtrlReadBufferNegative, true)
+DECL_FUNC_HOOK_INTERCEPT_CTRL(5, sceCtrlReadBufferNegative2, true)
+DECL_FUNC_HOOK_INTERCEPT_CTRL(6, sceCtrlReadBufferPositive, false)
+DECL_FUNC_HOOK_INTERCEPT_CTRL(7, sceCtrlReadBufferPositive2, false)
 
 static int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int sync) {
     const vg_config_t config = *vg_config_get();
@@ -60,119 +46,75 @@ static int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int s
     if (!g_main.osd_timer) {
         g_main.osd_timer = sceKernelGetProcessTimeLow();
     }
-    // OSD timer finished? Release the hook
-    else if (sceKernelGetProcessTimeLow() - g_main.osd_timer > OSD_SHOW_DURATION
-            && config_status.code == IO_OK // Show indefinitely on i/o error
-            && patch_status.code == IO_OK) {
-        int ret = TAI_CONTINUE(int, g_main.osd_hook_ref, pParam, sync);
-
-        taiHookRelease(g_main.osd_hook, g_main.osd_hook_ref);
-        g_main.osd_hook = -1;
-        return ret;
-    }
 
     osd_update_fb(pParam);
-    osd_set_back_color(0, 0, 0, 200);
 
-    // Background
-    osd_draw_rectangle_fast(20, 20, vg_main_get_osd_width(), 70);
+    if (g_main.patch_match == MODULE_MATCH) {
+        bool menu_was_open = vg_menu_is_open();
+        SceCtrlData ctrl;
+        if (sceCtrlPeekBufferPositive(0, &ctrl, 1) > 0) {
+            vg_menu_check_input(&ctrl);
+        }
 
-    // Logo
-    osd_draw_logo(30 + 5, 30); // 60x38
+        // menu closed and notice is set, reset the OSD timer
+        if (menu_was_open && !vg_menu_is_open() && vg_menu_get_notice() != MENU_NOTICE_NONE) {
+            g_main.osd_timer = sceKernelGetProcessTimeLow();
+        }
 
-    // Version
-    osd_set_back_color(0, 0, 0, 0);
-    osd_set_text_scale_fl(0.5f);
-    osd_draw_stringf(35 + 5 + 21, 70 + 2, VG_VERSION); // 30x10
+        if (vg_menu_is_open()) {
+            vg_menu_draw();
+            return TAI_CONTINUE(int, g_main.osd_hook_ref, pParam, sync);
+        }
+    }
 
-    // Draw configuration
-    osd_set_text_scale(1);
-    int y = 56;
+    // OSD already shown, and all is good, return
+    if (sceKernelGetProcessTimeLow() - g_main.osd_timer > OSD_SHOW_DURATION
+            && config_status.code == IO_OK && patch_status.code == IO_OK) {
+        return TAI_CONTINUE(int, g_main.osd_hook_ref, pParam, sync);
+    }
 
-    // IO/parse failure?
     if (config_status.code != IO_OK || patch_status.code != IO_OK) {
-        osd_draw_string(110, y, "Error");
-        osd_set_back_color(0, 0, 0, 255);
-
-        // Draw short message
         if (config_status.code == IO_ERROR_OPEN_FAILED) {
-            osd_draw_string(20, 110, OSD_MSG_CONFIG_OPEN_FAILED);
-            osd_draw_string(20, 130, OSD_MSG_IOPLUS_HINT);
+            osd_draw_header(OSD_ERROR_HEADER "\n" OSD_MSG_CONFIG_OPEN_FAILED "\n" OSD_MSG_IOPLUS_HINT);
         } else if (patch_status.code == IO_ERROR_OPEN_FAILED) {
-            osd_draw_string(20, 110, OSD_MSG_PATCH_OPEN_FAILED);
-            osd_draw_string(20, 130, OSD_MSG_IOPLUS_HINT);
+            osd_draw_header(OSD_ERROR_HEADER "\n" OSD_MSG_PATCH_OPEN_FAILED "\n" OSD_MSG_IOPLUS_HINT);
         } else if (config_status.code != IO_OK) {
-            osd_draw_string(20, 110, OSD_MSG_CONFIG_ERROR);
+            osd_draw_header(OSD_ERROR_HEADER "\n" OSD_MSG_CONFIG_ERROR);
         } else if (patch_status.code != IO_OK) {
-            osd_draw_string(20, 110, OSD_MSG_PATCH_ERROR);
+            osd_draw_header(OSD_ERROR_HEADER "\n" OSD_MSG_PATCH_ERROR);
         }
 
-        // Draw first x characters from log
-        if (config.log_enabled) {
-            osd_draw_log(20, 150, pParam->height, g_osd_buffer);
-        }
-    }
-    // Wrong version
-    else if (g_main.patch_match == MODULE_NID_MISMATCH) {
-        osd_draw_string(110, y, "Error");
         osd_set_back_color(0, 0, 0, 255);
-        osd_draw_string(pParam->width / 2 - osd_get_text_width(OSD_MSG_GAME_WRONG_VERSION) / 2,
-                        pParam->height / 2 - 20,
-                        OSD_MSG_GAME_WRONG_VERSION);
-    }
-    else {
-        // MSAA
-        char msaa_sm_buf[16] = "";
-        if (config.msaa_enabled == FT_ENABLED) {
-            snprintf(msaa_sm_buf, 16, "%s",
-                    (config.msaa == MSAA_4X ? "4x" :
-                    (config.msaa == MSAA_2X ? "2x" : "1x")));
+        if (config.log_enabled) {
+            osd_draw_log(20, 110, pParam->height, g_osd_buffer);
         }
+    } else if (g_main.patch_match == MODULE_NID_MISMATCH) {
+        osd_draw_header(OSD_ERROR_HEADER "\n" OSD_MSG_GAME_WRONG_VERSION);
+    } else if (vg_menu_get_notice() == MENU_NOTICE_SAVED) {
+        osd_draw_header(OSD_MSG_CONFIG_SAVED);
+    } else if (vg_menu_get_notice() == MENU_NOTICE_SAVE_FAILED) {
+        osd_draw_header(OSD_MSG_CONFIG_SAVE_FAILED);
+    } else if (config.osd_enabled == FT_ENABLED) {
+        char info[64] = "";
 
-        // 2nd line
-        if (config.fps_enabled == FT_ENABLED) {
-            osd_draw_stringf(110, y, "%d FPS",
-                    config.fps == FPS_60 ? 60 : 30);
-            y -= 20;
-        } else if (config.fps_enabled != FT_UNSUPPORTED) {
-            osd_draw_stringf(110, y, "FPS: default");
-            y -= 20;
-        }
-
-        // 1st line
-        char res_buf[32] = "";
         if (config.fb_enabled == FT_ENABLED) {
-            snprintf(res_buf, 32, "%dx%d",
-                    config.fb.width,
-                    config.fb.height);
+            snprintf(info, sizeof(info), "%dx%d", config.fb.width, config.fb.height);
         } else if (config.ib_enabled == FT_ENABLED) {
-            if (config.ib_count == 1) {
-                snprintf(res_buf, 32, "%dx%d",
-                        config.ib[0].width,
-                        config.ib[0].height);
-            } else {
-                snprintf(res_buf, 32, "%dx%d >> %dx%d",
-                        config.ib[0].width,
-                        config.ib[0].height,
-                        config.ib[config.ib_count - 1].width,
-                        config.ib[config.ib_count - 1].height);
-            }
-        } else if (config.fb_enabled != FT_UNSUPPORTED
-                    || config.ib_enabled != FT_UNSUPPORTED) {
-            snprintf(res_buf, 32, "Res: default");
-        } else if (config.msaa_enabled == FT_ENABLED) {
-            snprintf(res_buf, 32, "MSAA: %s", msaa_sm_buf);
-        } else if (config.msaa_enabled != FT_UNSUPPORTED) {
-            snprintf(res_buf, 16, "MSAA: default");
+            snprintf(info, sizeof(info), config.ib_count > 1 ? "%dx%d >> %dx%d" : "%dx%d",
+                    config.ib[0].width, config.ib[0].height,
+                    config.ib[config.ib_count - 1].width, config.ib[config.ib_count - 1].height);
+        }
+        if (config.fps_enabled == FT_ENABLED) {
+            const int fps = config.fps == FPS_60 ? 60 : config.fps == FPS_30 ? 30 : 20;
+            snprintf(info + strlen(info), sizeof(info) - strlen(info), "%s%d FPS", info[0] ? " / " : "", fps);
+        }
+        if (config.msaa_enabled == FT_ENABLED) {
+            const char *msaa = config.msaa == MSAA_4X ? "4x MSAA" : config.msaa == MSAA_2X ? "2x MSAA" : "No MSAA";
+            snprintf(info + strlen(info), sizeof(info) - strlen(info), "%s%s", info[0] ? " / " : "", msaa);
         }
 
-        if (res_buf[0] != '\0') {
-            if (config.msaa_enabled == FT_ENABLED
-                    && (config.fb_enabled != FT_UNSUPPORTED
-                    || config.ib_enabled != FT_UNSUPPORTED))
-                osd_draw_stringf(110, y, "%s (%s)", res_buf, msaa_sm_buf);
-            else
-                osd_draw_stringf(110, y, "%s", res_buf);
+        if (info[0]) {
+            osd_draw_header(info);
         }
     }
 
@@ -196,14 +138,6 @@ vg_module_match_t vg_main_match_current_module(const char titleid[], const char 
 
 void _start() __attribute__ ((weak, alias ("module_start")));
 int module_start(SceSize argc, const void *args) {
-    // Get app titleid
-    sceAppMgrAppParamGetString(0, 12, g_main.titleid, 16);
-
-    // Exit if using VitaShell
-    if (!strncmp(g_main.titleid, "VITASHELL", TITLEID_LEN)) {
-        goto EXIT;
-    }
-
     g_main.osd_hook = -1;
     g_main.inject_num = 0;
     for (int i = 0; i < MAX_INJECT_NUM; i++) {
@@ -211,6 +145,17 @@ int module_start(SceSize argc, const void *args) {
     }
     for (int i = 0; i < MAX_HOOK_NUM; i++) {
         g_main.hook[i] = -1;
+    }
+    for (int i = 0; i < INPUT_HOOK_NUM; i++) {
+        g_main.input_hook[i] = -1;
+    }
+
+    // Get app titleid
+    sceAppMgrAppParamGetString(0, 12, g_main.titleid, 16);
+
+    // Exit if using VitaShell
+    if (!strncmp(g_main.titleid, "VITASHELL", TITLEID_LEN)) {
+        goto EXIT;
     }
 
     // Get eboot.bin info
@@ -227,7 +172,7 @@ int module_start(SceSize argc, const void *args) {
     vg_log_printf("=======================================\n");
     vg_log_printf("[MAIN] Title ID: %s\n", g_main.titleid);
     vg_log_printf("[MAIN] SELF: %s\n", g_main.sce_info.path);
-    vg_log_printf("[MAIN] NID: 0x%X\n", g_main.tai_info.module_nid);
+    vg_log_printf("[MAIN] NID: 0x%08X\n", g_main.tai_info.module_nid);
     vg_log_printf("=======================================\n");
 
     // Parse config.txt
@@ -268,9 +213,29 @@ int module_start(SceSize argc, const void *args) {
     if (g_main.patch_match == MODULE_SELF_MISMATCH || g_main.patch_match == MODULE_TITLE_MISMATCH)
         goto EXIT;
 
+    if (config->osd_enabled == FT_ENABLED) {
+        g_main.input_hook[0] = taiHookFunctionImport(&g_main.input_hook_ref[0], TAI_MAIN_MODULE,
+                TAI_ANY_LIBRARY, 0x104ED1A7, sceCtrlPeekBufferNegative_patched);
+        g_main.input_hook[1] = taiHookFunctionImport(&g_main.input_hook_ref[1], TAI_MAIN_MODULE,
+                TAI_ANY_LIBRARY, 0x81A89660, sceCtrlPeekBufferNegative2_patched);
+        g_main.input_hook[2] = taiHookFunctionImport(&g_main.input_hook_ref[2], TAI_MAIN_MODULE,
+                TAI_ANY_LIBRARY, 0xA9C3CED6, sceCtrlPeekBufferPositive_patched);
+        g_main.input_hook[3] = taiHookFunctionImport(&g_main.input_hook_ref[3], TAI_MAIN_MODULE,
+                TAI_ANY_LIBRARY, 0x15F81E8C, sceCtrlPeekBufferPositive2_patched);
+        g_main.input_hook[4] = taiHookFunctionImport(&g_main.input_hook_ref[4], TAI_MAIN_MODULE,
+                TAI_ANY_LIBRARY, 0x15F96FB0, sceCtrlReadBufferNegative_patched);
+        g_main.input_hook[5] = taiHookFunctionImport(&g_main.input_hook_ref[5], TAI_MAIN_MODULE,
+                TAI_ANY_LIBRARY, 0x27A0C5FB, sceCtrlReadBufferNegative2_patched);
+        g_main.input_hook[6] = taiHookFunctionImport(&g_main.input_hook_ref[6], TAI_MAIN_MODULE,
+                TAI_ANY_LIBRARY, 0x67E7AB83, sceCtrlReadBufferPositive_patched);
+        g_main.input_hook[7] = taiHookFunctionImport(&g_main.input_hook_ref[7], TAI_MAIN_MODULE,
+                TAI_ANY_LIBRARY, 0xC4226A3E, sceCtrlReadBufferPositive2_patched);
+        vg_menu_init();
+    }
+
 EXIT_HOOK_OSD:
     // Hook sceDisplaySetFrameBuf for OSD
-    if (config->osd_enabled) {
+    if (config->osd_enabled == FT_ENABLED) {
         g_main.osd_timer = 0;
         g_main.osd_hook = taiHookFunctionImport(
                     &g_main.osd_hook_ref,
@@ -295,6 +260,13 @@ int module_stop(SceSize argc, const void *args) {
         taiHookRelease(g_main.osd_hook, g_main.osd_hook_ref);
     }
 
+    // Release input hooks
+    for (int i = 0; i < INPUT_HOOK_NUM; i++) {
+        if (g_main.input_hook[i] >= 0) {
+            taiHookRelease(g_main.input_hook[i], g_main.input_hook_ref[i]);
+        }
+    }
+
     // Release game patches
     for (uint32_t i = g_main.inject_num; i > 0; i--) {
         if (g_main.inject[i - 1] >= 0)
@@ -302,7 +274,7 @@ int module_stop(SceSize argc, const void *args) {
     }
     g_main.inject_num = 0;
 
-    // Release game hooks, we need to loop the whole array since hooks are indexed by their id
+    // Release game hooks: we need to loop the whole array since hooks are indexed by their id
     for (uint8_t i = MAX_HOOK_NUM; i > 0; i--) {
         if (g_main.hook[i - 1] >= 0)
             taiHookRelease(g_main.hook[i - 1], g_main.hook_ref[i - 1]);
