@@ -13,6 +13,7 @@
 #define OSD_MSG_PATCH_ERROR        "An error occurred while reading the patch file."
 #define OSD_MSG_IOPLUS_HINT        "Do you have ioPlus installed?"
 #define OSD_MSG_GAME_WRONG_VERSION "Patch is for another game version."
+#define OSD_MSG_PATCHES_AVAILABLE  "Patches available."
 #define OSD_MSG_CONFIG_SAVED       "Saved. Restart the game to apply."
 #define OSD_MSG_CONFIG_SAVE_FAILED "Failed to save configuration."
 

@@ -73,6 +73,14 @@ static int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int s
         return TAI_CONTINUE(int, g_main.osd_hook_ref, pParam, sync);
     }
 
+    bool has_applied_patches = g_main.inject_num > 0;
+    for (int i = 0; i < MAX_HOOK_NUM; i++) {
+        if (g_main.hook[i] >= 0) {
+            has_applied_patches = true;
+            break;
+        }
+    }
+
     if (config_status.code != IO_OK || patch_status.code != IO_OK) {
         if (config_status.code == IO_ERROR_OPEN_FAILED) {
             osd_draw_header(OSD_ERROR_HEADER "\n" OSD_MSG_CONFIG_OPEN_FAILED "\n" OSD_MSG_IOPLUS_HINT);
@@ -94,6 +102,8 @@ static int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int s
         osd_draw_header(OSD_MSG_CONFIG_SAVED);
     } else if (vg_menu_get_notice() == MENU_NOTICE_SAVE_FAILED) {
         osd_draw_header(OSD_MSG_CONFIG_SAVE_FAILED);
+    } else if (g_main.patch_match == MODULE_MATCH && !has_applied_patches) {
+        osd_draw_header(OSD_MSG_PATCHES_AVAILABLE);
     } else if (config.osd_enabled == FT_ENABLED) {
         char info[64] = "";
 
