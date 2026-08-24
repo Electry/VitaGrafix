@@ -194,20 +194,6 @@ vg_module_match_t vg_main_match_current_module(const char titleid[], const char 
     return MODULE_MATCH;
 }
 
-void vg_main_log_header() {
-#ifndef ENABLE_VERBOSE_LOGGING
-    // Don't overwrite log
-    vg_log_prepare();
-#endif
-    // Log basic info
-    vg_log_printf("VitaGrafix " VG_VERSION "\n");
-    vg_log_printf("=======================================\n");
-    vg_log_printf("[MAIN] Title ID: %s\n", g_main.titleid);
-    vg_log_printf("[MAIN] SELF: %s\n", g_main.sce_info.path);
-    vg_log_printf("[MAIN] NID: 0x%X\n", g_main.tai_info.module_nid);
-    vg_log_printf("=======================================\n");
-}
-
 void _start() __attribute__ ((weak, alias ("module_start")));
 int module_start(SceSize argc, const void *args) {
     // Get app titleid
@@ -236,25 +222,29 @@ int module_start(SceSize argc, const void *args) {
     // Create VitaGrafix folder (if doesn't exist)
     sceIoMkdir(VG_DIR, 0777);
 
-#ifdef ENABLE_VERBOSE_LOGGING
-    // Create log file before config is parsed
-    // so we can print parsing debug info
-    vg_log_prepare();
-#endif
+    // Log basic info
+    vg_log_printf("VitaGrafix " VG_VERSION "\n");
+    vg_log_printf("=======================================\n");
+    vg_log_printf("[MAIN] Title ID: %s\n", g_main.titleid);
+    vg_log_printf("[MAIN] SELF: %s\n", g_main.sce_info.path);
+    vg_log_printf("[MAIN] NID: 0x%X\n", g_main.tai_info.module_nid);
+    vg_log_printf("=======================================\n");
 
     // Parse config.txt
     vg_io_status_t config_status = vg_config_parse();
     vg_io_status_t patch_status = {IO_OK, 0, 0};
     vg_config_t *config = vg_config_get();
+
+    if (config->log_enabled == FT_ENABLED) {
+        vg_log_prepare();
+        vg_log_set_enabled(true);
+    }
+
     if (config_status.code != IO_OK) {
-        config->enabled = config->osd_enabled = FT_ENABLED;
-        vg_log_set_enabled(config->log_enabled == FT_ENABLED);
-        vg_main_log_header();
+        config->enabled = FT_ENABLED;
+        config->osd_enabled = FT_ENABLED;
         vg_log_printf("[PATCH] Failed to parse config (line %d, pos %d): %s\n",
                     config_status.line, config_status.pos_line, vg_io_status_code_to_string(config_status.code));
-    } else if (config->log_enabled == FT_ENABLED) {
-        vg_log_set_enabled(true);
-        vg_main_log_header();
     }
 
     // Exit now?

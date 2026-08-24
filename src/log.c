@@ -15,21 +15,19 @@ void vg_log_set_enabled(bool enabled) {
 }
 
 void vg_log_prepare() {
-#ifndef ENABLE_VERBOSE_LOGGING
-    if (!g_log_enabled)
-        return;
-#endif
-
     SceUID fd = sceIoOpen(LOG_PATH, SCE_O_WRONLY | SCE_O_CREAT | SCE_O_TRUNC, 0777);
     if (fd >= 0)
         sceIoClose(fd);
 }
 
 void vg_log_flush() {
-#ifndef ENABLE_VERBOSE_LOGGING
-    if (!g_log_enabled)
+    // logger has to be enabled before the first flush!
+    if (!g_log_enabled) {
+        g_log_buffer_size = 0;
+        memset(g_log_buffer, 0, LOG_BUFFER_SIZE);
         return;
-#endif
+    }
+
     if (!g_log_buffer_size)
         return;
 
@@ -45,11 +43,6 @@ void vg_log_flush() {
 }
 
 void vg_log_printf(const char *format, ...) {
-#ifndef ENABLE_VERBOSE_LOGGING
-    if (!g_log_enabled)
-        return;
-#endif
-
     va_list args;
     va_start(args, format);
 
@@ -67,10 +60,8 @@ void vg_log_printf(const char *format, ...) {
 }
 
 void vg_log_read(char *dest, int size) {
-#ifndef ENABLE_VERBOSE_LOGGING
     if (!g_log_enabled)
         return;
-#endif
     if (size <= 0)
         return;
 
