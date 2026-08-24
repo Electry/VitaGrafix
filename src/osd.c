@@ -91,6 +91,11 @@ uint32_t osd_get_text_height() {
     return g_font->height * 544.0f / g_framebuf.height;
 }
 
+int osd_get_text_end_x(int x, const char *str) {
+    int end_x = OSD_RESCALE_X(x) + osd_get_text_width_abs(str);
+    return (end_x * 960 + g_framebuf.width - 1) / g_framebuf.width;
+}
+
 void osd_clear_screen() {
     if (g_color_bg.rgba.a == 255) {
         osd_fill_color((rgba_t *)g_framebuf.base, g_framebuf.pitch * g_framebuf.height);

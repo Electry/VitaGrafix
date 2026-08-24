@@ -323,8 +323,6 @@ void vg_menu_draw() {
 
     int label_x = x + 14;
     int value_x = x + 14 + osd_get_text_width("IB (+99):") + 12; // account for the widest label
-    int selected_offset_x = osd_get_text_width("< ");
-
     osd_set_back_color(0, 0, 0, 255);
     osd_draw_rounded_rectangle(x, y, width, height, 7);
 
@@ -366,7 +364,10 @@ void vg_menu_draw() {
                 snprintf(value, sizeof(value), selected ? "< Off >" : "Off");
             }
 
-            vg_menu_draw_value(row_value_x + (selected ? 0 : selected_offset_x), row_y, value, selected);
+            if (!selected) {
+                row_value_x = osd_get_text_end_x(row_value_x, "< ");
+            }
+            vg_menu_draw_value(row_value_x, row_y, value, selected);
 
             continue;
         }
@@ -381,7 +382,10 @@ void vg_menu_draw() {
             bool row_selected = g_menu.selected_item == MENU_ITEM_IB_WIDTH || g_menu.selected_item == MENU_ITEM_IB_HEIGHT;
 
             if (!vg_config_is_feature_enabled(FEATURE_IB)) {
-                vg_menu_draw_value(row_value_x + (row_selected ? 0 : selected_offset_x), row_y, row_selected ? "< Off >" : "Off", row_selected);
+                if (!row_selected) {
+                    row_value_x = osd_get_text_end_x(row_value_x, "< ");
+                }
+                vg_menu_draw_value(row_value_x, row_y, row_selected ? "< Off >" : "Off", row_selected);
             } else {
                 char width[8], height[8];
                 snprintf(width, sizeof(width), "%d", config->ib[g_menu.selected_ib_index].width);
@@ -390,7 +394,7 @@ void vg_menu_draw() {
                 if (row_selected) {
                     vg_menu_draw_value(row_value_x, row_y, "< ", true);
                 }
-                row_value_x += selected_offset_x;
+                row_value_x = osd_get_text_end_x(row_value_x, "< ");
 
                 vg_menu_draw_value(row_value_x, row_y, width, g_menu.selected_item == MENU_ITEM_IB_WIDTH);
                 row_value_x += osd_get_text_width(width);
@@ -417,7 +421,10 @@ void vg_menu_draw() {
                     config->fps == FPS_20 ? "20" : config->fps == FPS_30 ? "30" : "60";
             char display_value[16];
             snprintf(display_value, sizeof(display_value), selected ? "< %s >" : "%s", value);
-            vg_menu_draw_value(row_value_x + (selected ? 0 : selected_offset_x), row_y, display_value, selected);
+            if (!selected) {
+                row_value_x = osd_get_text_end_x(row_value_x, "< ");
+            }
+            vg_menu_draw_value(row_value_x, row_y, display_value, selected);
 
             continue;
         }
@@ -430,7 +437,10 @@ void vg_menu_draw() {
                     config->msaa == MSAA_NONE ? "No MSAA" : config->msaa == MSAA_2X ? "2x" : "4x";
             char display_value[16];
             snprintf(display_value, sizeof(display_value), selected ? "< %s >" : "%s", value);
-            vg_menu_draw_value(row_value_x + (selected ? 0 : selected_offset_x), row_y, display_value, selected);
+            if (!selected) {
+                row_value_x = osd_get_text_end_x(row_value_x, "< ");
+            }
+            vg_menu_draw_value(row_value_x, row_y, display_value, selected);
 
             continue;
         }
