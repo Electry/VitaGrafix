@@ -318,25 +318,18 @@ void vg_config_set_unspecified_to_defaults() {
 
     if (g_config.fb_enabled == FT_UNSPECIFIED) {
         g_config.fb_enabled = FT_DISABLED;
-        g_config.fb.width = 960;
-        g_config.fb.height = 544;
     }
 
     if (g_config.ib_enabled == FT_UNSPECIFIED) {
         g_config.ib_enabled = FT_DISABLED;
-        g_config.ib[0].width = 960;
-        g_config.ib[0].height = 544;
-        g_config.ib_count = 1;
     }
 
     if (g_config.fps_enabled == FT_UNSPECIFIED) {
         g_config.fps_enabled = FT_DISABLED;
-        g_config.fps = FPS_60;
     }
 
     if (g_config.msaa_enabled == FT_UNSPECIFIED) {
         g_config.msaa_enabled = FT_DISABLED;
-        g_config.msaa = MSAA_4X;
     }
 }
 
@@ -567,7 +560,8 @@ bool vg_config_save_current_title_override() {
 }
 
 vg_io_status_t vg_config_parse() {
-    // Reset
+    g_config = (vg_config_t){0};
+
     g_config.enabled      = FT_UNSPECIFIED;
     g_config.osd_enabled  = FT_UNSPECIFIED;
     g_config.log_enabled  = FT_UNSPECIFIED;
@@ -575,6 +569,12 @@ vg_io_status_t vg_config_parse() {
     g_config.ib_enabled   = FT_UNSPECIFIED;
     g_config.fps_enabled  = FT_UNSPECIFIED;
     g_config.msaa_enabled = FT_UNSPECIFIED;
+
+    g_config.fb = vg_config_framebuffer_resolutions[0];
+    g_config.ib[0] = (vg_res_t){960, 544};
+    g_config.ib_count = 1;
+    g_config.fps = FPS_60;
+    g_config.msaa = MSAA_4X;
 
     char path[CONFIG_PATH_SIZE];
     snprintf(path, sizeof(path), "%s%s.txt", CONFIG_DIR, g_main.titleid);
