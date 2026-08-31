@@ -63,7 +63,9 @@ static int sceDisplaySetFrameBuf_patched(const SceDisplayFrameBuf *pParam, int s
 
         if (vg_menu_is_open()) {
             vg_menu_draw();
-            return TAI_CONTINUE(int, g_main.osd_hook_ref, pParam, sync);
+            int ret = TAI_CONTINUE(int, g_main.osd_hook_ref, pParam, sync);
+            sceDisplayWaitVblankStart();
+            return ret;
         }
     }
 
