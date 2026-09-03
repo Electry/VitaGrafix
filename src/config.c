@@ -348,7 +348,7 @@ static bool vg_config_write_section_separator(SceUID fd, bool output_has_data, c
         return true;
     }
 
-    const char *separator = last_output_char == '\n' ? "\n" : "\n\n";
+    const char *separator = last_output_char == '\n' ? "" : "\n\n";
     return sceIoWrite(fd, separator, strlen(separator)) == (int)strlen(separator);
 }
 
