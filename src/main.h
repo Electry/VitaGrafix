@@ -1,20 +1,27 @@
 #ifndef _MAIN_H_
 #define _MAIN_H_
 
+#include <taihen.h>
+
 #define SECOND             1000000
 #define OSD_SHOW_DURATION  5 * SECOND
 
-#define OSD_MSG_CONFIG_OPEN_FAILED   "Failed to open config file."
-#define OSD_MSG_CONFIG_ERROR         "An error occured while reading config file."
-#define OSD_MSG_PATCH_OPEN_FAILED    "Failed to open patch file."
-#define OSD_MSG_PATCH_ERROR          "An error occured while reading patch file."
-#define OSD_MSG_IOPLUS_HINT          "Do you have ioPlus installed?"
-#define OSD_MSG_GAME_WRONG_VERSION   "Your game version is not supported :("
+#define OSD_ERROR_HEADER           "VitaGrafix " VG_VERSION ": Error"
+#define OSD_MSG_CONFIG_OPEN_FAILED "Failed to open the config file."
+#define OSD_MSG_CONFIG_ERROR       "An error occurred while reading the config file."
+#define OSD_MSG_PATCH_OPEN_FAILED  "Failed to open the patch file."
+#define OSD_MSG_PATCH_ERROR        "An error occurred while reading the patch file."
+#define OSD_MSG_IOPLUS_HINT        "Do you have ioPlus installed?"
+#define OSD_MSG_GAME_WRONG_VERSION "Patch is for another game version."
+#define OSD_MSG_PATCHES_AVAILABLE  "Patches available."
+#define OSD_MSG_CONFIG_SAVED       "Saved. Restart the game to apply."
+#define OSD_MSG_CONFIG_SAVE_FAILED "Failed to save configuration."
 
 #define VG_VERSION         "v6.0.0-dev"
 #define VG_DIR             "ux0:data/VitaGrafix/"
 
 #define STRING_BUFFER_SIZE 1024
+#define INPUT_HOOK_NUM     8
 
 #define MAX_INJECT_NUM 1024
 #define MAX_HOOK_NUM   3
@@ -41,6 +48,10 @@ typedef struct {
     SceUID osd_hook;
     tai_hook_ref_t osd_hook_ref;
     SceUInt32 osd_timer;
+
+    // input hooks
+    SceUID input_hook[INPUT_HOOK_NUM];
+    tai_hook_ref_t input_hook_ref[INPUT_HOOK_NUM];
 
     // title info
     char titleid[16];

@@ -22,6 +22,7 @@ add_definitions(-DBUILD_LEGACY_SUPPORT)
 
 add_executable(VitaGrafix
   src/main.c
+  src/menu.c
   src/osd.c
   src/io.c
   src/log.c
